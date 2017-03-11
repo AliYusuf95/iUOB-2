@@ -1,0 +1,48 @@
+package com.muqdd.iuob2.app;
+
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+
+import com.mikepenz.materialdrawer.Drawer;
+
+/**
+ * Created by Ali Yusuf on 3/10/2017.
+ * iUOB-2
+ */
+
+public class BaseActivity extends AppCompatActivity {
+
+    protected Drawer drawerMenu;
+
+    @Override
+    public void onBackPressed()
+    {
+        if(!BaseFragment.handleBackPressed(getSupportFragmentManager())){
+            super.onBackPressed();
+        }
+    }
+
+    public void setBackArrow (boolean backArrow) {
+        // Show the back arrow
+        if (backArrow) {
+            if (drawerMenu != null) {
+                drawerMenu.getActionBarDrawerToggle().setDrawerIndicatorEnabled(false);
+                drawerMenu.getActionBarDrawerToggle().setToolbarNavigationClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onBackPressed();
+                    }
+                });
+            }
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            }
+        } else { // Show the hamburger icon
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            }
+            if (drawerMenu != null)
+                drawerMenu.getActionBarDrawerToggle().setDrawerIndicatorEnabled(true);
+        }
+    }
+}
