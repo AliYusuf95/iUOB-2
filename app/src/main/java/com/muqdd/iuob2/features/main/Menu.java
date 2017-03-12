@@ -6,10 +6,21 @@ package com.muqdd.iuob2.features.main;
  */
 
 enum Menu {
-    SEMESTER_SCHEDULE,
-    MY_SCHEDULE,
-    SCHEDULE_BUILDER,
-    MAP,
-    LINKS,
-    ABOUT
+    SEMESTER_SCHEDULE ("Semester Schedule"),
+    MY_SCHEDULE ("My Schedule"),
+    SCHEDULE_BUILDER ("Schedule Builder"),
+    MAP ("UOB Map"),
+    LINKS ("Useful Links"),
+    ABOUT ("About");
+
+    private String title;
+
+    Menu(String title) {
+        this.title = title;
+    }
+
+    @Override
+    public String toString() {
+        return title;
+    }
 }

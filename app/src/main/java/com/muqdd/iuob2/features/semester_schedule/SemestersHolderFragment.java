@@ -12,10 +12,25 @@ import android.view.ViewGroup;
 
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
+import com.muqdd.iuob2.models.SemesterCoursesModel;
+import com.muqdd.iuob2.rest.ServiceGenerator;
+import com.muqdd.iuob2.rest.UOBSchedule;
 import com.orhanobut.logger.Logger;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by Ali Yusuf on 3/11/2017.
@@ -62,6 +77,7 @@ public class SemestersHolderFragment extends BaseFragment {
         super.onActivityCreated(savedInstanceState);
         // Setup variables and layouts
         initiate();
+        getSemesters();
     }
 
     @Override
@@ -72,16 +88,39 @@ public class SemestersHolderFragment extends BaseFragment {
 
     private void initiate() {
         pagerAdapter = new SemesterPagerAdapter(getActivity().getSupportFragmentManager());
-        pagerAdapter.addFragment(SemesterFragment.newInstance(), "2017/1");
-        pagerAdapter.addFragment(SemesterFragment.newInstance(), "2017/2");
+        //pagerAdapter.addFragment(SemesterFragment.newInstance(), "2017/2");
         viewPager.setAdapter(pagerAdapter);
         viewPager.addOnPageChangeListener(new PageListener());
-        pagerAdapter.notifyDataSetChanged();
         tabLayout.setupWithViewPager(viewPager);
     }
 
     public TabLayout getTabLayout() {
         return tabLayout;
+    }
+
+    private void getSemesters() {
+        ServiceGenerator.createService(UOBSchedule.class)
+                .semesterCourses("1","2016","2").enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    ArrayList<SemesterCoursesModel> list = new ArrayList<>();;
+                    Document document = Jsoup.parse(response.body().string());
+                    Elements subjects = document.body().select("a");
+                    for (Element subject : subjects) {
+                        list.add(new SemesterCoursesModel(subject.text(),subject.attr("href")));
+                    }
+                    pagerAdapter.addFragment(SemesterFragment.newInstance("2017/1", list), "2017/1");
+                } catch (IOException e) {
+                    Logger.e(e.getMessage());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
     }
 
     private class PageListener extends ViewPager.SimpleOnPageChangeListener {

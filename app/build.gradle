@@ -26,6 +26,9 @@ dependencies {
     // Retrofit
     compile 'com.squareup.retrofit2:retrofit:2.2.0'
     compile 'com.squareup.retrofit2:converter-gson:2.2.0'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.6.0'
+    // Jsoup
+    compile 'org.jsoup:jsoup:1.10.2'
     // MaterialDrawer
     compile('com.mikepenz:materialdrawer:5.8.2@aar') {
         transitive = true
@@ -35,5 +38,11 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
     // Logger
     compile 'com.orhanobut:logger:1.15'
+    // Super RecyclerView
     compile 'com.malinskiy:superrecyclerview:1.1.4'
+    // FastAdapter
+    compile('com.mikepenz:fastadapter:2.1.7@aar') {
+        transitive = true
+    }
+    compile 'com.mikepenz:fastadapter-commons:2.1.0@aar'
 }

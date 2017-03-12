@@ -5,24 +5,16 @@
     android:layout_width="match_parent"
     android:orientation="vertical">
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/semester_swipeContainer"
+    <com.malinskiy.superrecyclerview.SuperRecyclerView
+        android:id="@+id/semester_rv"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <com.malinskiy.superrecyclerview.SuperRecyclerView
-            android:id="@+id/semester_rv"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:mainLayoutId="@layout/layout_recyclerview_verticalscroll"
-            app:recyclerClipToPadding="false"
-            app:recyclerPadding="16dp"
-            app:scrollbarStyle="insideInset"
-            android:paddingBottom="8dp"
-            android:paddingTop="2dp"
-            android:clipToPadding="false" />
-
-    </android.support.v4.widget.SwipeRefreshLayout>
+        android:layout_height="match_parent"
+        app:mainLayoutId="@layout/layout_recyclerview_verticalscroll"
+        app:recyclerClipToPadding="false"
+        app:recyclerPadding="16dp"
+        app:scrollbarStyle="insideInset"
+        android:paddingBottom="8dp"
+        android:paddingTop="2dp"
+        android:clipToPadding="false" />
 
 </LinearLayout>

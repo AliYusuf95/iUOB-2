@@ -24,6 +24,7 @@ class SemesterPagerAdapter extends FragmentStatePagerAdapter {
     void addFragment(Fragment fragment, String title) {
         fragmentList.add(fragment);
         fragmentTitleList.add(title);
+        notifyDataSetChanged();
     }
 
     @Override
@@ -37,7 +38,7 @@ class SemesterPagerAdapter extends FragmentStatePagerAdapter {
     }
 
     @Override
-    public CharSequence getPageTitle(int position) {
+    public String getPageTitle(int position) {
         return fragmentTitleList.get(position);
     }
 

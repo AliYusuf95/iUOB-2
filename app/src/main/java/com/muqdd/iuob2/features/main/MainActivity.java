@@ -26,7 +26,6 @@ public class MainActivity extends BaseActivity {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
 
-    private AccountHeader drawerHeader;
     private FragmentManager fragmentManager;
 
     @Override
@@ -37,54 +36,54 @@ public class MainActivity extends BaseActivity {
 
         init();
         initDrawerMenu(savedInstanceState);
-        displayFragment(SemestersHolderFragment.newInstance());
     }
 
     private void init() {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            getSupportActionBar().setTitle(Menu.SEMESTER_SCHEDULE.toString());
         }
-
         fragmentManager = getSupportFragmentManager();
+        displayFragment(SemestersHolderFragment.newInstance());
     }
 
     private void initDrawerMenu(Bundle savedInstanceState) {
 
         PrimaryDrawerItem semesterSchedule = new PrimaryDrawerItem()
-                .withName("Semester Schedule")
-                .withIcon(R.drawable.semester)
                 .withTag(Menu.SEMESTER_SCHEDULE)
+                .withName(Menu.SEMESTER_SCHEDULE.toString())
+                .withIcon(R.drawable.semester)
                 .withSelectedTextColorRes(R.color.colorPrimaryDark);
 
         PrimaryDrawerItem mySchedule = new PrimaryDrawerItem()
-                .withName("My Schedule")
-                .withIcon(R.drawable.current)
                 .withTag(Menu.MY_SCHEDULE)
+                .withName(Menu.MY_SCHEDULE.toString())
+                .withIcon(R.drawable.current)
                 .withSelectedTextColorRes(R.color.colorPrimaryDark);
 
         PrimaryDrawerItem scheduleBuilder = new PrimaryDrawerItem()
-                .withName("Schedule Builder")
-                .withIcon(R.drawable.builder)
                 .withTag(Menu.SCHEDULE_BUILDER)
+                .withName(Menu.SCHEDULE_BUILDER.toString())
+                .withIcon(R.drawable.builder)
                 .withSelectedTextColorRes(R.color.colorPrimaryDark);
 
         PrimaryDrawerItem map = new PrimaryDrawerItem()
-                .withName("UOB Map")
-                .withIcon(R.drawable.map)
                 .withTag(Menu.MAP)
+                .withName(Menu.MAP.toString())
+                .withIcon(R.drawable.map)
                 .withSelectedTextColorRes(R.color.colorPrimaryDark);
 
         PrimaryDrawerItem links = new PrimaryDrawerItem()
-                .withName("Useful Links")
-                .withIcon(R.drawable.links)
                 .withTag(Menu.LINKS)
+                .withName(Menu.LINKS.toString())
+                .withIcon(R.drawable.links)
                 .withSelectedTextColorRes(R.color.colorPrimaryDark);
 
         PrimaryDrawerItem about = new PrimaryDrawerItem()
-                .withName("About")
-                .withIcon(R.drawable.credit)
                 .withTag(Menu.ABOUT)
+                .withName(Menu.ABOUT.toString())
+                .withIcon(R.drawable.credit)
                 .withSelectedTextColorRes(R.color.colorPrimaryDark);
 
         drawerMenu = new DrawerBuilder()
@@ -118,11 +117,13 @@ public class MainActivity extends BaseActivity {
                         switch ((Menu)drawerItem.getTag()){
                             case SEMESTER_SCHEDULE:
                                 displayFragment(SemestersHolderFragment.newInstance());
-                                return false;
+                                break;
                             default:
                                 Logger.w("not handled select");
                                 return true;
                         }
+                        toolbar.setTitle(drawerItem.getTag().toString());
+                        return false;
                     }
                 })
                 .build();
