@@ -6,7 +6,6 @@ import android.widget.TextView;
 
 import com.mikepenz.fastadapter.items.AbstractItem;
 import com.muqdd.iuob2.R;
-import com.orhanobut.logger.Logger;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -26,8 +25,8 @@ public class SemesterCoursesModel extends AbstractItem<SemesterCoursesModel, Sem
     private String inll;
     private String theabv;
     private String prog;
-    private String year;
-    private String csms;
+    public String year;
+    public String semester;
 
     public SemesterCoursesModel(String title, String href) {
         this.title = title;
@@ -37,8 +36,21 @@ public class SemesterCoursesModel extends AbstractItem<SemesterCoursesModel, Sem
             this.theabv = m.group(2);
             this.prog = m.group(3);
             this.year = m.group(4);
-            this.csms = m.group(5);
+            this.semester = m.group(5);
         }
+    }
+
+    public SemesterCoursesModel(int year, int semester) {
+        this.year = String.valueOf(year);
+        this.semester = String.valueOf(semester);
+    }
+
+    public String fileName() {
+        return "abrv_"+year+"_"+semester+".html";
+    }
+
+    public String semesterTitle()  {
+        return year+"/"+semester;
     }
 
     //The unique ID for this type of item

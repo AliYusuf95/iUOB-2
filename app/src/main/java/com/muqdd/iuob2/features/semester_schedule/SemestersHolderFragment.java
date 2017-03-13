@@ -5,13 +5,12 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
+import com.muqdd.iuob2.features.main.Menu;
 import com.muqdd.iuob2.models.SemesterCoursesModel;
 import com.muqdd.iuob2.rest.ServiceGenerator;
 import com.muqdd.iuob2.rest.UOBSchedule;
@@ -24,6 +23,8 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -49,18 +50,11 @@ public class SemestersHolderFragment extends BaseFragment {
     }
 
     public static SemestersHolderFragment newInstance() {
-        return new SemestersHolderFragment();
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
+        SemestersHolderFragment fragment = new SemestersHolderFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString(TITLE, Menu.SEMESTER_SCHEDULE.toString());
+        fragment.setArguments(bundle);
+        return fragment;
     }
 
     @Override
@@ -84,10 +78,11 @@ public class SemestersHolderFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
         tabLayout.setVisibility(View.VISIBLE);
+        toolbar.setTitle(title);
     }
 
     private void initiate() {
-        pagerAdapter = new SemesterPagerAdapter(getActivity().getSupportFragmentManager());
+        pagerAdapter = new SemesterPagerAdapter(getChildFragmentManager());
         //pagerAdapter.addFragment(SemesterFragment.newInstance(), "2017/2");
         viewPager.setAdapter(pagerAdapter);
         viewPager.addOnPageChangeListener(new PageListener());
@@ -99,20 +94,69 @@ public class SemestersHolderFragment extends BaseFragment {
     }
 
     private void getSemesters() {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH)+1;
+        List<SemesterCoursesModel> requests = new ArrayList<>();
+        // Second semester
+        if (month > 3 && month < 7){
+            requests.add(new SemesterCoursesModel(year-1, 2));
+            requests.add(new SemesterCoursesModel(year-1, 3));
+            requests.add(new SemesterCoursesModel(year, 1));
+        }
+        // Summer semester
+        else if (month > 6 && month < 10) {
+            requests.add(new SemesterCoursesModel(year-1, 3));
+            requests.add(new SemesterCoursesModel(year, 1));
+            requests.add(new SemesterCoursesModel(year, 2));
+        }
+        // First semester (from 9 to 12)
+        else {
+            requests.add(new SemesterCoursesModel(year-1, 1));
+            requests.add(new SemesterCoursesModel(year-1, 2));
+            requests.add(new SemesterCoursesModel(year-1, 3));
+        }
+
+        for (SemesterCoursesModel request : requests) {
+            try {
+                getSemesterCoursesFromCache(request);
+                Logger.i("Load from cache");
+            } catch (IOException e) {
+                getSemesterCoursesFromNet(request);
+                Logger.i("Load from internet");
+            }
+        }
+    }
+
+    private void getSemesterCoursesFromCache(SemesterCoursesModel request) throws IOException {
+        // Read data
+        String data = readHTMLDataToCache(request.fileName());
+        // Parse data
+        ArrayList<SemesterCoursesModel> list = parseSemesterCoursesData(data);
+        if (list.size() > 0) {
+            pagerAdapter.addFragment(SemesterFragment.newInstance(request.semesterTitle(),
+                    list), request.semesterTitle());
+        } else {
+            throw new IOException();
+        }
+    }
+
+    public void getSemesterCoursesFromNet(final SemesterCoursesModel request) {
         ServiceGenerator.createService(UOBSchedule.class)
-                .semesterCourses("1","2016","2").enqueue(new Callback<ResponseBody>() {
+                .semesterCourses("1",request.year,request.semester).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                try {
-                    ArrayList<SemesterCoursesModel> list = new ArrayList<>();;
-                    Document document = Jsoup.parse(response.body().string());
-                    Elements subjects = document.body().select("a");
-                    for (Element subject : subjects) {
-                        list.add(new SemesterCoursesModel(subject.text(),subject.attr("href")));
+                if (response.code() == 200) {
+                    try {
+                        ArrayList<SemesterCoursesModel> list = parseSemesterCoursesData(response.body().string());
+                        if (list.size() > 0) {
+                            pagerAdapter.addFragment(SemesterFragment.newInstance(request.semesterTitle(),
+                                    list), request.semesterTitle());
+                            writeHTMLDataToCache(request.fileName(), response.body().string().getBytes());
+                        }
+                    } catch (IOException e) {
+                        Logger.e(e.getMessage());
                     }
-                    pagerAdapter.addFragment(SemesterFragment.newInstance("2017/1", list), "2017/1");
-                } catch (IOException e) {
-                    Logger.e(e.getMessage());
                 }
             }
 
@@ -121,6 +165,18 @@ public class SemestersHolderFragment extends BaseFragment {
 
             }
         });
+    }
+
+    public static ArrayList<SemesterCoursesModel> parseSemesterCoursesData (String data) {
+        ArrayList<SemesterCoursesModel> list = new ArrayList<>();
+        Document document = Jsoup.parse(data);
+        Elements subjects = document.body().select("a");
+        for (Element subject : subjects) {
+            if (!subject.text().endsWith(".")) {
+                list.add(new SemesterCoursesModel(subject.text(), subject.attr("href")));
+            }
+        }
+        return list;
     }
 
     private class PageListener extends ViewPager.SimpleOnPageChangeListener {

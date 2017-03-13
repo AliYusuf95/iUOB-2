@@ -5,7 +5,7 @@ package com.muqdd.iuob2.features.main;
  * iUOB-2
  */
 
-enum Menu {
+public enum Menu {
     SEMESTER_SCHEDULE ("Semester Schedule"),
     MY_SCHEDULE ("My Schedule"),
     SCHEDULE_BUILDER ("Schedule Builder"),

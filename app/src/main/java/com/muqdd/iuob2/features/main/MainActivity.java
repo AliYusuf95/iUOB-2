@@ -1,13 +1,11 @@
 package com.muqdd.iuob2.features.main;
 
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
@@ -15,7 +13,6 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseActivity;
-import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.features.semester_schedule.SemestersHolderFragment;
 import com.orhanobut.logger.Logger;
 
@@ -45,7 +42,10 @@ public class MainActivity extends BaseActivity {
             getSupportActionBar().setTitle(Menu.SEMESTER_SCHEDULE.toString());
         }
         fragmentManager = getSupportFragmentManager();
-        displayFragment(SemestersHolderFragment.newInstance());
+        // Adding first fragment
+        fragmentManager.beginTransaction()
+                .add(R.id.frameLayout, SemestersHolderFragment.newInstance())
+                .commit();
     }
 
     private void initDrawerMenu(Bundle savedInstanceState) {
@@ -116,7 +116,7 @@ public class MainActivity extends BaseActivity {
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         switch ((Menu)drawerItem.getTag()){
                             case SEMESTER_SCHEDULE:
-                                displayFragment(SemestersHolderFragment.newInstance());
+                                replaceFragment(SemestersHolderFragment.newInstance());
                                 break;
                             default:
                                 Logger.w("not handled select");
@@ -126,15 +126,37 @@ public class MainActivity extends BaseActivity {
                         return false;
                     }
                 })
+                .withOnDrawerNavigationListener(new Drawer.OnDrawerNavigationListener() {
+                    @Override
+                    public boolean onNavigationClickListener(View clickedView) {
+                        //this method is only called if the Arrow icon is shown.
+                        //if the back arrow is shown.
+                        onBackPressed();
+                        //return true if we have consumed the event
+                        return true;
+                    }
+                })
                 .build();
     }
 
-    private void displayFragment(Fragment fragment){
+    public void replaceFragment(Fragment fragment){
         fragmentManager = getSupportFragmentManager();
         Fragment currentFragment = fragmentManager.findFragmentById(R.id.frameLayout);
         if (currentFragment == null || !fragment.getClass().toString().equals(currentFragment.getTag())) {
             fragmentManager.beginTransaction()
                     .replace(R.id.frameLayout,fragment,fragment.getClass().toString())
+                    .commit();
+            fragmentManager.executePendingTransactions();
+        }
+    }
+
+    public void displayFragment(Fragment fragment){
+        fragmentManager = getSupportFragmentManager();
+        Fragment currentFragment = fragmentManager.findFragmentById(R.id.frameLayout);
+        if (currentFragment == null || !fragment.getClass().toString().equals(currentFragment.getTag())) {
+            fragmentManager.beginTransaction()
+                    .replace(R.id.frameLayout, fragment, fragment.getClass().toString())
+                    .addToBackStack(null)
                     .commit();
             fragmentManager.executePendingTransactions();
         }
