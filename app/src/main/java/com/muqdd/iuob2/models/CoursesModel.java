@@ -19,38 +19,32 @@ import butterknife.ButterKnife;
  * iUOB-2
  */
 
-public class SemesterCoursesModel extends AbstractItem<SemesterCoursesModel, SemesterCoursesModel.ViewHolder> {
+public class CoursesModel extends AbstractItem<CoursesModel, CoursesModel.ViewHolder> {
 
     public String title;
-    public String inll;
-    public String theabv;
     public String prog;
+    public String abv;
+    public String inl;
+    public String courseNumber;
+    public String credits;
     public String year;
     public String semester;
+    public String pre;
 
-    public SemesterCoursesModel(String title, String href) {
+    public CoursesModel(String href, String title, String pre) {
         this.title = title;
-        Matcher m = Pattern.compile("\\?.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?$",Pattern.CASE_INSENSITIVE).matcher(href);
+        this.pre = pre;
+        String pattern = "\\?.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?";
+        Matcher m = Pattern.compile(pattern,Pattern.CASE_INSENSITIVE).matcher(href);
         if(m.find()) {
-            this.inll = m.group(1);
-            this.theabv = m.group(2);
-            this.prog = m.group(3);
-            this.year = m.group(4);
-            this.semester = m.group(5);
+            this.prog = m.group(1);
+            this.abv = m.group(2);
+            this.inl = m.group(3);
+            this.courseNumber = m.group(4);
+            this.credits = m.group(5);
+            this.year = m.group(6);
+            this.semester = m.group(7);
         }
-    }
-
-    public SemesterCoursesModel(int year, int semester) {
-        this.year = String.valueOf(year);
-        this.semester = String.valueOf(semester);
-    }
-
-    public String fileName() {
-        return "abrv_"+year+"_"+semester+".html";
-    }
-
-    public String semesterTitle()  {
-        return year+"/"+semester;
     }
 
     //The unique ID for this type of item
@@ -62,27 +56,36 @@ public class SemesterCoursesModel extends AbstractItem<SemesterCoursesModel, Sem
     //The layout to be used for this type of item
     @Override
     public int getLayoutRes() {
-        return R.layout.row_semester;
+        return R.layout.row_course;
     }
 
     //The logic to bind your data to the view
     @Override
-    public void bindView(SemesterCoursesModel.ViewHolder viewHolder, List<Object> payloads) {
+    public void bindView(CoursesModel.ViewHolder viewHolder, List<Object> payloads) {
         //call super so the selection is already handled for you
         super.bindView(viewHolder, payloads);
         viewHolder.title.setText(title);
+        if (pre == null || "".equals(pre)) {
+            viewHolder.pre.setVisibility(View.GONE);
+        } else {
+            viewHolder.pre.setText(pre);
+            viewHolder.pre.setVisibility(View.VISIBLE);
+        }
     }
 
     //reset the view here (this is an optional method, but recommended)
     @Override
-    public void unbindView(SemesterCoursesModel.ViewHolder holder) {
+    public void unbindView(CoursesModel.ViewHolder holder) {
         super.unbindView(holder);
         holder.title.setText("");
+        holder.pre.setText("");
+        holder.pre.setVisibility(View.GONE);
     }
 
     //The viewHolder used for this item. This viewHolder is always reused by the RecyclerView so scrolling is blazing fast
     static class ViewHolder extends RecyclerView.ViewHolder {
         protected @BindView(R.id.course_title) TextView title;
+        protected @BindView(R.id.course_pre) TextView pre;
 
         public ViewHolder(View view) {
             super(view);

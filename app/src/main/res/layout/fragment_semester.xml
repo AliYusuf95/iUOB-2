@@ -11,10 +11,9 @@
         android:layout_height="match_parent"
         app:mainLayoutId="@layout/layout_recyclerview_verticalscroll"
         app:recyclerClipToPadding="false"
-        app:recyclerPadding="16dp"
         app:scrollbarStyle="insideInset"
-        android:paddingBottom="8dp"
-        android:paddingTop="2dp"
-        android:clipToPadding="false" />
+        app:recyclerPaddingTop="2dp"
+        app:recyclerPaddingBottom="8dp"
+        />
 
 </LinearLayout>

@@ -3,6 +3,7 @@ package com.muqdd.iuob2.features.semester_schedule;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,11 +22,6 @@ import com.muqdd.iuob2.models.SemesterCoursesModel;
 import com.muqdd.iuob2.rest.ServiceGenerator;
 import com.muqdd.iuob2.rest.UOBSchedule;
 import com.orhanobut.logger.Logger;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -93,24 +89,38 @@ public class SemesterFragment extends BaseFragment {
     }
 
     private void initiate() {
+        // initialize variables
         fastAdapter = new FastItemAdapter<>();
         semesterCoursesList = new ArrayList<>();
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(fastAdapter);
+        recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(),
+                layoutManager.getOrientation()));
+        recyclerView.setAdapter(fastAdapter);
+
+        // set refreshable list
         recyclerView.getSwipeToRefresh().setEnabled(true);
         recyclerView.getSwipeToRefresh().setColorSchemeResources(
                 R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryLight);
+
+        // refresh request
         recyclerView.getSwipeToRefresh().setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (semesterCoursesList.size() > 0)
+                if (semesterCoursesList.size() > 0) {
                     getSemesterCoursesFromNet(semesterCoursesList.get(0));
-                recyclerView.getSwipeToRefresh().setRefreshing(false);
+                } else {
+                    recyclerView.getSwipeToRefresh().setRefreshing(false);
+                }
             }
         });
+
+        // initialize list values
         semesterCoursesList = new Gson().fromJson(jsonList, LIST_TYPE);
         fastAdapter.add(semesterCoursesList);
 
+        // On item click
         fastAdapter.withOnClickListener(new FastAdapter.OnClickListener<SemesterCoursesModel>() {
             @Override
             public boolean onClick(View v, IAdapter<SemesterCoursesModel> adapter,
@@ -141,11 +151,15 @@ public class SemesterFragment extends BaseFragment {
                         Logger.e(e.getMessage());
                     }
                 }
+                // stop refreshing
+                recyclerView.getSwipeToRefresh().setRefreshing(false);
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                // stop refreshing
+                recyclerView.getSwipeToRefresh().setRefreshing(false);
+                //TODO: Some message
             }
         });
     }

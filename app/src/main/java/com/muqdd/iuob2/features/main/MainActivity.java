@@ -3,6 +3,7 @@ package com.muqdd.iuob2.features.main;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
@@ -21,7 +22,7 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends BaseActivity {
 
-    @BindView(R.id.toolbar) Toolbar toolbar;
+    protected @BindView(R.id.toolbar) Toolbar toolbar;
 
     private FragmentManager fragmentManager;
 
@@ -38,7 +39,7 @@ public class MainActivity extends BaseActivity {
     private void init() {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            //getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             getSupportActionBar().setTitle(Menu.SEMESTER_SCHEDULE.toString());
         }
         fragmentManager = getSupportFragmentManager();
@@ -46,6 +47,22 @@ public class MainActivity extends BaseActivity {
         fragmentManager.beginTransaction()
                 .add(R.id.frameLayout, SemestersHolderFragment.newInstance())
                 .commit();
+        fragmentManager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+            @Override
+            public void onBackStackChanged() {
+                if (fragmentManager.getBackStackEntryCount() > 0) {
+                    drawerMenu.getActionBarDrawerToggle()
+                            .setDrawerIndicatorEnabled(false);
+                    getSupportActionBar()
+                            .setDisplayHomeAsUpEnabled(true);
+                } else {
+                    getSupportActionBar()
+                            .setDisplayHomeAsUpEnabled(false);
+                    drawerMenu.getActionBarDrawerToggle()
+                            .setDrawerIndicatorEnabled(true);
+                }
+            }
+        });
     }
 
     private void initDrawerMenu(Bundle savedInstanceState) {
@@ -88,11 +105,11 @@ public class MainActivity extends BaseActivity {
 
         drawerMenu = new DrawerBuilder()
                 .withActivity(this)
-                .withToolbar(toolbar)
                 .withHeader(R.layout.custom_drawer_header)
-                .withTranslucentStatusBar(false) // for embedded drawer
+                .withToolbar(toolbar)
                 .withActionBarDrawerToggle(true) // for hamburger icon
                 .withActionBarDrawerToggleAnimated(true) // to animate hamburger icon
+                .withTranslucentStatusBar(false) // for embedded drawer
                 .addDrawerItems(
                         semesterSchedule,
                         new DividerDrawerItem(),
@@ -140,7 +157,6 @@ public class MainActivity extends BaseActivity {
     }
 
     public void replaceFragment(Fragment fragment){
-        fragmentManager = getSupportFragmentManager();
         Fragment currentFragment = fragmentManager.findFragmentById(R.id.frameLayout);
         if (currentFragment == null || !fragment.getClass().toString().equals(currentFragment.getTag())) {
             fragmentManager.beginTransaction()
@@ -151,7 +167,6 @@ public class MainActivity extends BaseActivity {
     }
 
     public void displayFragment(Fragment fragment){
-        fragmentManager = getSupportFragmentManager();
         Fragment currentFragment = fragmentManager.findFragmentById(R.id.frameLayout);
         if (currentFragment == null || !fragment.getClass().toString().equals(currentFragment.getTag())) {
             fragmentManager.beginTransaction()

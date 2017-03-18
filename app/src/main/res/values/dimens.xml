@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="row_primary_text">12sp</dimen>
+    <dimen name="row_secondary_text">9sp</dimen>
+</resources>

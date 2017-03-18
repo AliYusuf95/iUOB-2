@@ -18,7 +18,7 @@ public interface UOBSchedule {
                                        @Query("csms") String semester);
 
     @GET("schedule2.thecourses")
-    Call<String> coursesList(@Query("inll") String inll,
+    Call<ResponseBody> coursesList(@Query("inll") String inll,
                              @Query("theabv") String theabv,
                              @Query("prog") String prog,
                              @Query("cyer") String year,
