@@ -125,6 +125,8 @@ public class CoursesFragment extends BaseFragment {
             @Override
             public boolean onClick(View v, IAdapter<CoursesModel> adapter,
                                    CoursesModel item, int position) {
+                SectionsFragment fragment = SectionsFragment.newInstance(item.title,item);
+                displayFragment(fragment);
                 return false;
             }
         });

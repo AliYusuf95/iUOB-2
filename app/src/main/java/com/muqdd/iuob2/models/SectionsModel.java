@@ -19,7 +19,7 @@ import butterknife.ButterKnife;
  * iUOB-2
  */
 
-public class CoursesModel extends AbstractItem<CoursesModel, CoursesModel.ViewHolder> {
+public class SectionsModel extends AbstractItem<SectionsModel, SectionsModel.ViewHolder> {
 
     public String title;
     public String prog;
@@ -31,7 +31,7 @@ public class CoursesModel extends AbstractItem<CoursesModel, CoursesModel.ViewHo
     public String semester;
     public String pre;
 
-    public CoursesModel(String href, String title, String pre) {
+    public SectionsModel(String href, String title, String pre) {
         this.title = title;
         this.pre = pre;
         String pattern = "\\?.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?";
@@ -45,19 +45,6 @@ public class CoursesModel extends AbstractItem<CoursesModel, CoursesModel.ViewHo
             this.year = m.group(6);
             this.semester = m.group(7);
         }
-    }
-
-    public CoursesModel(String title, String prog, String abv, String inl, String courseNumber,
-                        String credits, String year, String semester, String pre) {
-        this.title = title;
-        this.prog = prog;
-        this.abv = abv;
-        this.inl = inl;
-        this.courseNumber = courseNumber;
-        this.credits = credits;
-        this.year = year;
-        this.semester = semester;
-        this.pre = pre;
     }
 
     //The unique ID for this type of item
@@ -74,7 +61,7 @@ public class CoursesModel extends AbstractItem<CoursesModel, CoursesModel.ViewHo
 
     //The logic to bind your data to the view
     @Override
-    public void bindView(CoursesModel.ViewHolder viewHolder, List<Object> payloads) {
+    public void bindView(SectionsModel.ViewHolder viewHolder, List<Object> payloads) {
         //call super so the selection is already handled for you
         super.bindView(viewHolder, payloads);
         viewHolder.title.setText(title);
@@ -88,7 +75,7 @@ public class CoursesModel extends AbstractItem<CoursesModel, CoursesModel.ViewHo
 
     //reset the view here (this is an optional method, but recommended)
     @Override
-    public void unbindView(CoursesModel.ViewHolder holder) {
+    public void unbindView(SectionsModel.ViewHolder holder) {
         super.unbindView(holder);
         holder.title.setText("");
         holder.pre.setText("");
