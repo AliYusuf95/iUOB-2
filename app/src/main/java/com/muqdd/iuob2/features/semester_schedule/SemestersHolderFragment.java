@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.features.main.Menu;
-import com.muqdd.iuob2.models.SemesterCoursesModel;
+import com.muqdd.iuob2.models.SemesterCourseModel;
 import com.muqdd.iuob2.rest.ServiceGenerator;
 import com.muqdd.iuob2.rest.UOBSchedule;
 import com.orhanobut.logger.Logger;
@@ -40,10 +40,11 @@ import retrofit2.Response;
 
 public class SemestersHolderFragment extends BaseFragment {
 
-    @BindView(R.id.viewPager) ViewPager viewPager;
+    protected @BindView(R.id.viewPager) ViewPager viewPager;
 
     private SemesterPagerAdapter pagerAdapter;
     private int currentPage;
+    private View mView;
 
     public SemestersHolderFragment() {
         // Required empty public constructor
@@ -60,18 +61,22 @@ public class SemestersHolderFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater,container,savedInstanceState);
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_semesters_holder, container, false);
-        ButterKnife.bind(this, view);
-        return view;
+        if (mView == null) {
+            // Inflate the layout for this fragment
+            mView = inflater.inflate(R.layout.fragment_semesters_holder, container, false);
+            ButterKnife.bind(this, mView);
+            initiate();
+        }
+        return mView;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         // Setup variables and layouts
-        initiate();
-        getSemesters();
+        if (pagerAdapter.getCount() == 0) {
+            getSemesters();
+        }
     }
 
     @Override
@@ -97,62 +102,72 @@ public class SemestersHolderFragment extends BaseFragment {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH)+1;
-        List<SemesterCoursesModel> requests = new ArrayList<>();
+        List<SemesterCourseModel> requests = new ArrayList<>();
         // Second semester
         if (month > 3 && month < 7){
-            requests.add(new SemesterCoursesModel(year-1, 2));
-            requests.add(new SemesterCoursesModel(year-1, 3));
-            requests.add(new SemesterCoursesModel(year, 1));
+            requests.add(new SemesterCourseModel(year-1, 2));
+            requests.add(new SemesterCourseModel(year-1, 3));
+            requests.add(new SemesterCourseModel(year, 1));
+            Logger.d("case 1");
         }
         // Summer semester
         else if (month > 6 && month < 10) {
-            requests.add(new SemesterCoursesModel(year-1, 3));
-            requests.add(new SemesterCoursesModel(year, 1));
-            requests.add(new SemesterCoursesModel(year, 2));
+            requests.add(new SemesterCourseModel(year-1, 3));
+            requests.add(new SemesterCourseModel(year, 1));
+            requests.add(new SemesterCourseModel(year, 2));
+            Logger.d("case 2");
         }
         // First semester (from 9 to 12)
         else {
-            requests.add(new SemesterCoursesModel(year-1, 1));
-            requests.add(new SemesterCoursesModel(year-1, 2));
-            requests.add(new SemesterCoursesModel(year-1, 3));
+            requests.add(new SemesterCourseModel(year-1, 1));
+            requests.add(new SemesterCourseModel(year-1, 2));
+            requests.add(new SemesterCourseModel(year-1, 3));
+            Logger.d("case 3");
         }
 
-        for (SemesterCoursesModel request : requests) {
-            try {
+        for (SemesterCourseModel request : requests) {
+            // No more chase things
+            /*try {
                 getSemesterCoursesFromCache(request);
                 Logger.i("Load from cache");
             } catch (IOException e) {
                 getSemesterCoursesFromNet(request);
                 Logger.i("Load from internet");
-            }
+            }*/
+            // Data should loaded in semester fragment not here !!
+            getSemesterCoursesFromNet(request);
         }
     }
 
-    private void getSemesterCoursesFromCache(SemesterCoursesModel request) throws IOException {
+    // Data should loaded in semester fragment not here !!
+    /*private void getSemesterCoursesFromCache(SemesterCourseModel request) throws IOException {
         // Read data
         String data = readHTMLDataToCache(request.fileName());
         // Parse data
-        ArrayList<SemesterCoursesModel> list = parseSemesterCoursesData(data);
+        ArrayList<SemesterCourseModel> list = parseSemesterCoursesData(data);
         if (list.size() > 0) {
             pagerAdapter.addFragment(SemesterFragment.newInstance(request.semesterTitle(),
-                    list), request.semesterTitle());
+                    request), request.semesterTitle());
         } else {
             throw new IOException();
         }
-    }
+    }*/
 
-    public void getSemesterCoursesFromNet(final SemesterCoursesModel request) {
+    public void getSemesterCoursesFromNet(final SemesterCourseModel request) {
+        final SemesterFragment fragment = SemesterFragment.newInstance(request.semesterTitle(),
+                request);
+        pagerAdapter.addFragment(fragment, request.semesterTitle());
+
         ServiceGenerator.createService(UOBSchedule.class)
                 .semesterCourses("1",request.year,request.semester).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.code() == 200) {
                     try {
-                        ArrayList<SemesterCoursesModel> list = parseSemesterCoursesData(response.body().string());
-                        if (list.size() > 0) {
-                            pagerAdapter.addFragment(SemesterFragment.newInstance(request.semesterTitle(),
-                                    list), request.semesterTitle());
-                            writeHTMLDataToCache(request.fileName(), response.body().string().getBytes());
+                        ArrayList<SemesterCourseModel> list = parseSemesterCoursesData(response.body().string());
+                        if (list.size() == 0) {
+                            pagerAdapter.removeFragment(fragment);
+                            //writeHTMLDataToCache(request.fileName(), response.body().string().getBytes());
                         }
                     } catch (IOException e) {
                         Logger.e(e.getMessage());
@@ -167,13 +182,13 @@ public class SemestersHolderFragment extends BaseFragment {
         });
     }
 
-    public static ArrayList<SemesterCoursesModel> parseSemesterCoursesData (String data) {
-        ArrayList<SemesterCoursesModel> list = new ArrayList<>();
+    private ArrayList<SemesterCourseModel> parseSemesterCoursesData (String data) {
+        ArrayList<SemesterCourseModel> list = new ArrayList<>();
         Document document = Jsoup.parse(data);
         Elements subjects = document.body().select("a");
         for (Element subject : subjects) {
             if (!subject.text().endsWith(".")) {
-                list.add(new SemesterCoursesModel(subject.text(), subject.attr("href")));
+                list.add(new SemesterCourseModel(subject.text(), subject.attr("href")));
             }
         }
         return list;

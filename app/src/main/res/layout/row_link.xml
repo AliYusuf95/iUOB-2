@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="NestedWeights"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:background="?attr/selectableItemBackground"
+    android:layout_height="45dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_weight="0.9"
+        >
+
+        <TextView
+            android:id="@+id/link_title"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center_vertical|start"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="5dp"
+            android:textColor="@color/colorPrimaryText"
+            android:lines="1"
+            android:textSize="@dimen/row_primary_text"
+            tools:text="Some drawer text"
+            android:maxLines="1" />
+
+        <TextView
+            android:id="@+id/link_url"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif"
+            android:gravity="center_vertical|start"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="-10dp"
+            android:textColor="@color/colorSecondaryText"
+            android:lines="1"
+            android:textSize="@dimen/row_secondary_text"
+            tools:text="Some drawer text"
+            android:maxLines="1" />
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.1"
+        android:layout_gravity="center"
+        android:tint="@color/colorAccent"
+        android:src="@drawable/ic_link_black_24dp"/>
+
+</LinearLayout>

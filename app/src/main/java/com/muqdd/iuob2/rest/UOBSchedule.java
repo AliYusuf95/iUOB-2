@@ -25,8 +25,8 @@ public interface UOBSchedule {
                              @Query("csms") String semester);
 
     @GET("schedule2.contentpage")
-    Call<String> sectionsList(@Query("prog") String prog,
-                              @Query("ARABM") String arabm,
+    Call<ResponseBody> sectionsList(@Query("prog") String prog,
+                              @Query("abv") String arabm,
                               @Query("inl") String inl,
                               @Query("crsno") String courseNo,
                               @Query("crd") String credits,

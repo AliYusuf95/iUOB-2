@@ -21,7 +21,7 @@ public class ServiceGenerator {
     private static ConnectivityManager connectivityManager;
 
     private static HttpLoggingInterceptor logging =
-            new HttpLoggingInterceptor().setLevel(Level.BODY);
+            new HttpLoggingInterceptor().setLevel(Level.NONE);
 
     private static OkHttpClient.Builder httpClient =
             new OkHttpClient.Builder().addInterceptor(logging);

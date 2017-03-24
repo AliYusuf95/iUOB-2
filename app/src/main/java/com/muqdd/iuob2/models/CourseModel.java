@@ -4,8 +4,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-import com.mikepenz.fastadapter.items.AbstractItem;
 import com.muqdd.iuob2.R;
+import com.muqdd.iuob2.app.BaseModel;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -19,9 +19,14 @@ import butterknife.ButterKnife;
  * iUOB-2
  */
 
-public class CoursesModel extends AbstractItem<CoursesModel, CoursesModel.ViewHolder> {
+public class CourseModel extends BaseModel<CourseModel, CourseModel.ViewHolder> {
+
+    // static variables to enhance performance
+    private final static String pattern = "\\?.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?";
+    private final static Pattern pHref = Pattern.compile(pattern,Pattern.CASE_INSENSITIVE);
 
     public String title;
+    public String subTitle;
     public String prog;
     public String abv;
     public String inl;
@@ -31,33 +36,24 @@ public class CoursesModel extends AbstractItem<CoursesModel, CoursesModel.ViewHo
     public String semester;
     public String pre;
 
-    public CoursesModel(String href, String title, String pre) {
+    public CourseModel(String href, String title, String pre) {
         this.title = title;
+        this.subTitle = title.split("-")[0];
         this.pre = pre;
-        String pattern = "\\?.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?";
-        Matcher m = Pattern.compile(pattern,Pattern.CASE_INSENSITIVE).matcher(href);
-        if(m.find()) {
-            this.prog = m.group(1);
-            this.abv = m.group(2);
-            this.inl = m.group(3);
-            this.courseNumber = m.group(4);
-            this.credits = m.group(5);
-            this.year = m.group(6);
-            this.semester = m.group(7);
+        Matcher mHref = pHref.matcher(href);
+        if(mHref.find()) {
+            this.prog = mHref.group(1);
+            this.abv = mHref.group(2);
+            this.inl = mHref.group(3);
+            this.courseNumber = mHref.group(4);
+            this.credits = mHref.group(5);
+            this.year = mHref.group(6);
+            this.semester = mHref.group(7);
         }
     }
 
-    public CoursesModel(String title, String prog, String abv, String inl, String courseNumber,
-                        String credits, String year, String semester, String pre) {
-        this.title = title;
-        this.prog = prog;
-        this.abv = abv;
-        this.inl = inl;
-        this.courseNumber = courseNumber;
-        this.credits = credits;
-        this.year = year;
-        this.semester = semester;
-        this.pre = pre;
+    public String fileName() {
+        return abv+courseNumber+"_"+year+"_"+semester+".html";
     }
 
     //The unique ID for this type of item
@@ -74,7 +70,7 @@ public class CoursesModel extends AbstractItem<CoursesModel, CoursesModel.ViewHo
 
     //The logic to bind your data to the view
     @Override
-    public void bindView(CoursesModel.ViewHolder viewHolder, List<Object> payloads) {
+    public void bindView(CourseModel.ViewHolder viewHolder, List<Object> payloads) {
         //call super so the selection is already handled for you
         super.bindView(viewHolder, payloads);
         viewHolder.title.setText(title);
@@ -88,7 +84,7 @@ public class CoursesModel extends AbstractItem<CoursesModel, CoursesModel.ViewHo
 
     //reset the view here (this is an optional method, but recommended)
     @Override
-    public void unbindView(CoursesModel.ViewHolder holder) {
+    public void unbindView(CourseModel.ViewHolder holder) {
         super.unbindView(holder);
         holder.title.setText("");
         holder.pre.setText("");

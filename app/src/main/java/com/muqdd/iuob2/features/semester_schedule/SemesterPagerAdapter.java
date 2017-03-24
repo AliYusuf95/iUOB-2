@@ -27,6 +27,15 @@ class SemesterPagerAdapter extends FragmentStatePagerAdapter {
         notifyDataSetChanged();
     }
 
+    void removeFragment(Fragment fragment){
+        int index = fragmentList.indexOf(fragment);
+        if (index != -1){
+            fragmentList.remove(index);
+            fragmentTitleList.remove(index);
+            notifyDataSetChanged();
+        }
+    }
+
     @Override
     public Fragment getItem(int position) {
         return fragmentList.get(position);

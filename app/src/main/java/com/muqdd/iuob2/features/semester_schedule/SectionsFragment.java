@@ -1,9 +1,12 @@
 package com.muqdd.iuob2.features.semester_schedule;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,8 +21,8 @@ import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
-import com.muqdd.iuob2.models.CoursesModel;
-import com.muqdd.iuob2.models.SemesterCoursesModel;
+import com.muqdd.iuob2.models.CourseModel;
+import com.muqdd.iuob2.models.SectionModel;
 import com.muqdd.iuob2.rest.ServiceGenerator;
 import com.muqdd.iuob2.rest.UOBSchedule;
 import com.orhanobut.logger.Logger;
@@ -46,20 +49,20 @@ import retrofit2.Response;
 public class SectionsFragment extends BaseFragment {
 
     public final static String COURSE = "COURSE";
-    public final static Type TYPE = new TypeToken<CoursesModel>() {}.getType();
+    public final static Type TYPE = new TypeToken<CourseModel>() {}.getType();
 
-    //@BindView(R.id.main_content) LinearLayout mainContent;
-    //@BindView(R.id.semester_rv) SuperRecyclerView recyclerView;
+    @BindView(R.id.main_content) LinearLayout mainContent;
+    @BindView(R.id.recycler_view) SuperRecyclerView recyclerView;
 
-    //private List<CoursesModel> coursesList;
-    private CoursesModel course;
-    //private FastItemAdapter<CoursesModel> fastAdapter;
+    private List<SectionModel> sectionsList;
+    private CourseModel course;
+    private FastItemAdapter<SectionModel> fastAdapter;
 
     public SectionsFragment() {
         // Required empty public constructor
     }
 
-    public static SectionsFragment newInstance(String title, CoursesModel course) {
+    public static SectionsFragment newInstance(String title, CourseModel course) {
         SectionsFragment fragment = new SectionsFragment();
         Bundle bundle = new Bundle();
         bundle.putString(TITLE, title);
@@ -78,91 +81,100 @@ public class SectionsFragment extends BaseFragment {
         super.onCreateView(inflater,container,savedInstanceState);
         // Inflate the layout for this fragment
         course = new Gson().fromJson(getArguments().getString(COURSE), TYPE);
-        View view = inflater.inflate(R.layout.row_section, container, false);
+        View view = inflater.inflate(R.layout.fragment_list, container, false);
         ButterKnife.bind(this, view);
+        // Setup variables and layouts
+        initiate();
+        // get courses list
+        getSectionsListFromNet();
         return view;
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        // Setup variables and layouts
-        initiate();
-        // get courses list
-//        getCoursesListFromNet(semesterCourse);
+    public void onResume() {
+        super.onResume();
+        // set fragment title
+        toolbar.setTitle(title);
+        // stop hiding toolbar
+        params.setScrollFlags(0);
     }
 
     private void initiate() {
-        // set fragment title
-        toolbar.setTitle(title);
-
-        // stop hiding toolbar
-        params.setScrollFlags(0);
-
         // initialize variables
-//        fastAdapter = new FastItemAdapter<>();
-//        coursesList = new ArrayList<>();
-//        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-//        recyclerView.setLayoutManager(layoutManager);
-//        recyclerView.setAdapter(fastAdapter);
-//        recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(),
-//                layoutManager.getOrientation()));
-//
-//        // set refreshable list
-//        recyclerView.getSwipeToRefresh().setEnabled(true);
-//        recyclerView.getSwipeToRefresh().setColorSchemeResources(
-//                R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryLight);
-//
-//        // refresh request
-//        recyclerView.getSwipeToRefresh().setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-//            @Override
-//            public void onRefresh() {
-//                getCoursesListFromNet(semesterCourse);
-//            }
-//        });
-//        fastAdapter.add(coursesList);
+        fastAdapter = new FastItemAdapter<>();
+        sectionsList = new ArrayList<>();
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        // set refreshable list
+        recyclerView.getSwipeToRefresh().setEnabled(true);
+        recyclerView.getSwipeToRefresh().setColorSchemeResources(
+                R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryLight);
+
+        // refresh request
+        recyclerView.getSwipeToRefresh().setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getSectionsListFromNet();
+            }
+        });
+        fastAdapter.withOnLongClickListener(new FastAdapter.OnLongClickListener<SectionModel>() {
+            @Override
+            public boolean onLongClick(View v, IAdapter<SectionModel> adapter, SectionModel item, int position) {
+                Logger.d(item.toString());
+                ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("iUOB2", item.toString());
+                clipboard.setPrimaryClip(clip);
+                Snackbar.make(mainContent,"Section details copied",Snackbar.LENGTH_LONG).show();
+                return false;
+            }
+        });
     }
 
-//    public void getCoursesListFromNet(final SemesterCoursesModel request) {
-//        ServiceGenerator.createService(UOBSchedule.class)
-//                .coursesList(request.inll,request.theabv,request.prog,request.year,request.semester)
-//                .enqueue(new Callback<ResponseBody>() {
-//                    @Override
-//                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                        if (response.code() == 200) {
-//                            try {
-//                                coursesList.clear();
-//                                coursesList.addAll(parseCoursesListData(response.body().string()));
-//
-//                                if (coursesList.size() > 0) {
-//                                    fastAdapter.clear().add(coursesList);
-//                                    writeHTMLDataToCache(request.fileName(), response.body().string().getBytes());
-//                                }
-//                            } catch (IOException e) {
-//                                Logger.e(e.getMessage());
-//                            }
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-//
-//                    }
-//                });
-//    }
-//
-//    public static ArrayList<CoursesModel> parseCoursesListData (String data) {
-//        String pattern = "<font size=\"2\">\\n?\\r?\\s?<B>\\n?\\r?\\s?<A HREF=\"(.*)?\" "+
-//                "TARGET=\"main\">\\n?\\r?\\s?<FONT color=\"#000000\">(.*)?</font>(.*)?</A>"+
-//                "\\n?\\r?\\s?</B>\\n?\\r?\\s?</font>\\n?\\r?\\s?(<br>\\n?\\r?\\s?<a href=\""+
-//                "javascript:onclick=viewpre\\('(.*)?'\\)\">\\n?\\r?\\s?<font color=\"#FF0000\" "+
-//                "size=\"?2\"?>\\n?\\r?\\s?Pre-Requisite for this course\\n?\\r?\\s?</font>"+
-//                "\\n?\\r?\\s?</a>\\n?\\r?\\s?)?<br>";
-//        Matcher m = Pattern.compile(pattern,Pattern.UNIX_LINES | Pattern.CASE_INSENSITIVE).matcher(data);
-//        ArrayList<CoursesModel> list = new ArrayList<>();
-//        while (m.find()){
-//            list.add(new CoursesModel(m.group(1), m.group(2) +" - "+ m.group(3), m.group(5)));
-//        }
-//        return list;
-//    }
+    public void getSectionsListFromNet() {
+        ServiceGenerator.createService(UOBSchedule.class)
+                .sectionsList(course.prog,course.abv,course.inl,course.courseNumber,
+                        course.credits,course.year,course.semester)
+                .enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, final Response<ResponseBody> response) {
+                        if (response.code() == 200) {
+                            // do parsing in background
+                            AsyncTask.execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        sectionsList.clear();
+                                        sectionsList.addAll(parseSectionsListData(response.body().string()));
+                                        if (sectionsList.size() > 0) {
+                                            // attach the adapter
+                                            getActivity().runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    fastAdapter.set(sectionsList);
+                                                    recyclerView.setAdapter(fastAdapter);
+                                                }
+                                            });
+                                            //writeHTMLDataToCache(course.fileName(), response.body().string().getBytes());
+                                        }
+                                    } catch (IOException e) {
+                                        Logger.e(e.getMessage());
+                                    }
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {}
+                });
+    }
+
+    public static ArrayList<SectionModel> parseSectionsListData (String data) {
+        String pattern = "(<P ALIGN=\"center\">[\\s\\S]*?<TABLE[\\s\\S]*?</TABLE>[\\s\\S]*?)";
+        Matcher m = Pattern.compile(pattern,Pattern.UNIX_LINES | Pattern.CASE_INSENSITIVE).matcher(data);
+        ArrayList<SectionModel> list = new ArrayList<>();
+        while (m.find()){
+            list.add(new SectionModel(m.group(1)));
+        }
+        return list;
+    }
 }

@@ -4,18 +4,13 @@ import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.gson.Gson;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.features.main.MainActivity;
-import com.muqdd.iuob2.features.semester_schedule.CoursesFragment;
-import com.muqdd.iuob2.models.SemesterCoursesModel;
-import com.orhanobut.logger.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -54,7 +49,7 @@ public class BaseFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // setup toolbar and tabLayout
-        if (getArguments().containsKey(TITLE))
+        if (getArguments() != null && getArguments().containsKey(TITLE))
             title = getArguments().getString(TITLE);
         toolbar = ButterKnife.findById(getActivity(), R.id.toolbar);
         tabLayout = ButterKnife.findById(getActivity(), R.id.tabLayout);

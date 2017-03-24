@@ -17,7 +17,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:background="?android:attr/selectableItemBackground">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -25,6 +26,7 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/section_number"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="0.1"
@@ -36,8 +38,9 @@
                     android:textAppearance="?android:textAppearanceListItem" />
 
                 <TextView
+                    android:id="@+id/doctor_name"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="0.55"
                     android:padding="10dp"
                     android:gravity="center_vertical|start"
@@ -47,9 +50,10 @@
                     android:textAppearance="?android:textAppearanceListItem" />
 
                 <TextView
+                    android:id="@+id/available_seats"
                     android:layout_width="0dp"
                     android:layout_gravity="center"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="0.15"
                     android:text="10"
                     android:maxLines="1"
@@ -68,14 +72,48 @@
                 android:layout_height="1dp"
                 android:background="@color/divider"/>
 
-            <include layout="@layout/row_section_time" />
-
-            <View
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/divider"/>
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp"
+                android:orientation="horizontal">
 
-            <include layout="@layout/row_section_time" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:gravity="center_vertical|start"
+                    android:text="Time"
+                    android:textSize="@dimen/row_title_text"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textAppearance="?android:textAppearanceListItem" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/divider"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:gravity="center_vertical|end"
+                    android:text="Room"
+                    android:textSize="@dimen/row_title_text"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textAppearance="?android:textAppearanceListItem" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/section_time_rows"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            </LinearLayout>
 
         </LinearLayout>
 

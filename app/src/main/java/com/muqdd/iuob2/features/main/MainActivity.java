@@ -3,7 +3,6 @@ package com.muqdd.iuob2.features.main;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
@@ -14,6 +13,8 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseActivity;
+import com.muqdd.iuob2.features.about.AboutFragment;
+import com.muqdd.iuob2.features.links.LinksFragment;
 import com.muqdd.iuob2.features.semester_schedule.SemestersHolderFragment;
 import com.orhanobut.logger.Logger;
 
@@ -32,37 +33,39 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        init();
+        init(savedInstanceState);
         initDrawerMenu(savedInstanceState);
     }
 
-    private void init() {
+    private void init(Bundle savedInstanceState) {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             //getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             getSupportActionBar().setTitle(Menu.SEMESTER_SCHEDULE.toString());
         }
+
         fragmentManager = getSupportFragmentManager();
-        // Adding first fragment
-        fragmentManager.beginTransaction()
-                .add(R.id.frameLayout, SemestersHolderFragment.newInstance())
-                .commit();
+
+        // if there is change in fragment stack change drawer icon.
         fragmentManager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
             @Override
             public void onBackStackChanged() {
                 if (fragmentManager.getBackStackEntryCount() > 0) {
-                    drawerMenu.getActionBarDrawerToggle()
-                            .setDrawerIndicatorEnabled(false);
-                    getSupportActionBar()
-                            .setDisplayHomeAsUpEnabled(true);
+                    drawerMenu.getActionBarDrawerToggle().setDrawerIndicatorEnabled(false);
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 } else {
-                    getSupportActionBar()
-                            .setDisplayHomeAsUpEnabled(false);
-                    drawerMenu.getActionBarDrawerToggle()
-                            .setDrawerIndicatorEnabled(true);
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                    drawerMenu.getActionBarDrawerToggle().setDrawerIndicatorEnabled(true);
                 }
             }
         });
+
+        // if it is not change orientation call append default fragment
+        if (savedInstanceState == null){
+            fragmentManager.beginTransaction()
+                    .add(R.id.frameLayout, SemestersHolderFragment.newInstance())
+                    .commit();
+        }
     }
 
     private void initDrawerMenu(Bundle savedInstanceState) {
@@ -112,7 +115,7 @@ public class MainActivity extends BaseActivity {
                 .withTranslucentStatusBar(false) // for embedded drawer
                 .addDrawerItems(
                         semesterSchedule,
-                        new DividerDrawerItem(),
+                        //new DividerDrawerItem(), // just test divider
                         mySchedule,
                         scheduleBuilder,
                         map,
@@ -135,6 +138,12 @@ public class MainActivity extends BaseActivity {
                             case SEMESTER_SCHEDULE:
                                 replaceFragment(SemestersHolderFragment.newInstance());
                                 break;
+                            case LINKS:
+                                replaceFragment(LinksFragment.newInstance());
+                                break;
+                            case ABOUT:
+                                replaceFragment(AboutFragment.newInstance());
+                                break;
                             default:
                                 Logger.w("not handled select");
                                 return true;
@@ -154,6 +163,19 @@ public class MainActivity extends BaseActivity {
                     }
                 })
                 .build();
+
+        // setup current drawer icon (in case orientation changed)
+        if(savedInstanceState != null){
+            if (getSupportActionBar() != null) {
+                if (fragmentManager.getBackStackEntryCount() > 0) {
+                    drawerMenu.getActionBarDrawerToggle().setDrawerIndicatorEnabled(false);
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                } else {
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                    drawerMenu.getActionBarDrawerToggle().setDrawerIndicatorEnabled(true);
+                }
+            }
+        }
     }
 
     public void replaceFragment(Fragment fragment){

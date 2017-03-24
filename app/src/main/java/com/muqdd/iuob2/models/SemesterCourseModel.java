@@ -4,8 +4,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-import com.mikepenz.fastadapter.items.AbstractItem;
 import com.muqdd.iuob2.R;
+import com.muqdd.iuob2.app.BaseModel;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -19,32 +19,42 @@ import butterknife.ButterKnife;
  * iUOB-2
  */
 
-public class SectionsModel extends AbstractItem<SectionsModel, SectionsModel.ViewHolder> {
+public class SemesterCourseModel extends BaseModel<SemesterCourseModel, SemesterCourseModel.ViewHolder> {
+
+    // static variables to enhance performance
+    private final static Pattern pHref =
+            Pattern.compile("\\?.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?$",Pattern.CASE_INSENSITIVE);
 
     public String title;
+    public String inll;
+    public String theabv;
     public String prog;
-    public String abv;
-    public String inl;
-    public String courseNumber;
-    public String credits;
     public String year;
     public String semester;
-    public String pre;
 
-    public SectionsModel(String href, String title, String pre) {
+    public SemesterCourseModel(String title, String href) {
         this.title = title;
-        this.pre = pre;
-        String pattern = "\\?.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?";
-        Matcher m = Pattern.compile(pattern,Pattern.CASE_INSENSITIVE).matcher(href);
-        if(m.find()) {
-            this.prog = m.group(1);
-            this.abv = m.group(2);
-            this.inl = m.group(3);
-            this.courseNumber = m.group(4);
-            this.credits = m.group(5);
-            this.year = m.group(6);
-            this.semester = m.group(7);
+        Matcher mHref = pHref.matcher(href);
+        if(mHref.find()) {
+            this.inll = mHref.group(1);
+            this.theabv = mHref.group(2);
+            this.prog = mHref.group(3);
+            this.year = mHref.group(4);
+            this.semester = mHref.group(5);
         }
+    }
+
+    public SemesterCourseModel(int year, int semester) {
+        this.year = String.valueOf(year);
+        this.semester = String.valueOf(semester);
+    }
+
+    public String fileName() {
+        return "abrv_"+year+"_"+semester+".html";
+    }
+
+    public String semesterTitle()  {
+        return year+"/"+semester;
     }
 
     //The unique ID for this type of item
@@ -56,36 +66,27 @@ public class SectionsModel extends AbstractItem<SectionsModel, SectionsModel.Vie
     //The layout to be used for this type of item
     @Override
     public int getLayoutRes() {
-        return R.layout.row_course;
+        return R.layout.row_semester;
     }
 
     //The logic to bind your data to the view
     @Override
-    public void bindView(SectionsModel.ViewHolder viewHolder, List<Object> payloads) {
+    public void bindView(SemesterCourseModel.ViewHolder viewHolder, List<Object> payloads) {
         //call super so the selection is already handled for you
         super.bindView(viewHolder, payloads);
         viewHolder.title.setText(title);
-        if (pre == null || "".equals(pre)) {
-            viewHolder.pre.setVisibility(View.GONE);
-        } else {
-            viewHolder.pre.setText(pre);
-            viewHolder.pre.setVisibility(View.VISIBLE);
-        }
     }
 
     //reset the view here (this is an optional method, but recommended)
     @Override
-    public void unbindView(SectionsModel.ViewHolder holder) {
+    public void unbindView(SemesterCourseModel.ViewHolder holder) {
         super.unbindView(holder);
         holder.title.setText("");
-        holder.pre.setText("");
-        holder.pre.setVisibility(View.GONE);
     }
 
     //The viewHolder used for this item. This viewHolder is always reused by the RecyclerView so scrolling is blazing fast
     static class ViewHolder extends RecyclerView.ViewHolder {
         protected @BindView(R.id.course_title) TextView title;
-        protected @BindView(R.id.course_pre) TextView pre;
 
         public ViewHolder(View view) {
             super(view);

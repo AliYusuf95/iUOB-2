@@ -6,7 +6,7 @@
     android:orientation="vertical">
 
     <com.malinskiy.superrecyclerview.SuperRecyclerView
-        android:id="@+id/semester_rv"
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:mainLayoutId="@layout/layout_recyclerview_verticalscroll"
