@@ -1,4 +1,4 @@
-package com.muqdd.iuob2.features.links;
+package com.muqdd.iuob2.features.my_schedule;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -30,23 +30,20 @@ import butterknife.ButterKnife;
  * iUOB-2
  */
 @SuppressWarnings("FieldCanBeLocal")
-public class LinksFragment extends BaseFragment {
+public class MyScheduleFragment extends BaseFragment {
 
     @BindView(R.id.main_content) LinearLayout mainContent;
-    @BindView(R.id.recycler_view) SuperRecyclerView recyclerView;
 
     private View mView;
-    private List<LinkModel> linksList;
-    private FastItemAdapter<LinkModel> fastAdapter;
 
-    public LinksFragment() {
+    public MyScheduleFragment() {
         // Required empty public constructor
     }
 
-    public static LinksFragment newInstance() {
-        LinksFragment fragment = new LinksFragment();
+    public static MyScheduleFragment newInstance() {
+        MyScheduleFragment fragment = new MyScheduleFragment();
         Bundle bundle = new Bundle();
-        bundle.putString(TITLE, Menu.LINKS.toString());
+        bundle.putString(TITLE, Menu.MY_SCHEDULE.toString());
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -77,49 +74,7 @@ public class LinksFragment extends BaseFragment {
     }
 
     private void initiate() {
-        // initialize variables
-        fastAdapter = new FastItemAdapter<>();
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        // disable refreshable list
-        recyclerView.getSwipeToRefresh().setEnabled(false);
 
-        // hard coded links
-        linksList = new ArrayList<>();
-        linksList.add(new LinkModel("iUOB", "http://iuob.net"));
-        linksList.add(new LinkModel("UOB Website", "http://www.uob.edu.bh"));
-        linksList.add(new LinkModel("Enrollment", "http://www.online.uob.edu.bh/cgi/enr/all_enroll"));
-        linksList.add(new LinkModel("Exam Location", "http://www.online.uob.edu.bh/cgi/enr/examtable.exam"));
-        linksList.add(new LinkModel("Blackboard", "http://bb.uob.edu.bh"));
-        linksList.add(new LinkModel("Academic Calendar", "http://offline.uob.edu.bh/pages.aspx?module=pages&id=5366&SID=868"));
-        linksList.add(new LinkModel("Phonebook", "http://dir.uob.edu.bh/mainEn.aspx"));
-
-        // setup adapter
-        fastAdapter.set(linksList);
-        recyclerView.setAdapter(fastAdapter);
-
-        // open link on click
-        fastAdapter.withOnClickListener(new FastAdapter.OnClickListener<LinkModel>() {
-            @Override
-            public boolean onClick(View v, IAdapter<LinkModel> adapter, LinkModel item, int position) {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(item.url));
-                startActivity(i);
-                return false;
-            }
-        });
-        // copy link on hold
-        // TODO: need to fix click/long click behavior
-        /*fastAdapter.withOnLongClickListener(new FastAdapter.OnLongClickListener<LinkModel>() {
-            @Override
-            public boolean onLongClick(View v, IAdapter<LinkModel> adapter, LinkModel item, int position) {
-                Logger.d(item.toString());
-                ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText("iUOB2", item.url);
-                clipboard.setPrimaryClip(clip);
-                Snackbar.make(mainContent,"Url copied",Snackbar.LENGTH_LONG).show();
-                return false;
-            }
-        });*/
     }
 
 }
