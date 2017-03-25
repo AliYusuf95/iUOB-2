@@ -1,6 +1,6 @@
 # ![](logo.png) iUOB 2
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/moked/iuob/blob/master/License.md)
-[![Platform](https://img.shields.io/badge/platform-android-green.svg)]()
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/AliYusuf95/iUOB-2/blob/master/License.md)
+![Platform](https://img.shields.io/badge/platform-android-green.svg)
 
 ## Introduction:
 This is an **Android** version of [ios iUOB 2](https://github.com/moked/iuob), it's contains source code which has some of the features of the original iUOB.
