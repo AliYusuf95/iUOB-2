@@ -8,13 +8,13 @@ import android.view.View;
 
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseActivity;
 import com.muqdd.iuob2.features.about.AboutFragment;
 import com.muqdd.iuob2.features.links.LinksFragment;
+import com.muqdd.iuob2.features.map.MapFragment;
 import com.muqdd.iuob2.features.semester_schedule.SemestersHolderFragment;
 import com.orhanobut.logger.Logger;
 
@@ -138,6 +138,9 @@ public class MainActivity extends BaseActivity {
                             case SEMESTER_SCHEDULE:
                                 replaceFragment(SemestersHolderFragment.newInstance());
                                 break;
+                            case MAP:
+                                replaceFragment(MapFragment.newInstance());
+                                break;
                             case LINKS:
                                 replaceFragment(LinksFragment.newInstance());
                                 break;
@@ -178,6 +181,11 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    /**
+     * Replace current fragment with another one
+     *
+     * @param fragment Fragment instance
+     */
     public void replaceFragment(Fragment fragment){
         Fragment currentFragment = fragmentManager.findFragmentById(R.id.frameLayout);
         if (currentFragment == null || !fragment.getClass().toString().equals(currentFragment.getTag())) {
@@ -188,6 +196,9 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    /**
+     * @param fragment Fragment instance
+     */
     public void displayFragment(Fragment fragment){
         Fragment currentFragment = fragmentManager.findFragmentById(R.id.frameLayout);
         if (currentFragment == null || !fragment.getClass().toString().equals(currentFragment.getTag())) {

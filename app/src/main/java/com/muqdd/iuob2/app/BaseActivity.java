@@ -5,7 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import com.mikepenz.materialdrawer.Drawer;
-import com.muqdd.iuob2.rest.ServiceGenerator;
+import com.muqdd.iuob2.network.ServiceGenerator;
 
 /**
  * Created by Ali Yusuf on 3/10/2017.
@@ -15,6 +15,7 @@ import com.muqdd.iuob2.rest.ServiceGenerator;
 public class BaseActivity extends AppCompatActivity {
 
     protected Drawer drawerMenu;
+    protected OnBackPressedListener mOnBackPressedListener;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -22,4 +23,20 @@ public class BaseActivity extends AppCompatActivity {
         ServiceGenerator.init(this);
     }
 
+    public void setOnBackPressedListener(OnBackPressedListener listener) {
+        this.mOnBackPressedListener = listener;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mOnBackPressedListener == null || !mOnBackPressedListener.onBack())
+            super.onBackPressed();
+    }
+
+    public interface OnBackPressedListener{
+        /**
+         * @return true to prevent default onBackPressed; false otherwise
+         */
+        boolean onBack();
+    }
 }

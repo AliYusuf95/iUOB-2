@@ -18,7 +18,7 @@ import butterknife.ButterKnife;
  * Created by Ali Yusuf on 3/12/2017.
  * iUOB-2
  */
-
+@SuppressWarnings("unused")
 public class SemesterCourseModel extends BaseModel<SemesterCourseModel, SemesterCourseModel.ViewHolder> {
 
     // static variables to enhance performance

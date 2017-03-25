@@ -53,6 +53,7 @@
         android:layout_weight="0.1"
         android:layout_gravity="center"
         android:tint="@color/colorAccent"
-        android:src="@drawable/ic_link_black_24dp"/>
+        android:src="@drawable/ic_link_black_24dp"
+        android:contentDescription="@string/row_icon" />
 
 </LinearLayout>

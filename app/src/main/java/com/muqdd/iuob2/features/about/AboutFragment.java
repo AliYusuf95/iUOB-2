@@ -4,25 +4,16 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.malinskiy.superrecyclerview.SuperRecyclerView;
-import com.mikepenz.fastadapter.FastAdapter;
-import com.mikepenz.fastadapter.IAdapter;
-import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 import com.muqdd.iuob2.BuildConfig;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.features.main.Menu;
-import com.muqdd.iuob2.models.LinkModel;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -83,28 +74,28 @@ public class AboutFragment extends BaseFragment {
     private void initiate() {
         // initialize variables
         txtTitle.setText(getString(R.string.app_name)+" Version "+ BuildConfig.VERSION_NAME);
-        txtGihub.setText("github.com/moked/iuob");
+        txtGihub.setText(R.string.about_github);
         txtGihub.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openLink("https://github.com/moked/iuob");
             }
         });
-        txtEmail.setText("muqdd@hotmail.com");
+        txtEmail.setText(R.string.about_email);
         txtEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 sendEmail("muqdd@hotmail.com");
             }
         });
-        txtTwitter.setText("@muqdd");
+        txtTwitter.setText(R.string.about_twitter);
         txtTwitter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openTwitterAccount("muqdd");
             }
         });
-        txtWebsite.setText("muqdd.com");
+        txtWebsite.setText(R.string.about_website);
         txtWebsite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

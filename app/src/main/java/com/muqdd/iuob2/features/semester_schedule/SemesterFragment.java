@@ -20,8 +20,8 @@ import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.models.SemesterCourseModel;
-import com.muqdd.iuob2.rest.ServiceGenerator;
-import com.muqdd.iuob2.rest.UOBSchedule;
+import com.muqdd.iuob2.network.ServiceGenerator;
+import com.muqdd.iuob2.network.UOBSchedule;
 import com.orhanobut.logger.Logger;
 
 import org.jsoup.Jsoup;
