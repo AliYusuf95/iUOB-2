@@ -9,6 +9,7 @@ android {
         targetSdkVersion 25
         versionCode 1
         versionName "1.0.0"
+        resValue "string", "google_maps_key", (project.findProperty("GOOGLE_MAPS_API_KEY") ?: "")
     }
     buildTypes {
         release {
@@ -24,6 +25,10 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.3.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.android.support:cardview-v7:25.3.0'
+    // Google map services
+    compile 'com.google.android.gms:play-services-maps:10.2.1'
+    // FCM
+    compile 'com.google.firebase:firebase-messaging:10.0.1'
     // Retrofit
     compile 'com.squareup.retrofit2:retrofit:2.2.0'
     compile 'com.squareup.retrofit2:converter-gson:2.2.0'
@@ -48,4 +53,7 @@ dependencies {
     compile 'com.mikepenz:fastadapter-commons:2.1.0@aar'
     // RoundedImageView
     compile 'com.makeramen:roundedimageview:2.3.0'
+    // Material sheet fab
+    compile 'com.gordonwong:material-sheet-fab:1.2.1'
 }
+apply plugin: 'com.google.gms.google-services'

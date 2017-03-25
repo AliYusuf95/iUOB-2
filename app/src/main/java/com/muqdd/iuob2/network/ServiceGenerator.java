@@ -1,4 +1,4 @@
-package com.muqdd.iuob2.rest;
+package com.muqdd.iuob2.network;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -13,7 +13,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Created by Ali Yusuf on 3/11/2017.
  * iUOB-2
  */
-
+@SuppressWarnings("WeakerAccess")
 public class ServiceGenerator {
 
     public static final String API_BASE_URL = "https://www.online.uob.edu.bh/cgi/enr/";

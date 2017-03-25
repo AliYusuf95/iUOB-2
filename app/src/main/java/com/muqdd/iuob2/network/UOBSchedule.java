@@ -1,4 +1,4 @@
-package com.muqdd.iuob2.rest;
+package com.muqdd.iuob2.network;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;

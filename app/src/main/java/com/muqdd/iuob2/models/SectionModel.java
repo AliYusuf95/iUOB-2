@@ -1,5 +1,6 @@
 package com.muqdd.iuob2.models;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutCompat;
@@ -26,6 +27,7 @@ import butterknife.ButterKnife;
  * iUOB-2
  */
 
+@SuppressWarnings({"unused","WeakerAccess"})
 public class SectionModel extends BaseModel<SectionModel, SectionModel.ViewHolder> {
 
     // static variables to enhance performance
@@ -45,6 +47,7 @@ public class SectionModel extends BaseModel<SectionModel, SectionModel.ViewHolde
     public String number;
     public String doctor;
     public List<SectionTime> times;
+    // TODO: Final Exam
     public String finalExam;
     public String seats;
     public boolean showSeats;
@@ -141,6 +144,7 @@ public class SectionModel extends BaseModel<SectionModel, SectionModel.ViewHolde
             this.context = view.getContext();
         }
 
+        @SuppressLint("InflateParams")
         public void addRow(SectionTime sectionTime){
             // separator line
             View line = new View(context);

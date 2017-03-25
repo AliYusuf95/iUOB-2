@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.features.main.MainActivity;
+import com.muqdd.iuob2.app.BaseActivity.OnBackPressedListener;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,7 +26,7 @@ import butterknife.ButterKnife;
  * Created by Ali Yusuf on 3/11/2017.
  * iUOB-2
  */
-
+@SuppressWarnings("unused")
 public class BaseFragment extends Fragment {
     protected static final String TITLE = "TITLE";
 
@@ -58,7 +59,14 @@ public class BaseFragment extends Fragment {
         // Setup scroll flags
         params.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL |
                 AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS);
+        setHasOptionsMenu(false);
         return null;
+    }
+
+    protected void setOnBackPressedListener(OnBackPressedListener listener) {
+        if (getActivity() instanceof MainActivity){
+            ((MainActivity) getActivity()).setOnBackPressedListener(listener);
+        }
     }
 
     protected String readHTMLDataToCache(String fileName) throws IOException {

@@ -13,6 +13,7 @@ import com.mikepenz.fastadapter.utils.ViewHolderFactory;
  * iUOB-2
  */
 
+@SuppressWarnings("unchecked")
 public abstract class BaseModel<Item extends IItem & IClickable, VH extends RecyclerView.ViewHolder> extends AbstractItem<Item, VH> {
 
     /**

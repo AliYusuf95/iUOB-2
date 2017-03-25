@@ -18,7 +18,7 @@ import butterknife.ButterKnife;
  * Created by Ali Yusuf on 3/12/2017.
  * iUOB-2
  */
-
+@SuppressWarnings({"unused","WeakerAccess"})
 public class CourseModel extends BaseModel<CourseModel, CourseModel.ViewHolder> {
 
     // static variables to enhance performance
@@ -93,8 +93,8 @@ public class CourseModel extends BaseModel<CourseModel, CourseModel.ViewHolder> 
 
     //The viewHolder used for this item. This viewHolder is always reused by the RecyclerView so scrolling is blazing fast
     static class ViewHolder extends RecyclerView.ViewHolder {
-        protected @BindView(R.id.course_title) TextView title;
-        protected @BindView(R.id.course_pre) TextView pre;
+        @BindView(R.id.course_title) TextView title;
+        @BindView(R.id.course_pre) TextView pre;
 
         public ViewHolder(View view) {
             super(view);

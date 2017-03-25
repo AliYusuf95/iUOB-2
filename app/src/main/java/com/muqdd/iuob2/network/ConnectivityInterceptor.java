@@ -1,6 +1,5 @@
-package com.muqdd.iuob2.rest;
+package com.muqdd.iuob2.network;
 
-import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
@@ -14,7 +13,7 @@ import okhttp3.Response;
  * Created by Ali Yusuf on 3/11/2017.
  * iUOB-2
  */
-
+@SuppressWarnings({"unused","WeakerAccess"})
 public class ConnectivityInterceptor implements Interceptor {
 
     private ConnectivityManager connectivityManager;

@@ -23,7 +23,7 @@
             android:layout_height="0dp"
             android:layout_weight="0.5"
             android:gravity="start|center_vertical"
-            android:text="Days: UTHMW"
+            tools:text="Days: UTHMW"
             android:textSize="@dimen/row_primary_text"
             android:textColor="@color/colorPrimaryDark"
             android:textAppearance="?android:textAppearanceListItem" />
@@ -34,7 +34,7 @@
             android:layout_height="0dp"
             android:layout_weight="0.5"
             android:gravity="start|center_vertical"
-            android:text="14:30 - 15:45"
+            tools:text="14:30 - 15:45"
             android:textSize="@dimen/row_primary_text"
             android:textColor="@color/colorPrimaryText"
             android:textAppearance="?android:textAppearanceListItem" />
@@ -80,7 +80,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:gravity="end|center_vertical"
-            android:text="S1A-109"
+            tools:text="S1A-109"
             android:textSize="@dimen/row_primary_text"
             android:textColor="@color/colorPrimaryText"
             android:textAppearance="?android:textAppearanceListItemSecondary" />

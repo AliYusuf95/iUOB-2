@@ -1,13 +1,9 @@
 package com.muqdd.iuob2.features.links;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +18,6 @@ import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.features.main.Menu;
 import com.muqdd.iuob2.models.LinkModel;
-import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +29,7 @@ import butterknife.ButterKnife;
  * Created by Ali Yusuf on 3/11/2017.
  * iUOB-2
  */
-
+@SuppressWarnings("FieldCanBeLocal")
 public class LinksFragment extends BaseFragment {
 
     @BindView(R.id.main_content) LinearLayout mainContent;
