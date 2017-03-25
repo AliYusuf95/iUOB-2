@@ -30,6 +30,6 @@ You can follow me on Twitter [@aliyusuf\_95](https://twitter.com/aliyusuf_95).
 
 
 ## License
-iUOB 2 is available under the MIT License. See the [LICENSE](https://github.com/moked/iuob/blob/master/License.md) for details.
+iUOB 2 is available under the MIT License. See the [LICENSE](https://github.com/AliYusuf95/iUOB-2/blob/master/License.md) for details.
 
 Copyright (c) 2016 Miqdad Altaitoon.
