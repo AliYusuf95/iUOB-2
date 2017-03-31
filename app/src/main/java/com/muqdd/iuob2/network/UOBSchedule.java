@@ -13,23 +13,35 @@ import retrofit2.http.Query;
 public interface UOBSchedule {
 
     @GET("schedule2.abrv")
-    Call<ResponseBody> semesterCourses(@Query("prog") String prog,
-                                       @Query("cyer") String year,
-                                       @Query("csms") String semester);
+    Call<ResponseBody> semesterCourses(
+            @Query("prog") String prog,
+            @Query("cyer") String year,
+            @Query("csms") String semester
+    );
 
     @GET("schedule2.thecourses")
-    Call<ResponseBody> coursesList(@Query("inll") String inll,
-                             @Query("theabv") String theabv,
-                             @Query("prog") String prog,
-                             @Query("cyer") String year,
-                             @Query("csms") String semester);
+    Call<ResponseBody> coursesList(
+            @Query("inll") String departmentCode,
+            @Query("theabv") String theabv,
+            @Query("prog") String prog,
+            @Query("cyer") String year,
+            @Query("csms") String semester
+    );
 
     @GET("schedule2.contentpage")
-    Call<ResponseBody> sectionsList(@Query("prog") String prog,
-                              @Query("abv") String arabm,
-                              @Query("inl") String inl,
-                              @Query("crsno") String courseNo,
-                              @Query("crd") String credits,
-                              @Query("cyer") String year,
-                              @Query("csms") String semester);
+    Call<ResponseBody> sectionsList(
+            @Query("prog") String prog,
+            @Query("abv") String arabm,
+            @Query("inl") String departmentCode,
+            @Query("crsno") String courseNo,
+            @Query("crd") String credits,
+            @Query("cyer") String year,
+            @Query("csms") String semester
+    );
+
+    @GET("enr_sections")
+    Call<ResponseBody> availableSeats(
+            @Query("pcrsnbr") String courseNo,
+            @Query("pcrsinlcde") String departmentCode
+    );
 }

@@ -29,7 +29,7 @@ public class CourseModel extends BaseModel<CourseModel, CourseModel.ViewHolder> 
     public String subTitle;
     public String prog;
     public String abv;
-    public String inl;
+    public String departmentCode;
     public String courseNumber;
     public String credits;
     public String year;
@@ -44,7 +44,7 @@ public class CourseModel extends BaseModel<CourseModel, CourseModel.ViewHolder> 
         if(mHref.find()) {
             this.prog = mHref.group(1);
             this.abv = mHref.group(2);
-            this.inl = mHref.group(3);
+            this.departmentCode = mHref.group(3);
             this.courseNumber = mHref.group(4);
             this.credits = mHref.group(5);
             this.year = mHref.group(6);

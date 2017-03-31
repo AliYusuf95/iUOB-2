@@ -131,7 +131,7 @@ public class SectionsFragment extends BaseFragment {
 
     public void getSectionsListFromNet() {
         ServiceGenerator.createService(UOBSchedule.class)
-                .sectionsList(course.prog,course.abv,course.inl,course.courseNumber,
+                .sectionsList(course.prog,course.abv,course.departmentCode,course.courseNumber,
                         course.credits,course.year,course.semester)
                 .enqueue(new Callback<ResponseBody>() {
                     @Override
@@ -145,6 +145,7 @@ public class SectionsFragment extends BaseFragment {
                                         sectionsList.clear();
                                         sectionsList.addAll(parseSectionsListData(response.body().string()));
                                         if (sectionsList.size() > 0) {
+                                            getAvailableSeats();
                                             // attach the adapter
                                             getActivity().runOnUiThread(new Runnable() {
                                                 @Override
@@ -153,7 +154,6 @@ public class SectionsFragment extends BaseFragment {
                                                     recyclerView.setAdapter(fastAdapter);
                                                 }
                                             });
-                                            //writeHTMLDataToCache(course.fileName(), response.body().string().getBytes());
                                         }
                                     } catch (IOException e) {
                                         Logger.e(e.getMessage());
@@ -168,7 +168,27 @@ public class SectionsFragment extends BaseFragment {
                 });
     }
 
-    public static ArrayList<SectionModel> parseSectionsListData (String data) {
+    private void getAvailableSeats(){
+        ServiceGenerator.createService(UOBSchedule.class)
+                .availableSeats(course.courseNumber,course.departmentCode)
+                .enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (response.code() == 200){
+                            try {
+                                parseAvailableSeatsData(response.body().string());
+                            } catch (IOException e) {
+                                Logger.e(e.getMessage());
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {}
+                });
+    }
+
+    public ArrayList<SectionModel> parseSectionsListData (String data) {
         String pattern = "(<P ALIGN=\"center\">[\\s\\S]*?<TABLE[\\s\\S]*?</TABLE>[\\s\\S]*?)";
         Matcher m = Pattern.compile(pattern,Pattern.UNIX_LINES | Pattern.CASE_INSENSITIVE).matcher(data);
         ArrayList<SectionModel> list = new ArrayList<>();
@@ -176,5 +196,18 @@ public class SectionsFragment extends BaseFragment {
             list.add(new SectionModel(m.group(1)));
         }
         return list;
+    }
+
+    public void parseAvailableSeatsData(String data){
+        String pattern = "";
+        Matcher m = Pattern.compile(pattern,Pattern.UNIX_LINES | Pattern.CASE_INSENSITIVE).matcher(data);
+        while (m.find()){
+            for(SectionModel s : sectionsList){
+                if(s.number != null && s.number.equals("")) {
+                    //TODO: Add seats
+                    break;
+                }
+            }
+        }
     }
 }

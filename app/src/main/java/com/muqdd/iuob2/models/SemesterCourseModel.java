@@ -26,7 +26,7 @@ public class SemesterCourseModel extends BaseModel<SemesterCourseModel, Semester
             Pattern.compile("\\?.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?&.*?=(.*)?$",Pattern.CASE_INSENSITIVE);
 
     public String title;
-    public String inll;
+    public String departmentCode;
     public String theabv;
     public String prog;
     public String year;
@@ -36,7 +36,7 @@ public class SemesterCourseModel extends BaseModel<SemesterCourseModel, Semester
         this.title = title;
         Matcher mHref = pHref.matcher(href);
         if(mHref.find()) {
-            this.inll = mHref.group(1);
+            this.departmentCode = mHref.group(1);
             this.theabv = mHref.group(2);
             this.prog = mHref.group(3);
             this.year = mHref.group(4);

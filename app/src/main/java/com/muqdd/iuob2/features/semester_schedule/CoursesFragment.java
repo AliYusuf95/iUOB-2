@@ -141,7 +141,7 @@ public class CoursesFragment extends BaseFragment {
 
     public void getCoursesListFromNet(final SemesterCourseModel request) {
         ServiceGenerator.createService(UOBSchedule.class)
-                .coursesList(request.inll,request.theabv,request.prog,request.year,request.semester)
+                .coursesList(request.departmentCode,request.theabv,request.prog,request.year,request.semester)
                 .enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, final Response<ResponseBody> response) {
@@ -170,13 +170,11 @@ public class CoursesFragment extends BaseFragment {
                     }
 
                     @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                    }
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {}
                 });
     }
 
-    public static ArrayList<CourseModel> parseCoursesListData (String data) {
+    public ArrayList<CourseModel> parseCoursesListData (String data) {
         String pattern = "<font size=\"2\">\\n?\\r?\\s?<B>\\n?\\r?\\s?<A HREF=\"(.*)?\" "+
                 "TARGET=\"main\">\\n?\\r?\\s?<FONT color=\"#000000\">(.*)?</font>(.*)?</A>"+
                 "\\n?\\r?\\s?</B>\\n?\\r?\\s?</font>\\n?\\r?\\s?(<br>\\n?\\r?\\s?<a href=\""+
