@@ -1,14 +1,19 @@
 package com.muqdd.iuob2.features.my_schedule;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 
 import com.malinskiy.superrecyclerview.SuperRecyclerView;
 import com.mikepenz.fastadapter.FastAdapter;
@@ -22,6 +27,7 @@ import com.muqdd.iuob2.models.LinkModel;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -32,9 +38,16 @@ import butterknife.ButterKnife;
 @SuppressWarnings("FieldCanBeLocal")
 public class MyScheduleFragment extends BaseFragment {
 
-    @BindView(R.id.main_content) LinearLayout mainContent;
+    @BindView(R.id.u_layout) LinearLayout uLayout;
+    @BindView(R.id.m_layout) LinearLayout mLayout;
+    @BindView(R.id.t_layout) LinearLayout tLayout;
+    @BindView(R.id.w_layout) LinearLayout wLayout;
+    @BindView(R.id.h_layout) LinearLayout hLayout;
+    @BindDrawable(R.drawable.ic_notifications_active_24dp) Drawable notificationActive;
+    @BindDrawable(R.drawable.ic_notifications_off_24dp) Drawable notificationOff;
 
     private View mView;
+    private boolean notificationState;
 
     public MyScheduleFragment() {
         // Required empty public constructor
@@ -53,16 +66,32 @@ public class MyScheduleFragment extends BaseFragment {
         super.onCreateView(inflater,container,savedInstanceState);
         if (mView == null) {
             // Inflate the layout for this fragment
-            mView = inflater.inflate(R.layout.fragment_list, container, false);
+            mView = inflater.inflate(R.layout.fragment_my_schedule, container, false);
             ButterKnife.bind(this, mView);
             initiate();
         }
+        setHasOptionsMenu(true);
         return mView;
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onCreateOptionsMenu(android.view.Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.my_schedule_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // handle item selection
+        switch (item.getItemId()) {
+            case R.id.edit:
+                return true;
+            case R.id.notification:
+                changeNotificationState(item);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -74,7 +103,12 @@ public class MyScheduleFragment extends BaseFragment {
     }
 
     private void initiate() {
+        notificationState = true;
+    }
 
+    private void changeNotificationState(MenuItem item) {
+        item.setIcon(notificationState ? notificationActive : notificationOff);
+        notificationState = !notificationState;
     }
 
 }

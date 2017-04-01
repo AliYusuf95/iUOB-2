@@ -154,7 +154,7 @@ public class CoursesFragment extends BaseFragment {
                                         coursesList.clear();
                                         coursesList.addAll(parseCoursesListData(response.body().string()));
                                         // attach the adapter
-                                        getActivity().runOnUiThread(new Runnable() {
+                                        runOnUi(new Runnable() {
                                             @Override
                                             public void run() {
                                                 fastAdapter.set(coursesList);

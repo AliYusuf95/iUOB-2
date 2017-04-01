@@ -15,4 +15,6 @@
     <string name="map_normal">Normal</string>
     <string name="row_section_time">Time</string>
     <string name="row_section_room">Room</string>
+    <string name="menu_edit">Edit</string>
+    <string name="menu_notification">Notification</string>
 </resources>

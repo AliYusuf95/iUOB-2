@@ -141,7 +141,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
             @Override
             public void run() {
                 addLocation();
-                getActivity().runOnUiThread(new Runnable() {
+                runOnUi(new Runnable() {
                     @Override
                     public void run() {
                         for (Location location: locations){

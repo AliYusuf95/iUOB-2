@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,7 +22,8 @@
                 android:layout_weight="1"
                 android:textColor="@color/colorPrimaryText"
                 android:gravity="center"
-                tools:text="U"/>
+                android:text="U"
+                />
 
             <TextView
                 android:layout_width="0dp"
@@ -33,7 +31,8 @@
                 android:layout_weight="1"
                 android:textColor="@color/colorPrimaryText"
                 android:gravity="center"
-                tools:text="M"/>
+                android:text="M"
+                />
 
             <TextView
                 android:layout_width="0dp"
@@ -41,7 +40,8 @@
                 android:layout_weight="1"
                 android:textColor="@color/colorPrimaryText"
                 android:gravity="center"
-                tools:text="T"/>
+                android:text="T"
+                />
 
             <TextView
                 android:layout_width="0dp"
@@ -49,7 +49,8 @@
                 android:layout_weight="1"
                 android:textColor="@color/colorPrimaryText"
                 android:gravity="center"
-                tools:text="W"/>
+                android:text="W"
+                />
 
             <TextView
                 android:layout_width="0dp"
@@ -57,7 +58,8 @@
                 android:layout_weight="1"
                 android:textColor="@color/colorPrimaryText"
                 android:gravity="center"
-                tools:text="H"/>
+                android:text="H"
+                />
 
         </LinearLayout>
 
@@ -121,4 +123,5 @@
         </LinearLayout>
 
     </LinearLayout>
+
 </ScrollView>

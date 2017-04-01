@@ -1,6 +1,7 @@
 package com.muqdd.iuob2.app;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -94,6 +95,12 @@ public class BaseFragment extends Fragment {
     protected void displayFragment(Fragment fragment){
         if (getActivity() instanceof MainActivity){
             ((MainActivity) getActivity()).displayFragment(fragment);
+        }
+    }
+
+    protected void runOnUi(@NonNull Runnable runnable){
+        if (getActivity() != null && !getActivity().isFinishing()) {
+            getActivity().runOnUiThread(runnable);
         }
     }
 

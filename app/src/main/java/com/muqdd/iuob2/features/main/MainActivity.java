@@ -15,6 +15,7 @@ import com.muqdd.iuob2.app.BaseActivity;
 import com.muqdd.iuob2.features.about.AboutFragment;
 import com.muqdd.iuob2.features.links.LinksFragment;
 import com.muqdd.iuob2.features.map.MapFragment;
+import com.muqdd.iuob2.features.my_schedule.MyScheduleFragment;
 import com.muqdd.iuob2.features.semester_schedule.SemestersHolderFragment;
 import com.orhanobut.logger.Logger;
 
@@ -137,6 +138,9 @@ public class MainActivity extends BaseActivity {
                         switch ((Menu)drawerItem.getTag()){
                             case SEMESTER_SCHEDULE:
                                 replaceFragment(SemestersHolderFragment.newInstance());
+                                break;
+                            case MY_SCHEDULE:
+                                replaceFragment(MyScheduleFragment.newInstance());
                                 break;
                             case MAP:
                                 replaceFragment(MapFragment.newInstance());

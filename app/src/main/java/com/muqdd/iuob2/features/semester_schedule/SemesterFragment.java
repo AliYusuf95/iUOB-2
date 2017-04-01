@@ -150,9 +150,8 @@ public class SemesterFragment extends BaseFragment {
                             try {
                                 semesterCoursesList = parseSemesterCoursesData(response.body().string());
                                 if (semesterCoursesList.size() > 0) {
-                                    Logger.d(semesterCoursesList.size());
                                     // attach the adapter
-                                    getActivity().runOnUiThread(new Runnable() {
+                                    runOnUi(new Runnable() {
                                         @Override
                                         public void run() {
                                             fastAdapter.set(semesterCoursesList);

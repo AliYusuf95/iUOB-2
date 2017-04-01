@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/edit"
+        android:title="@string/menu_edit"
+        android:icon="@drawable/ic_edit_24dp"
+        app:showAsAction="always"
+        android:orderInCategory="1"
+        />
+    <item
+        android:id="@+id/notification"
+        android:title="@string/menu_notification"
+        android:icon="@drawable/ic_notifications_active_24dp"
+        app:showAsAction="always"
+        android:orderInCategory="0"
+        />
+</menu>

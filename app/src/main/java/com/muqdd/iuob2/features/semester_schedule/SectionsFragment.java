@@ -147,7 +147,7 @@ public class SectionsFragment extends BaseFragment {
                                         if (sectionsList.size() > 0) {
                                             getAvailableSeats();
                                             // attach the adapter
-                                            getActivity().runOnUiThread(new Runnable() {
+                                            runOnUi(new Runnable() {
                                                 @Override
                                                 public void run() {
                                                     fastAdapter.set(sectionsList);
