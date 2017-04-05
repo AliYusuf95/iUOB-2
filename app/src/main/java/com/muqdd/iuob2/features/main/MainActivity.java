@@ -3,6 +3,7 @@ package com.muqdd.iuob2.features.main;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
@@ -52,11 +53,16 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onBackStackChanged() {
                 if (fragmentManager.getBackStackEntryCount() > 0) {
+                    // show arrow icon
                     drawerMenu.getActionBarDrawerToggle().setDrawerIndicatorEnabled(false);
                     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                    // disable swipe to open menu
+                    drawerMenu.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
                 } else {
                     getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                     drawerMenu.getActionBarDrawerToggle().setDrawerIndicatorEnabled(true);
+                    // enable swipe to open menu
+                    drawerMenu.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 }
             }
         });
