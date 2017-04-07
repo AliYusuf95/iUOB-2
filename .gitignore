@@ -9,3 +9,9 @@
 .externalNativeBuild
 /app/google-services.json
 gradle.properties
+app/app-release.apk
+app/libs/
+app/src/androidTest/
+app/src/main/java/com/muqdd/iuob2/features/schedule_builder/
+app/src/test/
+keystore.jks
