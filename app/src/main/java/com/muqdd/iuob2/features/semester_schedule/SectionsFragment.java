@@ -51,6 +51,14 @@ public class SectionsFragment extends BaseFragment {
     public final static String COURSE = "COURSE";
     public final static Type TYPE = new TypeToken<CourseModel>() {}.getType();
 
+    // static variables to enhance performance
+    private final static String sectionsPattern = "(<P ALIGN=\"center\">[\\s\\S]*?<TABLE[\\s\\S]*?</TABLE>[\\s\\S]*?)";
+    private final static Pattern pSections =
+            Pattern.compile(sectionsPattern,Pattern.UNIX_LINES | Pattern.CASE_INSENSITIVE);
+    private final static String seatsPattern = "Sec\\.[\\s\\S]*?color=\".*\">(.*?)<[\\s\\S]*?=&gt;[\\s\\S]*?size=\"2\">(\\d*?)<";
+    private final static Pattern pSeats =
+            Pattern.compile(seatsPattern,Pattern.UNIX_LINES | Pattern.CASE_INSENSITIVE);
+
     @BindView(R.id.main_content) LinearLayout mainContent;
     @BindView(R.id.recycler_view) SuperRecyclerView recyclerView;
 
@@ -184,13 +192,14 @@ public class SectionsFragment extends BaseFragment {
                     }
 
                     @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {}
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        Logger.e(t.getMessage());
+                    }
                 });
     }
 
     public ArrayList<SectionModel> parseSectionsListData (String data) {
-        String pattern = "(<P ALIGN=\"center\">[\\s\\S]*?<TABLE[\\s\\S]*?</TABLE>[\\s\\S]*?)";
-        Matcher m = Pattern.compile(pattern,Pattern.UNIX_LINES | Pattern.CASE_INSENSITIVE).matcher(data);
+        final Matcher m = pSections.matcher(data);
         ArrayList<SectionModel> list = new ArrayList<>();
         while (m.find()){
             list.add(new SectionModel(m.group(1)));
@@ -199,12 +208,12 @@ public class SectionsFragment extends BaseFragment {
     }
 
     public void parseAvailableSeatsData(String data){
-        String pattern = "";
-        Matcher m = Pattern.compile(pattern,Pattern.UNIX_LINES | Pattern.CASE_INSENSITIVE).matcher(data);
+        final Matcher m = pSeats.matcher(data);
         while (m.find()){
             for(SectionModel s : sectionsList){
-                if(s.number != null && s.number.equals("")) {
-                    //TODO: Add seats
+                if(s.number != null && s.number.equals(m.group(1))) {
+                    s.seats = m.group(2);
+                    s.showSeats = true;
                     break;
                 }
             }

@@ -63,18 +63,19 @@ public class SectionModel extends BaseModel<SectionModel, SectionModel.ViewHolde
                 times.add(new SectionTime(mTimes.group(1),mTimes.group(2),mTimes.group(3),mTimes.group(4)));
             }
             Matcher mFinal = pFinal.matcher(mData.group(3));
-            //if(mFinal.find())
-
         }
         showSeats = false;
     }
 
     @Override
     public String toString() {
-        return "SectionModel{" +
-                "number='" + number + '\'' +
-                ", doctor='" + doctor + '\'' +
-                '}';
+        String str = "Sec. [" + number + "] => "+ doctor + "\n";
+        if (times.size() > 0) {
+            for (SectionTime time : times) {
+                str += "\tDays: "+time.days+", Time: "+time.getDuration()+", Room: "+time.room+"\n";
+            }
+        }
+        return str;
     }
 
     //The unique ID for this type of item

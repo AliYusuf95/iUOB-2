@@ -2,10 +2,10 @@
     <string name="app_name" translatable="false">iUOB 2</string>
     <string name="navigation_drawer_open" translatable="false">open</string>
     <string name="navigation_drawer_close" translatable="false">close</string>
-    <string name="about_github" translatable="false">github.com/moked/iuob</string>
-    <string name="about_email" translatable="false">muqdd@hotmail.com</string>
-    <string name="about_twitter" translatable="false">\@muqdd</string>
-    <string name="about_website" translatable="false">muqdd.com</string>
+    <string name="about_github" translatable="false">iUOB-2@GitHub</string>
+    <string name="about_email" translatable="false">aliateeq95@gmail.com</string>
+    <string name="about_twitter" translatable="false">\@aliyusuf_95</string>
+    <string name="about_website" translatable="false">iuob.net</string>
     <string name="row_icon" translatable="false">row icon</string>
     <string name="menu_sakheer">Sakheer</string>
     <string name="menu_isa_town">Isa Town</string>
@@ -17,4 +17,5 @@
     <string name="row_section_room">Room</string>
     <string name="menu_edit">Edit</string>
     <string name="menu_notification">Notification</string>
+    <string name="row_section_date">Dates</string>
 </resources>

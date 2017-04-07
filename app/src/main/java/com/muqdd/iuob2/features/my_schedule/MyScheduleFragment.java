@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
+import com.muqdd.iuob2.app.User;
 import com.muqdd.iuob2.features.main.Menu;
 
 import butterknife.BindDrawable;
@@ -33,7 +34,6 @@ public class MyScheduleFragment extends BaseFragment {
     @BindDrawable(R.drawable.ic_notifications_off_24dp) Drawable notificationOff;
 
     private View mView;
-    private boolean notificationState;
 
     public MyScheduleFragment() {
         // Required empty public constructor
@@ -64,6 +64,9 @@ public class MyScheduleFragment extends BaseFragment {
     public void onCreateOptionsMenu(android.view.Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.my_schedule_menu, menu);
+        // init notification icon
+        menu.findItem(R.id.notification)
+            .setIcon(User.isNotificationOn(getContext()) ? notificationActive : notificationOff);
     }
 
     @Override
@@ -71,6 +74,7 @@ public class MyScheduleFragment extends BaseFragment {
         // handle item selection
         switch (item.getItemId()) {
             case R.id.edit:
+                //TODO: Open add course fragment
                 return true;
             case R.id.notification:
                 changeNotificationState(item);
@@ -89,12 +93,16 @@ public class MyScheduleFragment extends BaseFragment {
     }
 
     private void initiate() {
-        notificationState = true;
+
     }
 
     private void changeNotificationState(MenuItem item) {
+        // change current notification state
+        boolean notificationState = User.setNotification(getContext(), !User.isNotificationOn(getContext()));
+        // set new icon based on state
         item.setIcon(notificationState ? notificationActive : notificationOff);
-        notificationState = !notificationState;
+
+        //TODO: add system alarm functionality
     }
 
 }
