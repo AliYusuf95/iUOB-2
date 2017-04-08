@@ -74,7 +74,9 @@ public class MyScheduleFragment extends BaseFragment {
         // handle item selection
         switch (item.getItemId()) {
             case R.id.edit:
-                //TODO: Open add course fragment
+                AddCoursesFragment fragment =
+                        AddCoursesFragment.newInstance(getString(R.string.fragment_add_courses));
+                displayFragment(fragment);
                 return true;
             case R.id.notification:
                 changeNotificationState(item);

@@ -123,7 +123,7 @@ public class MainActivity extends BaseActivity {
                 .addDrawerItems(
                         semesterSchedule,
                         //new DividerDrawerItem(), // just test divider
-                        //mySchedule,
+                        mySchedule,
                         //scheduleBuilder,
                         map,
                         links,
