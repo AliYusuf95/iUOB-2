@@ -16,7 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 @SuppressWarnings("WeakerAccess")
 public class ServiceGenerator {
 
-    public static final String API_BASE_URL = "https://www.online.uob.edu.bh/cgi/enr/";
+    public static final String API_BASE_URL = "https://www.online.uob.edu.bh/cgi/";
 
     private static ConnectivityManager connectivityManager;
 

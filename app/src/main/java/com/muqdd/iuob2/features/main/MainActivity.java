@@ -14,6 +14,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseActivity;
 import com.muqdd.iuob2.features.about.AboutFragment;
+import com.muqdd.iuob2.features.calendar.CalendarSemestersFragment;
 import com.muqdd.iuob2.features.links.LinksFragment;
 import com.muqdd.iuob2.features.map.MapFragment;
 import com.muqdd.iuob2.features.my_schedule.MyScheduleFragment;
@@ -83,6 +84,12 @@ public class MainActivity extends BaseActivity {
                 .withIcon(R.drawable.semester)
                 .withSelectedTextColorRes(R.color.colorPrimaryDark);
 
+        PrimaryDrawerItem calendarSchedule = new PrimaryDrawerItem()
+                .withTag(Menu.CALENDAR)
+                .withName(Menu.CALENDAR.toString())
+                .withIcon(R.drawable.semester)
+                .withSelectedTextColorRes(R.color.colorPrimaryDark);
+
         PrimaryDrawerItem mySchedule = new PrimaryDrawerItem()
                 .withTag(Menu.MY_SCHEDULE)
                 .withName(Menu.MY_SCHEDULE.toString())
@@ -122,6 +129,7 @@ public class MainActivity extends BaseActivity {
                 .withTranslucentStatusBar(false) // for embedded drawer
                 .addDrawerItems(
                         semesterSchedule,
+                        calendarSchedule,
                         //new DividerDrawerItem(), // just test divider
                         mySchedule,
                         //scheduleBuilder,
@@ -144,6 +152,9 @@ public class MainActivity extends BaseActivity {
                         switch ((Menu)drawerItem.getTag()){
                             case SEMESTER_SCHEDULE:
                                 replaceFragment(SemestersHolderFragment.newInstance());
+                                break;
+                            case CALENDAR:
+                                replaceFragment(CalendarSemestersFragment.newInstance());
                                 break;
                             case MY_SCHEDULE:
                                 replaceFragment(MyScheduleFragment.newInstance());

@@ -56,5 +56,7 @@ dependencies {
     compile 'com.makeramen:roundedimageview:2.3.0'
     // Material sheet fab
     compile 'com.gordonwong:material-sheet-fab:1.2.1'
+    // Timeline View
+    compile 'com.github.vipulasri:timelineview:1.0.5'
 }
 apply plugin: 'com.google.gms.google-services'
