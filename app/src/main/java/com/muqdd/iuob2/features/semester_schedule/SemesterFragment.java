@@ -2,11 +2,13 @@ package com.muqdd.iuob2.features.semester_schedule;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.SearchView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -16,6 +18,7 @@ import com.google.gson.reflect.TypeToken;
 import com.malinskiy.superrecyclerview.SuperRecyclerView;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.IAdapter;
+import com.mikepenz.fastadapter.IItemAdapter;
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
@@ -90,17 +93,40 @@ public class SemesterFragment extends BaseFragment {
             initiate();
             getSemesterCoursesFromNet(mSemesterCourses);
         }
+        setHasOptionsMenu(true);
         return mView;
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onCreateOptionsMenu(android.view.Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        if (searchView != null) { // just in case
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String s) {
+                    fastAdapter.filter(s);
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String s) {
+                    fastAdapter.filter(s);
+                    return true;
+                }
+            });
+        }
     }
 
     private void initiate() {
         // initialize variables
         fastAdapter = new FastItemAdapter<>();
+        fastAdapter.withFilterPredicate(new IItemAdapter.Predicate<SemesterCourseModel>() {
+            @Override
+            public boolean filter(SemesterCourseModel item, CharSequence constraint) {
+                return !item.title.toLowerCase().contains(constraint.toString().toLowerCase());
+            }
+        });
         //semesterCoursesList = new ArrayList<>();
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);

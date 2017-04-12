@@ -87,7 +87,7 @@ public class MainActivity extends BaseActivity {
         PrimaryDrawerItem calendarSchedule = new PrimaryDrawerItem()
                 .withTag(Menu.CALENDAR)
                 .withName(Menu.CALENDAR.toString())
-                .withIcon(R.drawable.semester)
+                .withIcon(R.drawable.calendar)
                 .withSelectedTextColorRes(R.color.colorPrimaryDark);
 
         PrimaryDrawerItem mySchedule = new PrimaryDrawerItem()

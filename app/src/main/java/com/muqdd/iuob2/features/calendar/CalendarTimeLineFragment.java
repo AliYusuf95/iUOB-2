@@ -48,7 +48,7 @@ public class CalendarTimeLineFragment extends BaseFragment {
 
     private View mView;
     private List<CalendarSemesterInfo> timeLineList;
-    private FastItemAdapter<CalendarSemesterInfo> fastAdapter;
+    private TimeLineAdapter fastAdapter;
 
     public CalendarTimeLineFragment() {
         // Required empty public constructor
@@ -91,7 +91,6 @@ public class CalendarTimeLineFragment extends BaseFragment {
 
     private void initiate() {
         // initialize variables
-        fastAdapter = new FastItemAdapter<>();
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         // disable refreshable list
         recyclerView.getSwipeToRefresh().setEnabled(false);
@@ -100,18 +99,10 @@ public class CalendarTimeLineFragment extends BaseFragment {
         if (timeLineList == null){
             timeLineList = new ArrayList<>();
         }
-        fastAdapter.set(timeLineList);
+        fastAdapter = new TimeLineAdapter(timeLineList);
         recyclerView.setAdapter(fastAdapter);
 
         // fixed size
         recyclerView.getRecyclerView().setHasFixedSize(true);
-        // add to calender
-        fastAdapter.withOnClickListener(new FastAdapter.OnClickListener<CalendarSemesterInfo>() {
-            @Override
-            public boolean onClick(View v, IAdapter<CalendarSemesterInfo> adapter, CalendarSemesterInfo item, int position) {
-                //TODO: add to calender
-                return false;
-            }
-        });
     }
 }

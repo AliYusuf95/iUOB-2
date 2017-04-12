@@ -4,6 +4,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
+import com.orhanobut.logger.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +27,16 @@ class SemesterPagerAdapter extends FragmentStatePagerAdapter {
         fragmentList.add(fragment);
         fragmentTitleList.add(title);
         notifyDataSetChanged();
+    }
+
+    void addFragment(Fragment fragment, String title, int pos) {
+        if (pos > -1 && pos <= fragmentList.size()) {
+            fragmentList.add(pos, fragment);
+            fragmentTitleList.add(pos, title);
+            notifyDataSetChanged();
+        } else {
+            addFragment(fragment,title);
+        }
     }
 
     void removeFragment(Fragment fragment){

@@ -26,4 +26,7 @@
     <string name="dialog_add_course_text_section_hint">Section e.g: 01</string>
     <string name="dialog_add_course_btn_add">Add</string>
     <string name="dialog_add_course_btn_cancel">Cancel</string>
+    <string name="row_finalexam_time_final">Final Exam:</string>
+    <string name="row_finalexam_time_no_exam">No Exam</string>
+    <string name="search_title">Search</string>
 </resources>

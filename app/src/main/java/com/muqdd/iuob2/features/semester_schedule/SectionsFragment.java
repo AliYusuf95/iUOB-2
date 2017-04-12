@@ -4,14 +4,19 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -31,6 +36,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,7 +58,8 @@ public class SectionsFragment extends BaseFragment {
     public final static Type TYPE = new TypeToken<CourseModel>() {}.getType();
 
     // static variables to enhance performance
-    private final static String sectionsPattern = "(<P ALIGN=\"center\">[\\s\\S]*?<TABLE[\\s\\S]*?</TABLE>[\\s\\S]*?)";
+    private final static String sectionsPattern = "<center><B>\\s*?([^\\s][\\S\\s]*?)\\s*?</B></center>" +
+            "[\\s\\S]*?(<P ALIGN=\"center\">[\\s\\S]*?<TABLE[\\s\\S]*?</TABLE>[\\s\\S]*?)";
     private final static Pattern pSections =
             Pattern.compile(sectionsPattern,Pattern.UNIX_LINES | Pattern.CASE_INSENSITIVE);
     private final static String seatsPattern = "Sec\\.[\\s\\S]*?color=\".*\">(.*?)<[\\s\\S]*?=&gt;[\\s\\S]*?size=\"2\">(\\d*?)<";
@@ -65,6 +72,7 @@ public class SectionsFragment extends BaseFragment {
     private List<SectionModel> sectionsList;
     private CourseModel course;
     private FastItemAdapter<SectionModel> fastAdapter;
+    private View finalView;
 
     public SectionsFragment() {
         // Required empty public constructor
@@ -158,6 +166,7 @@ public class SectionsFragment extends BaseFragment {
                                             runOnUi(new Runnable() {
                                                 @Override
                                                 public void run() {
+                                                    addFinalExamView();
                                                     fastAdapter.set(sectionsList);
                                                     recyclerView.setAdapter(fastAdapter);
                                                 }
@@ -174,6 +183,23 @@ public class SectionsFragment extends BaseFragment {
                     @Override
                     public void onFailure(Call<ResponseBody> call, Throwable t) {}
                 });
+    }
+
+    private void addFinalExamView() {
+        // remove final view if exist
+        mainContent.removeView(finalView);
+        // create new view
+        finalView =
+                LayoutInflater.from(getContext()).inflate(R.layout.row_finalexam_time,null,false);
+        String color = Integer.toHexString(ContextCompat.getColor(getActivity(),R.color.colorAccent) & 0x00ffffff);
+        String finalExam = sectionsList.get(0).getFinalExam();
+        finalExam = finalExam.equals("") ? getString(R.string.row_finalexam_time_no_exam) : finalExam;
+        String text = String.format(Locale.getDefault(), "<font color=\"#%s\">%s</font> %s",
+                color,
+                getString(R.string.row_finalexam_time_final),
+                finalExam);
+        ((TextView)finalView.findViewById(R.id.text)).setText(Html.fromHtml(text));
+        mainContent.addView(finalView,0);
     }
 
     private void getAvailableSeats(){
@@ -202,7 +228,7 @@ public class SectionsFragment extends BaseFragment {
         final Matcher m = pSections.matcher(data);
         ArrayList<SectionModel> list = new ArrayList<>();
         while (m.find()){
-            list.add(new SectionModel(m.group(1)));
+            list.add(new SectionModel(m.group(1), m.group(2)));
         }
         return list;
     }

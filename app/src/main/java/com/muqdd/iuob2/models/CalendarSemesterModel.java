@@ -37,11 +37,6 @@ public class CalendarSemesterModel extends BaseModel<SemesterCourseModel, Semest
     }
 
     public List<CalendarSemesterInfo> getSemesterInfo() {
-        if (semesterInfo != null && semesterInfo.size()>0) {
-            CalendarSemesterInfo.setItemCount(semesterInfo.size());
-        } else {
-            CalendarSemesterInfo.setItemCount(0);
-        }
         return semesterInfo;
     }
 

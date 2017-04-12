@@ -5,8 +5,10 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
@@ -41,6 +43,7 @@ import retrofit2.Response;
 public class SemestersHolderFragment extends BaseFragment {
 
     protected @BindView(R.id.viewPager) ViewPager viewPager;
+    protected @BindView(R.id.progress_bar) ProgressBar progressBar;
 
     private SemesterPagerAdapter pagerAdapter;
     private int currentPage;
@@ -67,7 +70,14 @@ public class SemestersHolderFragment extends BaseFragment {
             ButterKnife.bind(this, mView);
             initiate();
         }
+        setHasOptionsMenu(true);
         return mView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(android.view.Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.search_menu, menu);
     }
 
     @Override
@@ -125,18 +135,20 @@ public class SemestersHolderFragment extends BaseFragment {
             Logger.d("case 3");
         }
 
-        for (SemesterCourseModel request : requests) {
+        for (int i=0 ; i<requests.size() ; i++){
+            getSemesterCoursesFromNet(requests.get(i),i);
+        }
+        /*for (SemesterCourseModel request : requests) {
             // No more chase things
-            /*try {
+            try {
                 getSemesterCoursesFromCache(request);
                 Logger.i("Load from cache");
             } catch (IOException e) {
                 getSemesterCoursesFromNet(request);
                 Logger.i("Load from internet");
-            }*/
+            }
             // Data should loaded in semester fragment not here !!
-            getSemesterCoursesFromNet(request);
-        }
+        }*/
     }
 
     // Data should loaded in semester fragment not here !!
@@ -153,11 +165,7 @@ public class SemestersHolderFragment extends BaseFragment {
         }
     }*/
 
-    public void getSemesterCoursesFromNet(final SemesterCourseModel request) {
-        final SemesterFragment fragment = SemesterFragment.newInstance(request.semesterTitle(),
-                request);
-        pagerAdapter.addFragment(fragment, request.semesterTitle());
-
+    public void getSemesterCoursesFromNet(final SemesterCourseModel request, final int pos) {
         ServiceGenerator.createService(UOBSchedule.class)
                 .semesterCourses("1",request.year,request.semester).enqueue(new Callback<ResponseBody>() {
             @Override
@@ -165,8 +173,11 @@ public class SemestersHolderFragment extends BaseFragment {
                 if (response.code() == 200) {
                     try {
                         ArrayList<SemesterCourseModel> list = parseSemesterCoursesData(response.body().string());
-                        if (list.size() == 0) {
-                            pagerAdapter.removeFragment(fragment);
+                        if (list.size() > 0) {
+                            progressBar.setVisibility(View.GONE);
+                            SemesterFragment fragment =
+                                    SemesterFragment.newInstance(request.semesterTitle(), request);
+                            pagerAdapter.addFragment(fragment, request.semesterTitle(),pos);
                             //writeHTMLDataToCache(request.fileName(), response.body().string().getBytes());
                         }
                     } catch (IOException e) {

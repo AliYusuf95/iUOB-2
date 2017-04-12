@@ -22,6 +22,18 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
+        <meta-data
+            android:name="com.google.android.gms.analytics.globalConfigResource"
+            android:resource="@xml/global_tracker"/>
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_logo_white" />
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorPrimary" />
+
         <activity android:name=".features.main.MainActivity"/>
         <activity
             android:name=".features.splash.SplashActivity"
@@ -39,6 +51,19 @@
                     android:pathPrefix="/" />
             </intent-filter>
         </activity>
-    </application>
 
+        <!-- FCM Services -->
+        <service android:name=".notification.RegistrationIntentService" android:exported="false"/>
+        <service android:name=".notification.MyInstanceIDListenerService" android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
+        <service android:name=".notification.FCMMessageHandler" android:exported="false" >
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+    </application>
 </manifest>

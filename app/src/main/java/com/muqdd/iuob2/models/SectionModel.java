@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseModel;
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,8 @@ import butterknife.ButterKnife;
 public class SectionModel extends BaseModel<SectionModel, SectionModel.ViewHolder> {
 
     // static variables to enhance performance
+    private final static String coursePattern =
+            "<center><B>\\s*?([^\\s][\\S\\s]*?)\\s*?</B></center>";
     private final static String sectionPattern =
             "Sec.*?>(\\d\\d)<.*?size=\"2\">([\\S\\s]*),[\\s\\S]*?(<TR>[\\s\\S]*?)</TABLE>";
     private final static String timesPattern =
@@ -40,21 +43,24 @@ public class SectionModel extends BaseModel<SectionModel, SectionModel.ViewHolde
             "<TD.*?height=\"19\"><FONT color=\"#0000FF\">[\\S ]*?"+
             "<[\\s\\S]*?TD.*?>.*?>([\\S ]*?)</FONT><[\\s\\S]*?TD.*?>.*?>([\\S ]*?)"+
             "</FONT><[\\s\\S]*?TD.*?>.*?>([\\S ]*?)</FONT></TD>";
+    private final static Pattern pCourse = Pattern.compile(coursePattern,Pattern.CASE_INSENSITIVE);
     private final static Pattern pData = Pattern.compile(sectionPattern,Pattern.CASE_INSENSITIVE);
     private final static Pattern pTimes = Pattern.compile(timesPattern,Pattern.CASE_INSENSITIVE);
     private final static Pattern pFinal = Pattern.compile(finalPattern,Pattern.CASE_INSENSITIVE);
 
+    public String title;
     public String number;
     public String doctor;
     public List<SectionTime> times;
     // TODO: Final Exam
-    public String finalExam;
+    public String finalExamDate;
+    public String finalExamTime;
     public String seats;
     public boolean showSeats;
 
-    public SectionModel(String data) {
+    public SectionModel(String title, String data) {
         Matcher mData = pData.matcher(data);
-        times = new ArrayList<>();
+        this.times = new ArrayList<>();
         if(mData.find()) {
             this.number = mData.group(1);
             this.doctor = mData.group(2);
@@ -63,13 +69,24 @@ public class SectionModel extends BaseModel<SectionModel, SectionModel.ViewHolde
                 times.add(new SectionTime(mTimes.group(1),mTimes.group(2),mTimes.group(3),mTimes.group(4)));
             }
             Matcher mFinal = pFinal.matcher(mData.group(3));
+            if (mFinal.find()){
+                finalExamDate = mFinal.group(1);
+                finalExamTime = mFinal.group(2)+"-"+mFinal.group(3);
+            }
         }
-        showSeats = false;
+        Matcher mCourse = pCourse.matcher(data);
+        this.title = title;
+        this.showSeats = false;
+    }
+
+    public String getFinalExam() {
+        return finalExamDate.trim().equals("")? "" : finalExamDate+" @ "+finalExamTime;
     }
 
     @Override
     public String toString() {
-        String str = "Sec. [" + number + "] => "+ doctor + "\n";
+        String str = title+"\n"+
+                "Sec. [" + number + "] => "+ doctor + "\n";
         if (times.size() > 0) {
             for (SectionTime time : times) {
                 str += "\tDays: "+time.days+", Time: "+time.getDuration()+", Room: "+time.room+"\n";
