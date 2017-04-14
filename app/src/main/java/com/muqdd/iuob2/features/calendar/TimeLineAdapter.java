@@ -5,20 +5,21 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.github.vipulasri.timelineview.TimelineView;
-import com.mikepenz.fastadapter.IItem;
-import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.models.CalendarSemesterInfo;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Ali Yusuf on 4/12/2017.
  * iUOB-2
  */
 
+@SuppressWarnings({"unused","WeakerAccess"})
 public class TimeLineAdapter extends RecyclerView.Adapter<CalendarSemesterInfo.ViewHolder> {
 
     private List<CalendarSemesterInfo> mFeedList;
@@ -50,7 +51,7 @@ public class TimeLineAdapter extends RecyclerView.Adapter<CalendarSemesterInfo.V
             Date dateTo = CalendarSemesterInfo.parser.parse(mFeedList.get(position).getDateTo());
             if (now.before(dateFrom)){
                 holder.timelineView.setMarker(holder.normal);
-            } else if (now.equals(dateFrom) || now.equals(dateTo) ||
+            } else if (isSameDay(now,dateFrom) || isSameDay(now,dateTo) ||
                     (now.after(dateFrom) && now.before(dateTo))){
                 holder.timelineView.setMarker(holder.active);
             } else {
@@ -59,6 +60,11 @@ public class TimeLineAdapter extends RecyclerView.Adapter<CalendarSemesterInfo.V
         } catch (ParseException e) {
             holder.timelineView.setMarker(holder.normal);
         }
+    }
+
+    private boolean isSameDay(Date date1, Date date2) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
+        return dateFormat.format(date1).equals(dateFormat.format(date2));
     }
 
     @Override

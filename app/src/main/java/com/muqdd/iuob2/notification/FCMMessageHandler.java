@@ -34,11 +34,11 @@ public class FCMMessageHandler extends FirebaseMessagingService {
     private void createNotification(Notification notification) {
         Context context = getBaseContext();
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+                .setContentTitle(notification.getTitle())
+                .setContentText(notification.getBody())
                 .setSmallIcon(R.drawable.ic_stat_logo_white)
                 .setColor(ContextCompat.getColor(context,R.color.colorPrimary))
-                .setContentTitle(notification.getTitle())
                 .setDefaults(android.app.Notification.DEFAULT_ALL)
-                .setContentText(notification.getBody())
                 .setAutoCancel(true);
 
         NotificationManager mNotificationManager = (NotificationManager) context

@@ -7,7 +7,7 @@
     android:gravity="center_horizontal">
 
     <TextView
-        android:text="@string/dialog_add_course_title"
+        android:text="@string/dialog_delete_course_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/title_text"
@@ -15,32 +15,16 @@
         android:layout_marginTop="10dp"/>
 
     <TextView
-        android:text="@string/dialog_add_course_sub_title"
+        android:id="@+id/course_details"
+        android:text="@string/dialog_delete_course_sub_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/row_title_text"
+        android:gravity="center"
         android:textColor="@color/colorSecondaryText"
+        android:layout_marginEnd="15dp"
+        android:layout_marginStart="15dp"
         android:layout_marginBottom="5dp"/>
-
-    <AutoCompleteTextView
-        android:id="@+id/course"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="13"
-        android:inputType="textCapCharacters|textNoSuggestions"
-        android:hint="@string/dialog_add_course_text_course_hint"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"/>
-
-    <EditText
-        android:id="@+id/section"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="13"
-        android:inputType="number"
-        android:hint="@string/dialog_add_course_text_section_hint"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -49,11 +33,11 @@
         android:layout_marginBottom="10dp">
 
         <Button
-            android:id="@+id/add"
+            android:id="@+id/delete"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:text="@string/dialog_btn_add"
+            android:text="@string/dialog_btn_delete"
             style="?android:attr/buttonStyle"
             android:textColor="@color/white"
             android:layout_marginStart="10dp"

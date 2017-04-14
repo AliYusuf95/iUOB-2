@@ -24,9 +24,13 @@
     <string name="dialog_add_course_sub_title">Please write the course and section</string>
     <string name="dialog_add_course_text_course_hint">Course e.g: HIST122</string>
     <string name="dialog_add_course_text_section_hint">Section e.g: 01</string>
-    <string name="dialog_add_course_btn_add">Add</string>
-    <string name="dialog_add_course_btn_cancel">Cancel</string>
+    <string name="dialog_btn_add">Add</string>
+    <string name="dialog_btn_cancel">Cancel</string>
+    <string name="dialog_course_btn_close">Close</string>
     <string name="row_finalexam_time_final">Final Exam:</string>
     <string name="row_finalexam_time_no_exam">No Exam</string>
     <string name="search_title">Search</string>
+    <string name="dialog_btn_delete">Delete</string>
+    <string name="dialog_delete_course_title">Are you sure?</string>
+    <string name="dialog_delete_course_sub_title">This course will be deleted from your schedule</string>
 </resources>

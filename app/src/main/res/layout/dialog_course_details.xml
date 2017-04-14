@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal">
+
+    <TextView
+        android:id="@+id/title"
+        tools:text="ITCS111"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/title_text"
+        android:textColor="@color/colorPrimaryText"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:id="@+id/section"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Section: 01"
+        android:textSize="@dimen/row_title_text"
+        android:textColor="@color/colorSecondaryText"
+        android:layout_marginBottom="5dp"/>
+
+    <TextView
+        android:id="@+id/doctor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Section: 01"
+        android:textSize="@dimen/row_title_text"
+        android:textColor="@color/colorSecondaryText"
+        android:layout_marginBottom="5dp"/>
+
+    <TextView
+        android:id="@+id/final_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Final: 11/06/2017 @ 11:30-13:50"
+        android:ems="18"
+        android:gravity="center"
+        android:textSize="@dimen/row_title_text"
+        android:textColor="@color/colorSecondaryText"
+        android:layout_marginBottom="5dp"/>
+
+    <Button
+        android:id="@+id/close"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_course_btn_close"
+        style="?android:attr/buttonStyle"
+        android:textColor="@color/white"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:backgroundTint="@color/colorPrimaryDark"/>
+
+</LinearLayout>

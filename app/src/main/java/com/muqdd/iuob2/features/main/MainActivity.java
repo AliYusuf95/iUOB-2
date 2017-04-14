@@ -70,9 +70,10 @@ public class MainActivity extends BaseActivity {
 
         // if it is not change orientation call append default fragment
         if (savedInstanceState == null){
-            fragmentManager.beginTransaction()
-                    .add(R.id.frameLayout, SemestersHolderFragment.newInstance())
-                    .commit();
+            replaceFragment(SemestersHolderFragment.newInstance());
+//            fragmentManager.beginTransaction()
+//                    .add(R.id.frameLayout, SemestersHolderFragment.newInstance())
+//                    .commit();
         }
     }
 

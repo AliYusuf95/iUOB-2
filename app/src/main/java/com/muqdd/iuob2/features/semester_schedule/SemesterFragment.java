@@ -2,13 +2,17 @@ package com.muqdd.iuob2.features.semester_schedule;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -61,6 +65,7 @@ public class SemesterFragment extends BaseFragment {
     private SemesterCourseModel mSemesterCourses;
     private FastItemAdapter<SemesterCourseModel> fastAdapter;
     private View mView;
+    private SearchView searchView;
 
     public SemesterFragment() {
         // Required empty public constructor
@@ -98,24 +103,8 @@ public class SemesterFragment extends BaseFragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(android.view.Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-        if (searchView != null) { // just in case
-            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextSubmit(String s) {
-                    fastAdapter.filter(s);
-                    return true;
-                }
-
-                @Override
-                public boolean onQueryTextChange(String s) {
-                    fastAdapter.filter(s);
-                    return true;
-                }
-            });
-        }
+    public void onResume() {
+        super.onResume();
     }
 
     private void initiate() {
@@ -161,6 +150,17 @@ public class SemesterFragment extends BaseFragment {
             }
         });
 
+        // Register to search view listener
+        Fragment parent = getParentFragment();
+        if (parent != null && parent instanceof SemestersHolderFragment){
+            ((SemestersHolderFragment) parent)
+                    .addSearchTextListeners(title, new SemestersHolderFragment.SearchTextListener() {
+                        @Override
+                        public void onTextChange(String s) {
+                            fastAdapter.filter(s);
+                        }
+                    });
+        }
     }
 
     public void getSemesterCoursesFromNet(final SemesterCourseModel request) {

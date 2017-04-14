@@ -14,10 +14,10 @@ public class Constants {
     public final static String[] coursesList = {"ACC","ACCA","ACCM","AH","ALH","AMST","ARAB","ARABA",
             "ARABM","ARCG","ART","BAA","BIOLS","BIONU","BIS","CEA","CEG","CENG","CGS","CHE","CHEMY",
             "CHENG","CHL","COM","CSA","CSC","DH","ECON","ECONA","ECONM","EDAR","EDEG","EDPS","EDTC",
-            "EDU","EEDA","EEG","EENG","ELE","ENG","ENGG","ENGL","ENGL.","ENGLA","ENGLM","ENGLU",
-            "EPD","ESD","ESP.","ETDA","EVALU","FA","FIN","FINA","FINM","FOUN","FREN","GEOG","GERM",
+            "EDU","EEDA","EEG","EENG","ELE","ENG","ENGG","ENGL",/*"ENGL.",*/"ENGLA","ENGLM","ENGLU",
+            "EPD","ESD",/*"ESP.",*/"ETDA","EVALU","FA","FIN","FINA","FINM","FOUN","FREN","GEOG","GERM",
             "HIST","HISTO","HRLC","IEN","INTD","ISLM","IT","ITBIS","ITCE","ITCS","ITIS","JAPN","LAW",
-            "LAW.","LFS","MATHA","MATHS","MATHS.","MCM","MEDA","MEG","MENG","MGT","MGTA","MISA",
+            /*"LAW.",*/"LFS","MATHA","MATHS",/*"MATHS.",*/"MCM","MEDA","MEG","MENG","MGT","MGTA","MISA",
             "MKT","MKTA","MLS","MLT","MPHYS","NUR","OMA","PHA","PHAM","PHED","PHEDE","PHTY","PHYCS",
             "PHYCSA","PICDA","PICENG","PSYC","PSYCH","QM","RAD","SBF","SBS","SOCIO","STAT","STATA",
             "TC1AR","TC1ART","TC1EN","TC1IS","TC1MA","TC1MAT","TC1SC","TC1SCT","TC2AR","TC2ART",
@@ -166,5 +166,9 @@ public class Constants {
             debCodeMap.put("TRAN","082");
         }
         return debCodeMap;
+    }
+
+    public static String getDebCode(String k){
+        return getDebCodeMap().get(k);
     }
 }

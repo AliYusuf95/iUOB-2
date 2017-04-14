@@ -47,14 +47,22 @@
             android:maxLines="1" />
     </LinearLayout>
 
-    <ImageView
+    <LinearLayout
+        android:id="@+id/delete"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="0.1"
         android:layout_gravity="center"
-        android:tint="@color/colorAccent"
-        android:src="@drawable/ic_chevron_right_24dp"
-        android:contentDescription="@string/row_icon"
-        android:visibility="gone"/>
+        android:gravity="center">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:tint="@color/colorAccent"
+            android:src="@drawable/ic_delete_24dp"
+            android:contentDescription="@string/row_icon" />
+
+    </LinearLayout>
 
 </LinearLayout>

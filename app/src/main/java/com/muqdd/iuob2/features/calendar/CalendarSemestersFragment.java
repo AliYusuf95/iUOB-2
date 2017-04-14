@@ -20,7 +20,6 @@ import com.muqdd.iuob2.models.CalendarSemesterModel;
 import com.muqdd.iuob2.network.ServiceGenerator;
 import com.muqdd.iuob2.network.UOBSchedule;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -40,7 +39,6 @@ public class CalendarSemestersFragment extends BaseFragment {
     @BindView(R.id.recycler_view) SuperRecyclerView recyclerView;
 
     private View mView;
-    private List<CalendarSemesterModel> semestersList;
     private FastItemAdapter<CalendarSemesterModel> fastAdapter;
 
     public CalendarSemestersFragment() {
@@ -92,7 +90,6 @@ public class CalendarSemestersFragment extends BaseFragment {
         recyclerView.getSwipeToRefresh().setEnabled(false);
 
         // init list
-        semestersList = new ArrayList<>();
 
         // open link on click
         fastAdapter.withOnClickListener(new FastAdapter.OnClickListener<CalendarSemesterModel>() {

@@ -4,8 +4,10 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -26,7 +28,9 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,6 +52,7 @@ public class SemestersHolderFragment extends BaseFragment {
     private SemesterPagerAdapter pagerAdapter;
     private int currentPage;
     private View mView;
+    private Map<String,SearchTextListener> searchTextListeners;
 
     public SemestersHolderFragment() {
         // Required empty public constructor
@@ -78,6 +83,26 @@ public class SemestersHolderFragment extends BaseFragment {
     public void onCreateOptionsMenu(android.view.Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.search_menu, menu);
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        if (searchView != null) { // just in case
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String s) {
+                    for (String key:searchTextListeners.keySet()){
+                        searchTextListeners.get(key).onTextChange(s);
+                    }
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String s) {
+                    for (String key:searchTextListeners.keySet()){
+                        searchTextListeners.get(key).onTextChange(s);
+                    }
+                    return true;
+                }
+            });
+        }
     }
 
     @Override
@@ -97,6 +122,7 @@ public class SemestersHolderFragment extends BaseFragment {
     }
 
     private void initiate() {
+        searchTextListeners = new HashMap<>();
         pagerAdapter = new SemesterPagerAdapter(getChildFragmentManager());
         //pagerAdapter.addFragment(SemesterFragment.newInstance(), "2017/2");
         viewPager.setAdapter(pagerAdapter);
@@ -138,17 +164,6 @@ public class SemestersHolderFragment extends BaseFragment {
         for (int i=0 ; i<requests.size() ; i++){
             getSemesterCoursesFromNet(requests.get(i),i);
         }
-        /*for (SemesterCourseModel request : requests) {
-            // No more chase things
-            try {
-                getSemesterCoursesFromCache(request);
-                Logger.i("Load from cache");
-            } catch (IOException e) {
-                getSemesterCoursesFromNet(request);
-                Logger.i("Load from internet");
-            }
-            // Data should loaded in semester fragment not here !!
-        }*/
     }
 
     // Data should loaded in semester fragment not here !!
@@ -193,6 +208,10 @@ public class SemestersHolderFragment extends BaseFragment {
         });
     }
 
+    public void addSearchTextListeners(String k, SearchTextListener listener) {
+        searchTextListeners.put(k,listener);
+    }
+
     private ArrayList<SemesterCourseModel> parseSemesterCoursesData (String data) {
         ArrayList<SemesterCourseModel> list = new ArrayList<>();
         Document document = Jsoup.parse(data);
@@ -203,6 +222,10 @@ public class SemestersHolderFragment extends BaseFragment {
             }
         }
         return list;
+    }
+
+    public interface SearchTextListener {
+        void onTextChange(String s);
     }
 
     private class PageListener extends ViewPager.SimpleOnPageChangeListener {

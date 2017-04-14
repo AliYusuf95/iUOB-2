@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseModel;
-import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +51,6 @@ public class SectionModel extends BaseModel<SectionModel, SectionModel.ViewHolde
     public String number;
     public String doctor;
     public List<SectionTime> times;
-    // TODO: Final Exam
     public String finalExamDate;
     public String finalExamTime;
     public String seats;

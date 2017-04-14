@@ -37,6 +37,10 @@ dependencies {
     compile 'com.squareup.retrofit2:retrofit:2.2.0'
     compile 'com.squareup.retrofit2:converter-gson:2.2.0'
     compile 'com.squareup.okhttp3:logging-interceptor:3.6.0'
+    // Stetho 'A debug bridge in Chrome'
+    debugCompile 'com.facebook.stetho:stetho:1.4.2'
+    debugCompile 'com.facebook.stetho:stetho-okhttp3:1.4.2'
+    debugCompile 'com.facebook.stetho:stetho-js-rhino:1.4.2'
     // Jsoup
     compile 'org.jsoup:jsoup:1.10.2'
     // MaterialDrawer
@@ -61,5 +65,7 @@ dependencies {
     compile 'com.gordonwong:material-sheet-fab:1.2.1'
     // Timeline View
     compile 'com.github.vipulasri:timelineview:1.0.5'
+    // AutoFit TextView
+    compile 'me.grantland:autofittextview:0.2.1'
 }
 apply plugin: 'com.google.gms.google-services'

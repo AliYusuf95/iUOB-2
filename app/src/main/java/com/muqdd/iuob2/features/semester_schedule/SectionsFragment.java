@@ -4,14 +4,12 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.Html;
-import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,8 +56,10 @@ public class SectionsFragment extends BaseFragment {
     public final static Type TYPE = new TypeToken<CourseModel>() {}.getType();
 
     // static variables to enhance performance
-    private final static String sectionsPattern = "<center><B>\\s*?([^\\s][\\S\\s]*?)\\s*?</B></center>" +
-            "[\\s\\S]*?(<P ALIGN=\"center\">[\\s\\S]*?<TABLE[\\s\\S]*?</TABLE>[\\s\\S]*?)";
+    private final static String titlePattern = "<center><B>\\s*?([^\\s][\\S\\s]*?)\\s*?</B></center>";
+    private final static Pattern pTitle =
+            Pattern.compile(titlePattern,Pattern.UNIX_LINES | Pattern.CASE_INSENSITIVE);
+    private final static String sectionsPattern = "[\\s\\S]*?(<P ALIGN=\"center\">[\\s\\S]*?<TABLE[\\s\\S]*?</TABLE>[\\s\\S]*?)";
     private final static Pattern pSections =
             Pattern.compile(sectionsPattern,Pattern.UNIX_LINES | Pattern.CASE_INSENSITIVE);
     private final static String seatsPattern = "Sec\\.[\\s\\S]*?color=\".*\">(.*?)<[\\s\\S]*?=&gt;[\\s\\S]*?size=\"2\">(\\d*?)<";
@@ -225,10 +225,15 @@ public class SectionsFragment extends BaseFragment {
     }
 
     public ArrayList<SectionModel> parseSectionsListData (String data) {
+        final Matcher mTitle = pTitle.matcher(data);
+        String title = "";
+        if (mTitle.find()){
+            title = mTitle.group(1);
+        }
         final Matcher m = pSections.matcher(data);
         ArrayList<SectionModel> list = new ArrayList<>();
         while (m.find()){
-            list.add(new SectionModel(m.group(1), m.group(2)));
+            list.add(new SectionModel(title, m.group(1)));
         }
         return list;
     }

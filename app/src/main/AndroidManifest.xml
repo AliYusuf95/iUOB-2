@@ -65,5 +65,8 @@
             </intent-filter>
         </service>
 
+        <!-- App Alarm -->
+        <receiver android:name=".notification.AlarmNotificationReceiver" />
+
     </application>
 </manifest>
