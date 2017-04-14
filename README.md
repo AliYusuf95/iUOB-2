@@ -22,9 +22,10 @@ You can follow me on Twitter [@aliyusuf\_95](https://twitter.com/aliyusuf_95).
 
 ## TO DO List:
 - [x] Semester Schedule
-- [ ] Student Schedule
+- [x] Student Schedule
 - [x] Map
 - [x] Useful Links
+- [x] Year Calander
 - [ ] Schedule Builder
 - [ ] UOB Auto
 
