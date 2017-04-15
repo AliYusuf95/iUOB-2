@@ -29,6 +29,13 @@ public class MainActivity extends BaseActivity {
     protected @BindView(R.id.toolbar) Toolbar toolbar;
 
     private FragmentManager fragmentManager;
+    private PrimaryDrawerItem semesterSchedule;
+    private PrimaryDrawerItem calendarSchedule;
+    private PrimaryDrawerItem mySchedule;
+    private PrimaryDrawerItem scheduleBuilder;
+    private PrimaryDrawerItem map;
+    private PrimaryDrawerItem links;
+    private PrimaryDrawerItem about;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +45,13 @@ public class MainActivity extends BaseActivity {
 
         init(savedInstanceState);
         initDrawerMenu(savedInstanceState);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // reset drawerMenu selection on orientation changed
+        setDrawerMenuSelection();
     }
 
     private void init(Bundle savedInstanceState) {
@@ -65,6 +79,8 @@ public class MainActivity extends BaseActivity {
                     // enable swipe to open menu
                     drawerMenu.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 }
+                // reset drawerMenu selection on orientation changed
+                setDrawerMenuSelection();
             }
         });
 
@@ -79,43 +95,43 @@ public class MainActivity extends BaseActivity {
 
     private void initDrawerMenu(Bundle savedInstanceState) {
 
-        PrimaryDrawerItem semesterSchedule = new PrimaryDrawerItem()
+        semesterSchedule = new PrimaryDrawerItem()
                 .withTag(Menu.SEMESTER_SCHEDULE)
                 .withName(Menu.SEMESTER_SCHEDULE.toString())
                 .withIcon(R.drawable.semester)
                 .withSelectedTextColorRes(R.color.colorPrimaryDark);
 
-        PrimaryDrawerItem calendarSchedule = new PrimaryDrawerItem()
+        calendarSchedule = new PrimaryDrawerItem()
                 .withTag(Menu.CALENDAR)
                 .withName(Menu.CALENDAR.toString())
                 .withIcon(R.drawable.calendar)
                 .withSelectedTextColorRes(R.color.colorPrimaryDark);
 
-        PrimaryDrawerItem mySchedule = new PrimaryDrawerItem()
+        mySchedule = new PrimaryDrawerItem()
                 .withTag(Menu.MY_SCHEDULE)
                 .withName(Menu.MY_SCHEDULE.toString())
                 .withIcon(R.drawable.current)
                 .withSelectedTextColorRes(R.color.colorPrimaryDark);
 
-        PrimaryDrawerItem scheduleBuilder = new PrimaryDrawerItem()
+        scheduleBuilder = new PrimaryDrawerItem()
                 .withTag(Menu.SCHEDULE_BUILDER)
                 .withName(Menu.SCHEDULE_BUILDER.toString())
                 .withIcon(R.drawable.builder)
                 .withSelectedTextColorRes(R.color.colorPrimaryDark);
 
-        PrimaryDrawerItem map = new PrimaryDrawerItem()
+        map = new PrimaryDrawerItem()
                 .withTag(Menu.MAP)
                 .withName(Menu.MAP.toString())
                 .withIcon(R.drawable.map)
                 .withSelectedTextColorRes(R.color.colorPrimaryDark);
 
-        PrimaryDrawerItem links = new PrimaryDrawerItem()
+        links = new PrimaryDrawerItem()
                 .withTag(Menu.LINKS)
                 .withName(Menu.LINKS.toString())
                 .withIcon(R.drawable.links)
                 .withSelectedTextColorRes(R.color.colorPrimaryDark);
 
-        PrimaryDrawerItem about = new PrimaryDrawerItem()
+        about = new PrimaryDrawerItem()
                 .withTag(Menu.ABOUT)
                 .withName(Menu.ABOUT.toString())
                 .withIcon(R.drawable.credit)
@@ -199,6 +215,33 @@ public class MainActivity extends BaseActivity {
                     getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                     drawerMenu.getActionBarDrawerToggle().setDrawerIndicatorEnabled(true);
                 }
+            }
+        }
+    }
+
+    /**
+     * Set drawerMenu selection based on current fragment
+     */
+    private void setDrawerMenuSelection(){
+        Fragment mFragment = fragmentManager.findFragmentById(R.id.frameLayout);
+        if(mFragment != null){
+            if (mFragment instanceof SemestersHolderFragment){
+                drawerMenu.setSelection(semesterSchedule);
+            }
+            if (mFragment instanceof CalendarSemestersFragment){
+                drawerMenu.setSelection(calendarSchedule);
+            }
+            if (mFragment instanceof MyScheduleFragment){
+                drawerMenu.setSelection(mySchedule);
+            }
+            if (mFragment instanceof MapFragment){
+                drawerMenu.setSelection(map);
+            }
+            if (mFragment instanceof LinksFragment){
+                drawerMenu.setSelection(links);
+            }
+            if (mFragment instanceof AboutFragment){
+                drawerMenu.setSelection(about);
             }
         }
     }
