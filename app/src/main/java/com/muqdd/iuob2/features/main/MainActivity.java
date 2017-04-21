@@ -1,6 +1,8 @@
 package com.muqdd.iuob2.features.main;
 
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
@@ -13,6 +15,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseActivity;
+import com.muqdd.iuob2.app.User;
 import com.muqdd.iuob2.features.about.AboutFragment;
 import com.muqdd.iuob2.features.calendar.CalendarSemestersFragment;
 import com.muqdd.iuob2.features.links.LinksFragment;
@@ -27,6 +30,7 @@ import butterknife.ButterKnife;
 public class MainActivity extends BaseActivity {
 
     protected @BindView(R.id.toolbar) Toolbar toolbar;
+    protected @BindView(R.id.main_content) CoordinatorLayout mainContent;
 
     private FragmentManager fragmentManager;
     private PrimaryDrawerItem semesterSchedule;
@@ -36,6 +40,7 @@ public class MainActivity extends BaseActivity {
     private PrimaryDrawerItem map;
     private PrimaryDrawerItem links;
     private PrimaryDrawerItem about;
+    private IDrawerItem lastSelectedItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,30 +171,38 @@ public class MainActivity extends BaseActivity {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        switch ((Menu)drawerItem.getTag()){
-                            case SEMESTER_SCHEDULE:
-                                replaceFragment(SemestersHolderFragment.newInstance());
-                                break;
-                            case CALENDAR:
-                                replaceFragment(CalendarSemestersFragment.newInstance());
-                                break;
-                            case MY_SCHEDULE:
-                                replaceFragment(MyScheduleFragment.newInstance());
-                                break;
-                            case MAP:
-                                replaceFragment(MapFragment.newInstance());
-                                break;
-                            case LINKS:
-                                replaceFragment(LinksFragment.newInstance());
-                                break;
-                            case ABOUT:
-                                replaceFragment(AboutFragment.newInstance());
-                                break;
-                            default:
-                                Logger.w("not handled select");
-                                return true;
+                        if (User.isFetchingData() && lastSelectedItem != null && drawerItem != lastSelectedItem){
+                            drawerMenu.setSelection(lastSelectedItem);
+                            drawerMenu.closeDrawer();
+                            Snackbar.make(mainContent,"Please wait fetching data",Snackbar.LENGTH_SHORT).show();
+                            Logger.d(drawerItem.getTag());
+                            Logger.d(lastSelectedItem.getTag());
+                        } else {
+                            lastSelectedItem = drawerItem;
+                            switch ((Menu) drawerItem.getTag()) {
+                                case SEMESTER_SCHEDULE:
+                                    replaceFragment(SemestersHolderFragment.newInstance());
+                                    break;
+                                case CALENDAR:
+                                    replaceFragment(CalendarSemestersFragment.newInstance());
+                                    break;
+                                case MY_SCHEDULE:
+                                    replaceFragment(MyScheduleFragment.newInstance());
+                                    break;
+                                case MAP:
+                                    replaceFragment(MapFragment.newInstance());
+                                    break;
+                                case LINKS:
+                                    replaceFragment(LinksFragment.newInstance());
+                                    break;
+                                case ABOUT:
+                                    replaceFragment(AboutFragment.newInstance());
+                                    break;
+                                default:
+                                    Logger.w("not handled select");
+                                    break;
+                            }
                         }
-                        toolbar.setTitle(drawerItem.getTag().toString());
                         return false;
                     }
                 })
@@ -216,6 +229,9 @@ public class MainActivity extends BaseActivity {
                     drawerMenu.getActionBarDrawerToggle().setDrawerIndicatorEnabled(true);
                 }
             }
+        } else {
+            // set last item only if it is new create
+            lastSelectedItem = semesterSchedule;
         }
     }
 

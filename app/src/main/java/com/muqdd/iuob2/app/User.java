@@ -45,6 +45,7 @@ public class User {
     private static final String MY_COURSES = "my_courses";
     private static final String MY_COURSES_UPDATE = "my_courses_update";
     private static final Type MY_COURSES_TYPE = new TypeToken<List<MyCourseModel>>() {}.getType();
+    private static boolean fetchingData = false;
 
     public static boolean setNotification(Context context, boolean state) {
         if (state) {
@@ -118,6 +119,7 @@ public class User {
 
     public static void fetchCoursesData(final Context context, final Runnable callback){
         // fetch data synchronously then rebuild schedule
+        fetchingData = true;
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
@@ -266,5 +268,13 @@ public class User {
         } catch (Exception e) {
             Log.e(TAG, "AlarmManager update was not canceled \n" + e.toString());
         }
+    }
+
+    public static boolean isFetchingData() {
+        return fetchingData;
+    }
+
+    public static void setFetchingData(boolean status) {
+        fetchingData = status;
     }
 }

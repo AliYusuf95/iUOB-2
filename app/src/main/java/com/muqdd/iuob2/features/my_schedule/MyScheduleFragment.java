@@ -4,8 +4,9 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -93,9 +94,13 @@ public class MyScheduleFragment extends BaseFragment {
         // handle item selection
         switch (item.getItemId()) {
             case R.id.edit:
-                AddCoursesFragment fragment =
-                        AddCoursesFragment.newInstance(getString(R.string.fragment_add_courses));
-                displayFragment(fragment);
+                if (User.isFetchingData()){
+                    Snackbar.make(mainContent,"Please wait fetching data",Snackbar.LENGTH_SHORT).show();
+                } else {
+                    AddCoursesFragment fragment =
+                            AddCoursesFragment.newInstance(getString(R.string.fragment_add_courses));
+                    displayFragment(fragment);
+                }
                 return true;
             case R.id.notification:
                 changeNotificationState(item);
@@ -155,118 +160,119 @@ public class MyScheduleFragment extends BaseFragment {
         User.fetchCoursesData(getContext(), new Runnable() {
             @Override
             public void run() {
-                runOnUi(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!User.isCoursesUpdated(getContext())) {
+                if (!User.isCoursesUpdated(getContext())) {
+                    User.setFetchingData(false);
+                    Logger.e("error accord while fetching data");
+                    runOnUi(new Runnable() {
+                        @Override
+                        public void run() {
                             mainContent.setRefreshing(false);
-                            Logger.e("error accord while fetching data");
-                        } else {
-                            // update UI
-                            Logger.d("build");
-                            buildMySchedule();
                         }
-                    }
-                });
+                    });
+                } else {
+                    // update UI
+                    Logger.d("build");
+                    buildMySchedule();
+                }
             }
         });
     }
 
-    @SuppressLint("SetTextI18n")
     private void buildMySchedule() {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                // clear lists
-                uList.clear();
-                mList.clear();
-                tList.clear();
-                wList.clear();
-                hList.clear();
-                for (MyCourseModel course : User.getCourses(getContext())) {
-                    if (course.times != null) {
-                        for (MyCourseModel.SectionTime time : course.times) {
-                            if (time.days.contains("U")) {
-                                uList.put(time, course);
-                            }
-                            if (time.days.contains("M")) {
-                                mList.put(time, course);
-                            }
-                            if (time.days.contains("T")) {
-                                tList.put(time, course);
-                            }
-                            if (time.days.contains("W")) {
-                                wList.put(time, course);
-                            }
-                            if (time.days.contains("H")) {
-                                hList.put(time, course);
-                            }
-                        }
+        // clear lists
+        uList.clear();
+        mList.clear();
+        tList.clear();
+        wList.clear();
+        hList.clear();
+        for (MyCourseModel course : User.getCourses(getContext())) {
+            if (course.times != null) {
+                for (MyCourseModel.SectionTime time : course.times) {
+                    if (time.days.contains("U")) {
+                        uList.put(time, course);
+                    }
+                    if (time.days.contains("M")) {
+                        mList.put(time, course);
+                    }
+                    if (time.days.contains("T")) {
+                        tList.put(time, course);
+                    }
+                    if (time.days.contains("W")) {
+                        wList.put(time, course);
+                    }
+                    if (time.days.contains("H")) {
+                        hList.put(time, course);
                     }
                 }
-                // update UI
-                runOnUi(new Runnable() {
+            }
+        }
+        // update UI
+        runOnUi(new Runnable() {
+            @Override
+            public void run() {
+                addCoursesForLayout(uLayout,uList);
+                addCoursesForLayout(mLayout,mList);
+                addCoursesForLayout(tLayout,tList);
+                addCoursesForLayout(wLayout,wList);
+                addCoursesForLayout(hLayout,hList);
+
+                mainContent.setRefreshing(false);
+                new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        addCoursesForLayout(uLayout,uList);
-                        addCoursesForLayout(mLayout,mList);
-                        addCoursesForLayout(tLayout,tList);
-                        addCoursesForLayout(wLayout,wList);
-                        addCoursesForLayout(hLayout,hList);
-
-                        mainContent.setRefreshing(false);
+                        User.setFetchingData(false);
                     }
-
-                    private void addCoursesForLayout(LinearLayout layout,
-                                                     Map<MyCourseModel.SectionTime, MyCourseModel> list) {
-                        layout.removeAllViews();
-                        for (MyCourseModel.SectionTime time : list.keySet()){
-                            if(list.get(time) != null)
-                                layout.addView(createScheduleCell(list.get(time), time));
-                            else {
-                                Logger.i("null");
-                                Logger.i(time.toString());
-                            }
-                        }
-                    }
-
-                    private View createScheduleCell(final MyCourseModel course, MyCourseModel.SectionTime time) {
-                        View view = LayoutInflater.from(getContext()).inflate(R.layout.cell_schedule, null, false);
-                        view.findViewById(R.id.layout).setBackgroundColor(course.bgColor);
-                        ((TextView)view.findViewById(R.id.course)).setText(course.getCourseTitle());
-                        ((TextView)view.findViewById(R.id.time_from)).setText(time.from);
-                        ((TextView)view.findViewById(R.id.time_to)).setText(time.to);
-                        ((TextView)view.findViewById(R.id.room)).setText(time.room);
-                        view.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                final Dialog dialog = new Dialog(getContext());
-
-                                // prepare dialog layout
-                                LayoutInflater inflater =
-                                        (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                                final View dialogView = inflater.inflate(R.layout.dialog_course_details, null);
-                                ((TextView)dialogView.findViewById((R.id.title))).setText(course.getCourseTitle());
-                                ((TextView)dialogView.findViewById((R.id.section))).setText("Section: "+course.sectionNumber);
-                                ((TextView)dialogView.findViewById((R.id.doctor))).setText("Doctor: "+course.doctor);
-                                ((TextView)dialogView.findViewById((R.id.final_time))).setText("Final : "+course.getFinalExam());
-                                dialogView.findViewById((R.id.close)).setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        if (dialog.isShowing())
-                                            dialog.dismiss();
-                                    }
-                                });
-                                // show dialog
-                                dialog.setContentView(dialogView);
-                                dialog.show();
-                            }
-                        });
-                        return view;
-                    }
-                });
+                },200);
             }
         });
+    }
+
+    private void addCoursesForLayout(LinearLayout layout, Map<MyCourseModel.SectionTime, MyCourseModel> list) {
+        layout.removeAllViews();
+        for (MyCourseModel.SectionTime time : list.keySet()){
+            if(list.get(time) != null)
+                layout.addView(createScheduleCell(list.get(time), time));
+            else {
+                Logger.i("null");
+                Logger.i(time.toString());
+            }
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private View createScheduleCell(final MyCourseModel course, MyCourseModel.SectionTime time) {
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.cell_schedule, null, false);
+        view.findViewById(R.id.layout).setBackgroundColor(course.bgColor);
+        ((TextView)view.findViewById(R.id.course)).setText(course.getCourseTitle());
+        ((TextView)view.findViewById(R.id.time_from)).setText(time.from);
+        ((TextView)view.findViewById(R.id.time_to)).setText(time.to);
+        ((TextView)view.findViewById(R.id.room)).setText(time.room);
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final Dialog dialog = new Dialog(getContext());
+
+                // prepare dialog layout
+                LayoutInflater inflater =
+                        (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                final View dialogView = inflater.inflate(R.layout.dialog_course_details, null);
+                ((TextView)dialogView.findViewById((R.id.title))).setText(course.getCourseTitle());
+                ((TextView)dialogView.findViewById((R.id.section))).setText("Section: "+course.sectionNumber);
+                ((TextView)dialogView.findViewById((R.id.doctor))).setText("Doctor: "+course.doctor);
+                ((TextView)dialogView.findViewById((R.id.final_time))).setText("Final : "+course.getFinalExam());
+                dialogView.findViewById((R.id.close)).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (dialog.isShowing())
+                            dialog.dismiss();
+                    }
+                });
+                // show dialog
+                dialog.setContentView(dialogView);
+                dialog.show();
+            }
+        });
+        return view;
     }
 
     private void changeNotificationState(MenuItem item) {
