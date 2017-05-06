@@ -56,6 +56,11 @@ public class LinkModel extends BaseModel<LinkModel, LinkModel.ViewHolder> {
         holder.url.setText(null);
     }
 
+    @Override
+    public ViewHolder getViewHolder(View v) {
+        return new ViewHolder(v);
+    }
+
     //The viewHolder used for this item. This viewHolder is always reused by the RecyclerView so scrolling is blazing fast
     static class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.link_title) TextView title;

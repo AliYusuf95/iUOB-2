@@ -13,7 +13,7 @@ import java.util.List;
  * Created by Ali Yusuf on 3/11/2017.
  * iUOB-2
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused","WeakerAccess"})
 class SemesterPagerAdapter extends FragmentStatePagerAdapter {
 
     private final List<Fragment> fragmentList = new ArrayList<>();

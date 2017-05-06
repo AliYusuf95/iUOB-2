@@ -19,7 +19,7 @@ import butterknife.ButterKnife;
  * iUOB-2
  */
 
-public class CalendarSemesterModel extends BaseModel<SemesterCourseModel, SemesterCourseModel.ViewHolder> {
+public class CalendarSemesterModel extends BaseModel<SemesterCourseModel, CalendarSemesterModel.ViewHolder> {
 
     @SerializedName("semester")
     @Expose
@@ -55,16 +55,21 @@ public class CalendarSemesterModel extends BaseModel<SemesterCourseModel, Semest
     }
 
     @Override
-    public void bindView(SemesterCourseModel.ViewHolder viewHolder, List<Object> payloads) {
+    public void bindView(ViewHolder viewHolder, List<Object> payloads) {
         //call super so the selection is already handled for you
         super.bindView(viewHolder, payloads);
         viewHolder.title.setText(semester);
     }
 
     @Override
-    public void unbindView(SemesterCourseModel.ViewHolder holder) {
+    public void unbindView(ViewHolder holder) {
         super.unbindView(holder);
         holder.title.setText(null);
+    }
+
+    @Override
+    public ViewHolder getViewHolder(View v) {
+        return new ViewHolder(v);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

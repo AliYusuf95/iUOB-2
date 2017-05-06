@@ -1,7 +1,9 @@
 package com.muqdd.iuob2.models;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -53,6 +55,21 @@ public class MyCourseModel extends BaseModel<MyCourseModel, MyCourseModel.ViewHo
     public String finalExamTime;
     public int bgColor;
 
+    public MyCourseModel(String courseName, String courseNumber) {
+        this.courseName = courseName;
+        this.courseNumber = courseNumber;
+        this.departmentCode = Constants.getDebCode(courseName);
+        this.doctor = "";
+        int rand = 0;
+        for (char b : courseName.toCharArray()){
+            rand += b%2 == 0 ? b*b : b*10;
+        }
+        float caj = (float) (((Integer.parseInt(courseNumber) * Integer.parseInt(courseNumber) * 13) % 15) / 100.0);
+        float hue = (float) (rand % 255) + caj;
+        this.bgColor = Color.HSVToColor(30, new float[]{hue, 0.7f,0.8f});
+        this.times = new ArrayList<>();
+    }
+
     public MyCourseModel(String courseName, String courseNumber, String sectionNumber) {
         this.courseName = courseName;
         this.courseNumber = courseNumber;
@@ -99,7 +116,14 @@ public class MyCourseModel extends BaseModel<MyCourseModel, MyCourseModel.ViewHo
         super.bindView(viewHolder, payloads);
         String courseTitle = courseName+courseNumber;
         viewHolder.courseTitle.setText(courseTitle);
-        viewHolder.section.setText(String.format("Section: %s",sectionNumber));
+        if (!"".equals(sectionNumber)) {
+            viewHolder.section.setText(String.format("Section: %s", sectionNumber));
+        }
+        else {
+            viewHolder.section.setVisibility(View.GONE);
+            float fontSize = viewHolder.courseTitle.getTextSize();
+            viewHolder.courseTitle.setTextSize(fontSize);
+        }
     }
 
     //reset the view here (this is an optional method, but recommended)
@@ -108,6 +132,11 @@ public class MyCourseModel extends BaseModel<MyCourseModel, MyCourseModel.ViewHo
         super.unbindView(holder);
         holder.courseTitle.setText("");
         holder.section.setText("");
+    }
+
+    @Override
+    public ViewHolder getViewHolder(View v) {
+        return new ViewHolder(v);
     }
 
     @Override

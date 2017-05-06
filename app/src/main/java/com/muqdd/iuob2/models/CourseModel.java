@@ -91,6 +91,11 @@ public class CourseModel extends BaseModel<CourseModel, CourseModel.ViewHolder> 
         holder.pre.setVisibility(View.GONE);
     }
 
+    @Override
+    public ViewHolder getViewHolder(View v) {
+        return new ViewHolder(v);
+    }
+
     //The viewHolder used for this item. This viewHolder is always reused by the RecyclerView so scrolling is blazing fast
     static class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.course_title) TextView title;

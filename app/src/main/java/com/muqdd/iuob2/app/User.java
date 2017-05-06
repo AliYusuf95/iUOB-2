@@ -1,28 +1,26 @@
 package com.muqdd.iuob2.app;
 
 import android.app.AlarmManager;
-import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.models.MyCourseModel;
 import com.muqdd.iuob2.network.ServiceGenerator;
 import com.muqdd.iuob2.network.UOBSchedule;
 import com.muqdd.iuob2.notification.AlarmNotificationReceiver;
 import com.muqdd.iuob2.utils.SPHelper;
+import com.orhanobut.logger.Logger;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -167,6 +165,7 @@ public class User {
                     }
                 }
                 if (!hasError && isNotificationOn(context)){
+                    stopNotificationSchedule(context);
                     for (MyCourseModel course : getCourses(context)){
                         for (MyCourseModel.SectionTime time : course.times){
                             scheduleNotification(context, course, time);
@@ -191,69 +190,72 @@ public class User {
     }
 
     private static void scheduleNotification(Context context,MyCourseModel course, MyCourseModel.SectionTime time) {
-        Notification.Builder builder = new Notification.Builder(context)
-                .setContentTitle(course.getCourseTitle())
-                //.setContentText("Your lecture will start soon")
-                .setSmallIcon(R.drawable.ic_stat_logo_white)
-                .setColor(ContextCompat.getColor(context,R.color.colorPrimary))
-                .setDefaults(android.app.Notification.DEFAULT_ALL)
-                .setAutoCancel(true);
-        try {
-            Calendar cur_cal = new GregorianCalendar();
-            cur_cal.setTimeInMillis(System.currentTimeMillis());
+        List<String> timeResult = Arrays.asList(time.to.split(":"));
+        // wrong time
+        if (timeResult.size() != 2) {
+            Log.e(TAG, "Fail to parse given time");
+            return;
+        }
 
-            Calendar cal = new GregorianCalendar();
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
-            cal.setTime(sdf.parse(time.from));
-            cal.set(Calendar.DAY_OF_YEAR, cur_cal.get(Calendar.DAY_OF_YEAR));
-            cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE)-15);
-            cal.set(Calendar.SECOND, cur_cal.get(Calendar.SECOND));
-            cal.set(Calendar.MILLISECOND, cur_cal.get(Calendar.MILLISECOND));
-            cal.set(Calendar.MONTH, cur_cal.get(Calendar.MONTH));
+        Calendar cur_cal = new GregorianCalendar();
+        cur_cal.setTimeInMillis(System.currentTimeMillis());
+        Calendar cal = new GregorianCalendar();
+        cal.set(Calendar.HOUR_OF_DAY, Integer.valueOf(timeResult.get(0))+1);
+        cal.set(Calendar.MINUTE, Integer.valueOf(timeResult.get(1))-20);
 
-            for (char day : time.days.toCharArray()){
-                switch (day){
-                    case 'U':
-                        cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-                        break;
-                    case 'M':
-                        cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-                        break;
-                    case 'T':
-                        cal.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
-                        break;
-                    case 'W':
-                        cal.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
-                        break;
-                    case 'H':
-                        cal.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
-                        break;
-                }
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        cal.set(Calendar.MONTH, cur_cal.get(Calendar.MONTH));
+        cal.set(Calendar.YEAR, cur_cal.get(Calendar.YEAR));
 
-                // set notification content
-                builder.setContentText("Your lecture will start soon at "+time.from);
-
-                Log.i(TAG,"Schedule notification set for "+course.getCourseTitle()+", at: "+
-                        sdf.format(cal.getTimeInMillis())+" on day: "+cal.get(Calendar.DAY_OF_WEEK));
-
-                if (System.currentTimeMillis() > cal.getTimeInMillis()){
-                    cal.setTimeInMillis(cal.getTimeInMillis() + 24*60*60*1000);
-                }
-
-                Intent nIntent = new Intent(context, AlarmNotificationReceiver.class);
-                nIntent.putExtra(AlarmNotificationReceiver.NOTIFICATION_ID, 1);
-                nIntent.putExtra(AlarmNotificationReceiver.NOTIFICATION, builder.build());
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, nIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT);
-
-//                AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-//                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),
-//                        AlarmManager.INTERVAL_DAY * 7, pendingIntent);
+        for (char day : time.days.toCharArray()){
+            switch (day){
+                case 'U':
+                    cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+                    break;
+                case 'M':
+                    cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+                    break;
+                case 'T':
+                    cal.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
+                    break;
+                case 'W':
+                    cal.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
+                    break;
+                case 'H':
+                    cal.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
+                    break;
+                default:
+                    Log.e(TAG,"Wrong date");
+                    return;
             }
 
-        } catch (ParseException e) {
-            Log.e(TAG, "Fail to parse given time \n" + e.toString());
+            SimpleDateFormat sdf = new SimpleDateFormat("EEEE HH:mm", Locale.getDefault());
+            Log.i(TAG,"Schedule notification set for "+course.getCourseTitle()+", at: "+
+                    sdf.format(cal.getTimeInMillis())+" on day: "+cal.get(Calendar.DAY_OF_WEEK));
+
+            // Check we aren't setting it in the past which would trigger it to fire instantly
+            if (System.currentTimeMillis() > cal.getTimeInMillis()){
+                cal.add(Calendar.DAY_OF_YEAR, 7);
+                Log.w(TAG,"Alarm will start from tomorrow");
+            }
+
+            Intent nIntent = new Intent(context, AlarmNotificationReceiver.class);
+            // pass notification data
+            nIntent.putExtra(AlarmNotificationReceiver.NOTIFICATION_ID,
+                    Integer.valueOf(course.courseNumber));
+            nIntent.putExtra(AlarmNotificationReceiver.NOTIFICATION_TITLE,
+                    course.getCourseTitle());
+            nIntent.putExtra(AlarmNotificationReceiver.NOTIFICATION_TEXT,
+                    "Your lecture will start soon at "+time.from);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
+                    (int)System.currentTimeMillis(), nIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+//            AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+//            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),
+//                    AlarmManager.INTERVAL_DAY * 7, pendingIntent);
         }
+
     }
 
     private static void stopNotificationSchedule(Context context){
@@ -276,5 +278,35 @@ public class User {
 
     public static void setFetchingData(boolean status) {
         fetchingData = status;
+    }
+
+    private static void testAlarm(Context context) {
+
+        Calendar cur_cal = new GregorianCalendar();
+        cur_cal.setTimeInMillis(System.currentTimeMillis());
+
+        Calendar cal = new GregorianCalendar();
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        cal.set(Calendar.MONTH, cur_cal.get(Calendar.MONTH));
+        cal.set(Calendar.HOUR_OF_DAY, 12);
+        cal.set(Calendar.MINUTE, 44);
+        cal.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
+
+        Logger.d("Schedule notification, at: "+
+                sdf.format(cal.getTimeInMillis())+" on day: "+cal.get(Calendar.DAY_OF_WEEK));
+
+        Intent nIntent = new Intent(context, AlarmNotificationReceiver.class);
+        nIntent.putExtra(AlarmNotificationReceiver.NOTIFICATION_ID, 1);
+        nIntent.putExtra(AlarmNotificationReceiver.NOTIFICATION_TITLE, "Test");
+        nIntent.putExtra(AlarmNotificationReceiver.NOTIFICATION_TEXT, "Your lecture will start soon");
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
+                (int)System.currentTimeMillis(), nIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),
+                AlarmManager.INTERVAL_DAY * 7, pendingIntent);
     }
 }

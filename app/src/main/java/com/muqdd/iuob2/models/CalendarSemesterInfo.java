@@ -26,7 +26,7 @@ import butterknife.ButterKnife;
  * iUOB-2
  */
 
-public class CalendarSemesterInfo extends BaseModel<CalendarSemesterInfo, CalendarSemesterInfo.ViewHolder> {
+public class CalendarSemesterInfo{
 
     public final static SimpleDateFormat parser =
             new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -78,45 +78,6 @@ public class CalendarSemesterInfo extends BaseModel<CalendarSemesterInfo, Calend
 
     public String getDate() {
         return dateFrom + " - " + dateTo;
-    }
-
-    @Override
-    public int getType() {
-        return R.id.time_marker;
-    }
-
-    @Override
-    public int getLayoutRes() {
-        return R.layout.row_timeline;
-    }
-
-    @Override
-    public void bindView(CalendarSemesterInfo.ViewHolder viewHolder, List<Object> payloads) {
-        //call super so the selection is already handled for you
-        super.bindView(viewHolder, payloads);
-        viewHolder.title.setText(eventName);
-        viewHolder.date.setText(getDate());
-        try {
-            Date now = new Date();
-            Date dateFrom = parser.parse(this.dateFrom);
-            Date dateTo = parser.parse(this.dateTo);
-            if (now.before(dateFrom)){
-                viewHolder.timelineView.setMarker(viewHolder.normal);
-            } else if (now.after(dateFrom) && now.before(dateTo)){
-                viewHolder.timelineView.setMarker(viewHolder.active);
-            } else {
-                viewHolder.timelineView.setMarker(viewHolder.inactive);
-            }
-        } catch (ParseException e) {
-            viewHolder.timelineView.setMarker(viewHolder.normal);
-        }
-    }
-
-    @Override
-    public void unbindView(CalendarSemesterInfo.ViewHolder holder) {
-        super.unbindView(holder);
-        holder.title.setText(null);
-        holder.date.setText(null);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

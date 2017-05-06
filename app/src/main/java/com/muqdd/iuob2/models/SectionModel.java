@@ -129,6 +129,11 @@ public class SectionModel extends BaseModel<SectionModel, SectionModel.ViewHolde
         viewHolder.timeRows.removeAllViews();
     }
 
+    @Override
+    public ViewHolder getViewHolder(View v) {
+        return new ViewHolder(v);
+    }
+
     private class SectionTime {
         String days;
         String from;

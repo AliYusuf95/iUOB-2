@@ -21,6 +21,7 @@ import com.muqdd.iuob2.features.calendar.CalendarSemestersFragment;
 import com.muqdd.iuob2.features.links.LinksFragment;
 import com.muqdd.iuob2.features.map.MapFragment;
 import com.muqdd.iuob2.features.my_schedule.MyScheduleFragment;
+import com.muqdd.iuob2.features.schedule_builder.ScheduleBuilderFragment;
 import com.muqdd.iuob2.features.semester_schedule.SemestersHolderFragment;
 import com.orhanobut.logger.Logger;
 
@@ -154,7 +155,7 @@ public class MainActivity extends BaseActivity {
                         calendarSchedule,
                         //new DividerDrawerItem(), // just test divider
                         mySchedule,
-                        //scheduleBuilder,
+                        scheduleBuilder,
                         map,
                         links,
                         about
@@ -188,6 +189,9 @@ public class MainActivity extends BaseActivity {
                                     break;
                                 case MY_SCHEDULE:
                                     replaceFragment(MyScheduleFragment.newInstance());
+                                    break;
+                                case SCHEDULE_BUILDER:
+                                    replaceFragment(ScheduleBuilderFragment.newInstance());
                                     break;
                                 case MAP:
                                     replaceFragment(MapFragment.newInstance());
@@ -249,6 +253,9 @@ public class MainActivity extends BaseActivity {
             }
             if (mFragment instanceof MyScheduleFragment){
                 drawerMenu.setSelection(mySchedule);
+            }
+            if (mFragment instanceof ScheduleBuilderFragment){
+                drawerMenu.setSelection(scheduleBuilder);
             }
             if (mFragment instanceof MapFragment){
                 drawerMenu.setSelection(map);

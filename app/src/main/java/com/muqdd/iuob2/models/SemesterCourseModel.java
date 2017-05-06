@@ -84,6 +84,11 @@ public class SemesterCourseModel extends BaseModel<SemesterCourseModel, Semester
         holder.title.setText("");
     }
 
+    @Override
+    public ViewHolder getViewHolder(View v) {
+        return new ViewHolder(v);
+    }
+
     //The viewHolder used for this item. This viewHolder is always reused by the RecyclerView so scrolling is blazing fast
     static class ViewHolder extends RecyclerView.ViewHolder {
         protected @BindView(R.id.course_title) TextView title;
