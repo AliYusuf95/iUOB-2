@@ -33,4 +33,6 @@
     <string name="dialog_btn_delete">Delete</string>
     <string name="dialog_delete_course_title">Are you sure?</string>
     <string name="dialog_delete_course_sub_title">This course will be deleted from your schedule</string>
+    <string name="menu_next">Next</string>
+    <string name="fragment_schedule_builder_options">Options</string>
 </resources>

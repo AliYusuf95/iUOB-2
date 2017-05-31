@@ -121,8 +121,7 @@ public class MyCourseModel extends BaseModel<MyCourseModel, MyCourseModel.ViewHo
         }
         else {
             viewHolder.section.setVisibility(View.GONE);
-            float fontSize = viewHolder.courseTitle.getTextSize();
-            viewHolder.courseTitle.setTextSize(fontSize);
+            viewHolder.courseTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         }
     }
 

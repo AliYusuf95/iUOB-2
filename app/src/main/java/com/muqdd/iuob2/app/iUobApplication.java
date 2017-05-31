@@ -30,7 +30,7 @@ public class iUobApplication extends Application {
                 @Override
                 public void uncaughtException(Thread paramThread, Throwable paramThrowable) {
                     Log.wtf("Crash", paramThrowable.getMessage(), paramThrowable);
-                    System.exit(2); //Prevents the service/app from freezing
+                    //System.exit(2); //Prevents the service/app from freezing
                 }
             });
         }

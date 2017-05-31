@@ -20,7 +20,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.malinskiy.superrecyclerview.SuperRecyclerView;
 import com.mikepenz.fastadapter.FastAdapter;
@@ -198,7 +197,7 @@ public class AddCoursesFragment extends BaseFragment {
         final AutoCompleteTextView  textCourse =
                 (AutoCompleteTextView)dialogView.findViewById((R.id.course));
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
-                android.R.layout.simple_dropdown_item_1line, Constants.coursesList);
+                android.R.layout.simple_dropdown_item_1line, Constants.coursesNameList);
         textCourse.setAdapter(adapter);
         // force all caps
         textCourse.setFilters(new InputFilter[]{new InputFilter.AllCaps()});
@@ -240,7 +239,7 @@ public class AddCoursesFragment extends BaseFragment {
                     return;
                 }
                 // course name not in the list
-                if (!Arrays.asList(Constants.coursesList).contains(courseName)){
+                if (!Arrays.asList(Constants.coursesNameList).contains(courseName)){
                     dialog.dismiss();
                     Snackbar.make(mainContent,"Wrong course input",Snackbar.LENGTH_SHORT).show();
                     return;

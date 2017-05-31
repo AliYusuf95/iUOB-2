@@ -63,10 +63,11 @@
             android:layout_height="wrap_content"
             android:textSize="@dimen/title_text"
             android:textStyle="bold"
-            android:textColor="@color/colorSecondaryText"
-            android:text="Course"/>
+            android:textColor="@color/colorPrimaryText"
+            android:text="Course"
+            android:labelFor="@id/course"/>
         
-        <EditText
+        <AutoCompleteTextView
             android:id="@id/course"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
