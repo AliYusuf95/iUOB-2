@@ -100,7 +100,7 @@ public class CoursesFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        // set fragment title
+        // set fragment course
         toolbar.setTitle(title);
         // stop hiding toolbar
         params.setScrollFlags(0);
@@ -132,7 +132,7 @@ public class CoursesFragment extends BaseFragment {
             @Override
             public boolean onClick(View v, IAdapter<CourseModel> adapter,
                                    CourseModel item, int position) {
-                SectionsFragment fragment = SectionsFragment.newInstance(item.subTitle,item);
+                SectionsFragment fragment = SectionsFragment.newInstance(item.courseName,item);
                 displayFragment(fragment);
                 return true;
             }

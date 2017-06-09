@@ -25,6 +25,7 @@ import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.models.CourseModel;
+import com.muqdd.iuob2.models.MyCourseModel;
 import com.muqdd.iuob2.models.SectionModel;
 import com.muqdd.iuob2.network.ServiceGenerator;
 import com.muqdd.iuob2.network.UOBSchedule;
@@ -56,12 +57,6 @@ public class SectionsFragment extends BaseFragment {
     public final static Type TYPE = new TypeToken<CourseModel>() {}.getType();
 
     // static variables to enhance performance
-    private final static String titlePattern = "<center><B>\\s*?([^\\s][\\S\\s]*?)\\s*?</B></center>";
-    private final static Pattern pTitle =
-            Pattern.compile(titlePattern,Pattern.UNIX_LINES | Pattern.CASE_INSENSITIVE);
-    private final static String sectionsPattern = "[\\s\\S]*?(<P ALIGN=\"center\">[\\s\\S]*?<TABLE[\\s\\S]*?</TABLE>[\\s\\S]*?)";
-    private final static Pattern pSections =
-            Pattern.compile(sectionsPattern,Pattern.UNIX_LINES | Pattern.CASE_INSENSITIVE);
     private final static String seatsPattern = "Sec\\.[\\s\\S]*?color=\".*\">(.*?)<[\\s\\S]*?=&gt;[\\s\\S]*?size=\"2\">(\\d*?)<";
     private final static Pattern pSeats =
             Pattern.compile(seatsPattern,Pattern.UNIX_LINES | Pattern.CASE_INSENSITIVE);
@@ -109,7 +104,7 @@ public class SectionsFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        // set fragment title
+        // set fragment course
         toolbar.setTitle(title);
         // stop hiding toolbar
         params.setScrollFlags(0);
@@ -159,7 +154,7 @@ public class SectionsFragment extends BaseFragment {
                                 public void run() {
                                     try {
                                         sectionsList.clear();
-                                        sectionsList.addAll(parseSectionsListData(response.body().string()));
+                                        sectionsList.addAll(SectionModel.parseSectionsData(response.body().string()));
                                         if (sectionsList.size() > 0) {
                                             getAvailableSeats();
                                             // attach the adapter
@@ -222,20 +217,6 @@ public class SectionsFragment extends BaseFragment {
                         Logger.e(t.getMessage());
                     }
                 });
-    }
-
-    public ArrayList<SectionModel> parseSectionsListData (String data) {
-        final Matcher mTitle = pTitle.matcher(data);
-        String title = "";
-        if (mTitle.find()){
-            title = mTitle.group(1);
-        }
-        final Matcher m = pSections.matcher(data);
-        ArrayList<SectionModel> list = new ArrayList<>();
-        while (m.find()){
-            list.add(new SectionModel(title, m.group(1)));
-        }
-        return list;
     }
 
     public void parseAvailableSeatsData(String data){

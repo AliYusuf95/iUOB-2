@@ -30,7 +30,7 @@ public class FCMMessageHandler extends FirebaseMessagingService {
         createNotification(notification);
     }
 
-    // Creates notification based on title and body received
+    // Creates notification based on course and body received
     private void createNotification(Notification notification) {
         Context context = getBaseContext();
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)

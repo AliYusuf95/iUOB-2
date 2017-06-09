@@ -1,5 +1,6 @@
 package com.muqdd.iuob2.features.schedule_builder;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
@@ -13,25 +14,21 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 
 import com.malinskiy.superrecyclerview.SuperRecyclerView;
 import com.mikepenz.fastadapter.FastAdapter;
-import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 import com.mikepenz.fastadapter.listeners.ClickEventHook;
-import com.mikepenz.fastadapter.listeners.EventHook;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.app.Constants;
 import com.muqdd.iuob2.features.main.Menu;
-import com.muqdd.iuob2.models.MyCourseModel;
-import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,8 +53,10 @@ public class ScheduleBuilderFragment extends BaseFragment {
     @BindView(R.id.recycler_view) SuperRecyclerView recyclerView;
 
     private View mView;
-    private FastItemAdapter<MyCourseModel> fastItemAdapter;
-    private List<MyCourseModel> myCourseList;
+    private FastItemAdapter<BCourseModel> fastItemAdapter;
+    private List<BCourseModel> myCourseList;
+    private MenuItem nextMenuItem;
+    private String semester;
 
     public ScheduleBuilderFragment() {
         // Required empty public constructor
@@ -88,6 +87,9 @@ public class ScheduleBuilderFragment extends BaseFragment {
     public void onCreateOptionsMenu(android.view.Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.schedule_builder_menu, menu);
+
+        nextMenuItem = menu.findItem(R.id.next);
+        refreshNextMenuItem();
     }
 
     @Override
@@ -98,8 +100,14 @@ public class ScheduleBuilderFragment extends BaseFragment {
                 if (myCourseList.size() == 0) {
                     Snackbar.make(mainContent, "Please add courses first", Snackbar.LENGTH_LONG).show();
                 } else {
+                    // hide keyboard
+                    course.requestFocus();
+                    InputMethodManager imm =
+                            (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(course.getWindowToken(), 0);
+                    // start options fragment
                     OptionsFragment fragment =
-                            OptionsFragment.newInstance(getString(R.string.fragment_schedule_builder_options), myCourseList);
+                            OptionsFragment.newInstance(getString(R.string.fragment_schedule_builder_options), semester, myCourseList);
                     displayFragment(fragment);
                 }
                 return true;
@@ -120,20 +128,21 @@ public class ScheduleBuilderFragment extends BaseFragment {
         fastItemAdapter = new FastItemAdapter<>();
         myCourseList = new ArrayList<>();
 
-        fastItemAdapter.withItemEvent(new ClickEventHook<MyCourseModel>() {
+        fastItemAdapter.withItemEvent(new ClickEventHook<BCourseModel>() {
             @Nullable
             @Override
             public View onBind(@NonNull RecyclerView.ViewHolder viewHolder) {
-                if (viewHolder instanceof MyCourseModel.ViewHolder){
-                    return ((MyCourseModel.ViewHolder) viewHolder).delete;
+                if (viewHolder instanceof BCourseModel.ViewHolder){
+                    return ((BCourseModel.ViewHolder) viewHolder).delete;
                 }
                 return null;
             }
 
             @Override
-            public void onClick(View v, int position, FastAdapter<MyCourseModel> fastAdapter, MyCourseModel item) {
+            public void onClick(View v, int position, FastAdapter<BCourseModel> fastAdapter, BCourseModel item) {
                 myCourseList.remove(position);
                 fastItemAdapter.remove(position);
+                refreshNextMenuItem();
             }
         });
 
@@ -147,17 +156,17 @@ public class ScheduleBuilderFragment extends BaseFragment {
         // Second semester
         if (month > 3 && month < 7){
             semesterRadio.check(R.id.second);
-            Logger.d("case 1");
+            semester = "2";
         }
         // Summer semester
         else if (month > 6 && month < 10) {
             semesterRadio.check(R.id.summer);
-            Logger.d("case 2");
+            semester = "3";
         }
         // First semester (from 9 to 12)
         else {
             semesterRadio.check(R.id.first);
-            Logger.d("case 3");
+            semester = "1";
         }
 
         semesterRadio.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -165,10 +174,13 @@ public class ScheduleBuilderFragment extends BaseFragment {
             public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
                 switch (i){
                     case R.id.first:
+                        semester = "1";
                         break;
                     case R.id.second:
+                        semester = "2";
                         break;
                     case R.id.summer:
+                        semester = "3";
                         break;
                 }
             }
@@ -209,6 +221,11 @@ public class ScheduleBuilderFragment extends BaseFragment {
         });
     }
 
+    private void refreshNextMenuItem(){
+        nextMenuItem.setEnabled(myCourseList.size() > 0);
+        nextMenuItem.setCheckable(myCourseList.size() > 0);
+    }
+
     @OnClick(R.id.add)
     void addCourse(){
         course.performValidation();
@@ -216,7 +233,7 @@ public class ScheduleBuilderFragment extends BaseFragment {
             String courseString = course.getText().toString().trim();
             String courseNumber = courseString.substring(courseString.length()-3);
             String CourseName = courseString.substring(0,courseString.length()-3);
-            MyCourseModel myCourse = new MyCourseModel(CourseName, courseNumber,"");
+            BCourseModel myCourse = new BCourseModel(CourseName, courseNumber);
             if (!myCourseList.contains(myCourse)) {
                 myCourseList.add(myCourse);
                 fastItemAdapter.add(myCourse);
@@ -225,5 +242,6 @@ public class ScheduleBuilderFragment extends BaseFragment {
                 Snackbar.make(mainContent, "This course already added", Snackbar.LENGTH_LONG).show();
             }
         }
+        refreshNextMenuItem();
     }
 }

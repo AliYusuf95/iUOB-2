@@ -35,6 +35,7 @@
             android:resource="@color/colorPrimary" />
 
         <activity android:name=".features.main.MainActivity"/>
+        <activity android:name=".features.schedule_builder.SectionsFilterActivity"/>
         <activity
             android:name=".features.splash.SplashActivity"
             android:theme="@style/SplashTheme">

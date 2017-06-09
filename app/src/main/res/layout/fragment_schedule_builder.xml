@@ -25,6 +25,8 @@
         android:orientation="horizontal"
         android:layout_marginTop="5dp"
         android:gravity="center"
+        android:paddingStart="25dp"
+        android:paddingEnd="25dp"
         segmentedgroup:sc_border_width="2dp"
         segmentedgroup:sc_tint_color="@color/colorPrimaryDark">
 
@@ -32,6 +34,7 @@
             android:id="@+id/first"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="0.3"
             android:text="First"
             style="@style/RadioButton" />
 
@@ -39,6 +42,7 @@
             android:id="@+id/second"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="0.3"
             android:text="Second"
             tools:checked="true"
             style="@style/RadioButton" />
@@ -47,6 +51,7 @@
             android:id="@+id/summer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="0.3"
             android:text="Summer"
             style="@style/RadioButton" />
         
@@ -71,18 +76,23 @@
             android:id="@id/course"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:hint="HIST122"
             android:ems="10"
+            android:maxLines="1"
+            android:inputType="text"
+            android:imeOptions="actionNext"
             android:layout_marginStart="5dp"
             android:layout_marginEnd="5dp"
             />
         
         <ImageButton
             android:id="@+id/add"
+            android:layout_width="24dp"
+            android:layout_height="32dp"
             android:src="@drawable/ic_add_24dp"
             android:tint="@color/colorPrimaryDark"
-            android:background="@android:color/transparent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:background="?selectableItemBackgroundBorderless"
+            />
         
     </LinearLayout>
 

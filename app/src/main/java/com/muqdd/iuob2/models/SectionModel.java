@@ -30,7 +30,7 @@ import butterknife.ButterKnife;
 @SuppressWarnings({"unused","WeakerAccess"})
 public class SectionModel extends BaseModel<SectionModel, SectionModel.ViewHolder> {
 
-    // static variables to enhance performance
+    // parsing one section
     private final static String coursePattern =
             "<center><B>\\s*?([^\\s][\\S\\s]*?)\\s*?</B></center>";
     private final static String sectionPattern =
@@ -47,10 +47,20 @@ public class SectionModel extends BaseModel<SectionModel, SectionModel.ViewHolde
     private final static Pattern pTimes = Pattern.compile(timesPattern,Pattern.CASE_INSENSITIVE);
     private final static Pattern pFinal = Pattern.compile(finalPattern,Pattern.CASE_INSENSITIVE);
 
+    // parsing sections list
+    private final static String sectionTitlePattern =
+            "<center><B>\\s*?([^\\s][\\S\\s]*?)\\s*?</B></center>";
+    private final static String sectionsPattern =
+            "[\\s\\S]*?(<P ALIGN=\"center\">[\\s\\S]*?<TABLE[\\s\\S]*?</TABLE>[\\s\\S]*?)";
+    private final static Pattern pTitle =
+            Pattern.compile(sectionTitlePattern,Pattern.UNIX_LINES | Pattern.CASE_INSENSITIVE);
+    private final static Pattern pSections =
+            Pattern.compile(sectionsPattern,Pattern.UNIX_LINES | Pattern.CASE_INSENSITIVE);
+
     public String title;
     public String number;
     public String doctor;
-    public List<SectionTime> times;
+    public List<SectionTimeModel> times;
     public String finalExamDate;
     public String finalExamTime;
     public String seats;
@@ -64,7 +74,7 @@ public class SectionModel extends BaseModel<SectionModel, SectionModel.ViewHolde
             this.doctor = mData.group(2);
             Matcher mTimes = pTimes.matcher(mData.group(3));
             while (mTimes.find()){
-                times.add(new SectionTime(mTimes.group(1),mTimes.group(2),mTimes.group(3),mTimes.group(4)));
+                times.add(new SectionTimeModel(mTimes.group(1),mTimes.group(2),mTimes.group(3),mTimes.group(4)));
             }
             Matcher mFinal = pFinal.matcher(mData.group(3));
             if (mFinal.find()){
@@ -77,6 +87,20 @@ public class SectionModel extends BaseModel<SectionModel, SectionModel.ViewHolde
         this.showSeats = false;
     }
 
+    public static ArrayList<SectionModel> parseSectionsData(String data) {
+        final Matcher mTitle = pTitle.matcher(data);
+        String title = "";
+        if (mTitle.find()){
+            title = mTitle.group(1);
+        }
+        final Matcher m = pSections.matcher(data);
+        ArrayList<SectionModel> list = new ArrayList<>();
+        while (m.find()){
+            list.add(new SectionModel(title, m.group(1)));
+        }
+        return list;
+    }
+
     public String getFinalExam() {
         return finalExamDate.trim().equals("")? "" : finalExamDate+" @ "+finalExamTime;
     }
@@ -86,7 +110,7 @@ public class SectionModel extends BaseModel<SectionModel, SectionModel.ViewHolde
         String str = title+"\n"+
                 "Sec. [" + number + "] => "+ doctor + "\n";
         if (times.size() > 0) {
-            for (SectionTime time : times) {
+            for (SectionTimeModel time : times) {
                 str += "\tDays: "+time.days+", Time: "+time.getDuration()+", Room: "+time.room+"\n";
             }
         }
@@ -112,7 +136,7 @@ public class SectionModel extends BaseModel<SectionModel, SectionModel.ViewHolde
         super.bindView(viewHolder, payloads);
         viewHolder.sectionNumber.setText(number);
         viewHolder.doctorName.setText(doctor);
-        for (SectionTime sectionTime: times) {
+        for (SectionTimeModel sectionTime: times) {
             viewHolder.addRow(sectionTime);
         }
         if (!showSeats) {
@@ -134,24 +158,6 @@ public class SectionModel extends BaseModel<SectionModel, SectionModel.ViewHolde
         return new ViewHolder(v);
     }
 
-    private class SectionTime {
-        String days;
-        String from;
-        String to;
-        String room;
-
-        SectionTime(String days, String from, String to, String room) {
-            this.days = days;
-            this.from = from;
-            this.to = to;
-            this.room = room;
-        }
-
-        public String getDuration() {
-            return from+" - "+to;
-        }
-    }
-
     static class ViewHolder extends RecyclerView.ViewHolder {
         protected @BindView(R.id.section_number) TextView sectionNumber;
         protected @BindView(R.id.doctor_name) TextView doctorName;
@@ -166,7 +172,7 @@ public class SectionModel extends BaseModel<SectionModel, SectionModel.ViewHolde
         }
 
         @SuppressLint("InflateParams")
-        public void addRow(SectionTime sectionTime){
+        public void addRow(SectionTimeModel sectionTime){
             // separator line
             View line = new View(context);
             int hLine = (int) context.getResources().getDimension(R.dimen.row_section_time_divider);

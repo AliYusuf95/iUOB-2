@@ -21,6 +21,7 @@ import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.app.User;
 import com.muqdd.iuob2.features.main.Menu;
 import com.muqdd.iuob2.models.MyCourseModel;
+import com.muqdd.iuob2.models.SectionTimeModel;
 import com.orhanobut.logger.Logger;
 
 import java.util.Comparator;
@@ -48,11 +49,11 @@ public class MyScheduleFragment extends BaseFragment {
     @BindDrawable(R.drawable.ic_notifications_off_24dp) Drawable notificationOff;
 
     private View mView;
-    private Map<MyCourseModel.SectionTime,MyCourseModel> uList;
-    private Map<MyCourseModel.SectionTime,MyCourseModel> mList;
-    private Map<MyCourseModel.SectionTime,MyCourseModel> tList;
-    private Map<MyCourseModel.SectionTime,MyCourseModel> wList;
-    private Map<MyCourseModel.SectionTime,MyCourseModel> hList;
+    private Map<SectionTimeModel, MyCourseModel> uList;
+    private Map<SectionTimeModel, MyCourseModel> mList;
+    private Map<SectionTimeModel, MyCourseModel> tList;
+    private Map<SectionTimeModel, MyCourseModel> wList;
+    private Map<SectionTimeModel, MyCourseModel> hList;
 
     public MyScheduleFragment() {
         // Required empty public constructor
@@ -138,9 +139,9 @@ public class MyScheduleFragment extends BaseFragment {
         });
 
         // section time comparator
-        Comparator comparator = new Comparator<MyCourseModel.SectionTime>(){
+        Comparator comparator = new Comparator<SectionTimeModel>(){
             @Override
-            public int compare(MyCourseModel.SectionTime t1, MyCourseModel.SectionTime t2) {
+            public int compare(SectionTimeModel t1, SectionTimeModel t2) {
                 // compare from then to then room to sort sections
                 int f,t;
                 return (f = t1.from.compareTo(t2.from)) == 0 ?
@@ -187,7 +188,7 @@ public class MyScheduleFragment extends BaseFragment {
         hList.clear();
         for (MyCourseModel course : User.getCourses(getContext())) {
             if (course.times != null) {
-                for (MyCourseModel.SectionTime time : course.times) {
+                for (SectionTimeModel time : course.times) {
                     if (time.days.contains("U")) {
                         uList.put(time, course);
                     }
@@ -227,9 +228,9 @@ public class MyScheduleFragment extends BaseFragment {
         });
     }
 
-    private void addCoursesForLayout(LinearLayout layout, Map<MyCourseModel.SectionTime, MyCourseModel> list) {
+    private void addCoursesForLayout(LinearLayout layout, Map<SectionTimeModel, MyCourseModel> list) {
         layout.removeAllViews();
-        for (MyCourseModel.SectionTime time : list.keySet()){
+        for (SectionTimeModel time : list.keySet()){
             if(list.get(time) != null)
                 layout.addView(createScheduleCell(list.get(time), time));
             else {
@@ -240,7 +241,7 @@ public class MyScheduleFragment extends BaseFragment {
     }
 
     @SuppressLint("SetTextI18n")
-    private View createScheduleCell(final MyCourseModel course, MyCourseModel.SectionTime time) {
+    private View createScheduleCell(final MyCourseModel course, SectionTimeModel time) {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.cell_schedule, null, false);
         view.findViewById(R.id.layout).setBackgroundColor(course.bgColor);
         ((TextView)view.findViewById(R.id.course)).setText(course.getCourseTitle());

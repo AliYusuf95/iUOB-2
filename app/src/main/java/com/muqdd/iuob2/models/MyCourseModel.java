@@ -1,6 +1,5 @@
 package com.muqdd.iuob2.models;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
@@ -11,9 +10,7 @@ import android.widget.TextView;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseModel;
 import com.muqdd.iuob2.app.Constants;
-import com.orhanobut.logger.Logger;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -40,6 +37,7 @@ public class MyCourseModel extends BaseModel<MyCourseModel, MyCourseModel.ViewHo
             "<TD.*?height=\"19\"><FONT color=\"#0000FF\">[\\S ]*?"+
                     "<[\\s\\S]*?TD.*?>.*?>([\\S ]*?)</FONT><[\\s\\S]*?TD.*?>.*?>([\\S ]*?)"+
                     "</FONT><[\\s\\S]*?TD.*?>.*?>([\\S ]*?)</FONT></TD>";
+
     private final static Pattern pData = Pattern.compile(sectionPattern,Pattern.CASE_INSENSITIVE);
     private final static Pattern pTimes = Pattern.compile(timesPattern,Pattern.CASE_INSENSITIVE);
     private final static Pattern pFinal = Pattern.compile(finalPattern,Pattern.CASE_INSENSITIVE);
@@ -50,25 +48,11 @@ public class MyCourseModel extends BaseModel<MyCourseModel, MyCourseModel.ViewHo
     public String departmentCode;
     public String doctor;
     public String room;
-    public List<SectionTime> times;
+    public List<SectionTimeModel> times;
     public String finalExamDate;
     public String finalExamTime;
     public int bgColor;
-
-    public MyCourseModel(String courseName, String courseNumber) {
-        this.courseName = courseName;
-        this.courseNumber = courseNumber;
-        this.departmentCode = Constants.getDebCode(courseName);
-        this.doctor = "";
-        int rand = 0;
-        for (char b : courseName.toCharArray()){
-            rand += b%2 == 0 ? b*b : b*10;
-        }
-        float caj = (float) (((Integer.parseInt(courseNumber) * Integer.parseInt(courseNumber) * 13) % 15) / 100.0);
-        float hue = (float) (rand % 255) + caj;
-        this.bgColor = Color.HSVToColor(30, new float[]{hue, 0.7f,0.8f});
-        this.times = new ArrayList<>();
-    }
+    public List<SectionModel> sections;
 
     public MyCourseModel(String courseName, String courseNumber, String sectionNumber) {
         this.courseName = courseName;
@@ -84,13 +68,14 @@ public class MyCourseModel extends BaseModel<MyCourseModel, MyCourseModel.ViewHo
         float hue = (float) (rand % 255) + caj;
         this.bgColor = Color.HSVToColor(30, new float[]{hue, 0.7f,0.8f});
         this.times = new ArrayList<>();
+        this.sections = new ArrayList<>();
     }
 
     @Override
     public String toString() {
         String str = "Sec. [" + sectionNumber + "] => "+ doctor + "\n";
         if (times.size() > 0) {
-            for (SectionTime time : times) {
+            for (SectionTimeModel time : times) {
                 str += "\tDays: "+time.days+", Time: "+time.getDuration()+", Room: "+time.room+"\n";
             }
         }
@@ -116,7 +101,7 @@ public class MyCourseModel extends BaseModel<MyCourseModel, MyCourseModel.ViewHo
         super.bindView(viewHolder, payloads);
         String courseTitle = courseName+courseNumber;
         viewHolder.courseTitle.setText(courseTitle);
-        if (!"".equals(sectionNumber)) {
+        if (sectionNumber != null && !"".equals(sectionNumber)) {
             viewHolder.section.setText(String.format("Section: %s", sectionNumber));
         }
         else {
@@ -145,9 +130,12 @@ public class MyCourseModel extends BaseModel<MyCourseModel, MyCourseModel.ViewHo
         else if (o == this)
             return true;
         MyCourseModel object = (MyCourseModel) o;
-        return courseName.equals(object.courseName) &&
-                courseNumber.equals(object.courseNumber) &&
-                sectionNumber.equals(object.sectionNumber);
+        return sectionNumber != null && object.sectionNumber != null ?
+                courseName.equals(object.courseName) &&
+                        courseNumber.equals(object.courseNumber) &&
+                        sectionNumber.equals(object.sectionNumber) :
+                courseName.equals(object.courseName) &&
+                        courseNumber.equals(object.courseNumber);
     }
 
     @Override
@@ -166,7 +154,7 @@ public class MyCourseModel extends BaseModel<MyCourseModel, MyCourseModel.ViewHo
             this.doctor = mData.group(2);
             Matcher mTimes = pTimes.matcher(mData.group(3));
             while (mTimes.find()){
-                times.add(new SectionTime(mTimes.group(1),mTimes.group(2),mTimes.group(3),mTimes.group(4)));
+                times.add(new SectionTimeModel(mTimes.group(1),mTimes.group(2),mTimes.group(3),mTimes.group(4)));
             }
             Matcher mFinal = pFinal.matcher(mData.group(3));
             if (mFinal.find()){
@@ -178,24 +166,6 @@ public class MyCourseModel extends BaseModel<MyCourseModel, MyCourseModel.ViewHo
 
     public String getFinalExam() {
         return finalExamDate.trim().equals("")? "" : finalExamDate+" @ "+finalExamTime;
-    }
-
-    public class SectionTime {
-        public String days;
-        public String from;
-        public String to;
-        public String room;
-
-        SectionTime(String days, String from, String to, String room) {
-            this.days = days;
-            this.from = from;
-            this.to = to;
-            this.room = room;
-        }
-
-        public String getDuration() {
-            return from+" - "+to;
-        }
     }
 
     //The viewHolder used for this item. This viewHolder is always reused by the RecyclerView so scrolling is blazing fast

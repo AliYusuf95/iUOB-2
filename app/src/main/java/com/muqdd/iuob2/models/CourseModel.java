@@ -26,7 +26,7 @@ public class CourseModel extends BaseModel<CourseModel, CourseModel.ViewHolder> 
     private final static Pattern pHref = Pattern.compile(pattern,Pattern.CASE_INSENSITIVE);
 
     public String title;
-    public String subTitle;
+    public String courseName;
     public String prog;
     public String abv;
     public String departmentCode;
@@ -38,7 +38,7 @@ public class CourseModel extends BaseModel<CourseModel, CourseModel.ViewHolder> 
 
     public CourseModel(String href, String title, String pre) {
         this.title = title;
-        this.subTitle = title.split("-")[0];
+        this.courseName = title.split("-")[0];
         this.pre = pre;
         Matcher mHref = pHref.matcher(href);
         if(mHref.find()) {
@@ -50,10 +50,6 @@ public class CourseModel extends BaseModel<CourseModel, CourseModel.ViewHolder> 
             this.year = mHref.group(6);
             this.semester = mHref.group(7);
         }
-    }
-
-    public String fileName() {
-        return abv+courseNumber+"_"+year+"_"+semester+".html";
     }
 
     //The unique ID for this type of item

@@ -35,4 +35,9 @@
     <string name="dialog_delete_course_sub_title">This course will be deleted from your schedule</string>
     <string name="menu_next">Next</string>
     <string name="fragment_schedule_builder_options">Options</string>
+    <string name="activity_sections_filter">Sections Filter</string>
+    <string name="menu_done">Done</string>
+    <string name="menu_select_all">Select All</string>
+    <string name="menu_deselect_all">Deselect All</string>
+    <string name="menu_deselect_to_be_announced">Deselect [To Be Announced]</string>
 </resources>

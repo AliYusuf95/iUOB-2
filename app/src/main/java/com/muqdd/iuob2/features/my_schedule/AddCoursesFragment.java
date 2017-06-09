@@ -113,7 +113,7 @@ public class AddCoursesFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        // set fragment title
+        // set fragment course
         toolbar.setTitle(title);
         // stop hiding toolbar
         params.setScrollFlags(0);
@@ -244,7 +244,7 @@ public class AddCoursesFragment extends BaseFragment {
                     Snackbar.make(mainContent,"Wrong course input",Snackbar.LENGTH_SHORT).show();
                     return;
                 }
-                // section number up to 99
+                // section sectionNumber up to 99
                 if (section.length() > 2){
                     dialog.dismiss();
                     Snackbar.make(mainContent,"Wrong section input",Snackbar.LENGTH_SHORT).show();

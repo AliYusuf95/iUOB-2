@@ -19,7 +19,7 @@ import com.muqdd.iuob2.features.main.MainActivity;
 public class AlarmNotificationReceiver extends BroadcastReceiver {
 
     public static String NOTIFICATION_ID = "notification-id";
-    public static String NOTIFICATION_TITLE = "notification-title";
+    public static String NOTIFICATION_TITLE = "notification-course";
     public static String NOTIFICATION_TEXT = "notification-text";
 
     public void onReceive(Context context, Intent intent) {

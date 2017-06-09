@@ -10,6 +10,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.muqdd.iuob2.models.MyCourseModel;
+import com.muqdd.iuob2.models.SectionTimeModel;
 import com.muqdd.iuob2.network.ServiceGenerator;
 import com.muqdd.iuob2.network.UOBSchedule;
 import com.muqdd.iuob2.notification.AlarmNotificationReceiver;
@@ -49,7 +50,7 @@ public class User {
         if (state) {
             SPHelper.saveToPrefs(context, NOTIFICATION, "on");
             for (MyCourseModel course : getCourses(context)){
-                for (MyCourseModel.SectionTime time : course.times) {
+                for (SectionTimeModel time : course.times) {
                     scheduleNotification(context, course, time);
                 }
             }
@@ -167,7 +168,7 @@ public class User {
                 if (!hasError && isNotificationOn(context)){
                     stopNotificationSchedule(context);
                     for (MyCourseModel course : getCourses(context)){
-                        for (MyCourseModel.SectionTime time : course.times){
+                        for (SectionTimeModel time : course.times){
                             scheduleNotification(context, course, time);
                         }
                     }
@@ -189,7 +190,7 @@ public class User {
         SPHelper.saveToPrefs(context,MY_COURSES,coursesJson);
     }
 
-    private static void scheduleNotification(Context context,MyCourseModel course, MyCourseModel.SectionTime time) {
+    private static void scheduleNotification(Context context, MyCourseModel course, SectionTimeModel time) {
         List<String> timeResult = Arrays.asList(time.to.split(":"));
         // wrong time
         if (timeResult.size() != 2) {

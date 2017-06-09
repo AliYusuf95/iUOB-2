@@ -12,6 +12,8 @@ import java.util.Map;
 public class Constants {
     private static Map<String, String> debCodeMap;
 
+    public final static String INTENT_SECTIONS_LIST = "INTENT_SECTIONS_LIST";
+
     public final static String[] coursesNameList = {"ACC","ACCA","ACCM","AH","ALH","AMST","ARAB","ARABA",
             "ARABM","ARCG","ART","BAA","BIOLS","BIONU","BIS","CEA","CEG","CENG","CGS","CHE","CHEMY",
             "CHENG","CHL","COM","CSA","CSC","DH","ECON","ECONA","ECONM","EDAR","EDEG","EDPS","EDTC",
