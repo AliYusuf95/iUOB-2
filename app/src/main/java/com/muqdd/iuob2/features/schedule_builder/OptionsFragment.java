@@ -2,6 +2,7 @@ package com.muqdd.iuob2.features.schedule_builder;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -12,10 +13,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
@@ -131,7 +130,9 @@ public class OptionsFragment extends BaseFragment {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.schedule_builder_menu, menu);
         nextMenuItem = menu.findItem(R.id.next);
-        nextMenuItem.setEnabled(false); // false by default
+        if (btnSectionFilter != null) {
+            nextMenuItem.setEnabled(btnSectionFilter.isEnabled());
+        }
     }
 
     @Override
@@ -139,11 +140,16 @@ public class OptionsFragment extends BaseFragment {
         // handle item selection
         switch (item.getItemId()) {
             case R.id.next:
+                // start options fragment
+                SummaryFragment fragment =
+                        SummaryFragment.newInstance(getString(R.string.fragment_schedule_builder_summary), myCourseList);
+                displayFragment(fragment);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -156,7 +162,14 @@ public class OptionsFragment extends BaseFragment {
         // initialize variables
         allCourseList = new Gson().fromJson(getArguments().getString(COURSES_LIST), COURSES_LIST_TYPE);
         if (allCourseList == null){
-            allCourseList = new ArrayList<>();
+            Dialog dialog = infoDialog("Sorry","Some thing goes wrong pleas try again later.", "Cancel");
+            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialogInterface) {
+                    getActivity().onBackPressed();
+                }
+            });
+            dialog.show();
         }
         myCourseList = new ArrayList<>();
         sectionFilter = false;
