@@ -44,7 +44,9 @@ public class SummaryFragment extends BaseFragment {
 
     private View mView;
     private List<BCourseModel> myCourseList; // filtered courses data
+    private List<List<BSectionModel>> mySchedulesList; // available schedules
     private MenuItem nextMenuItem;
+    private AsyncTask<Void, Void, Set<List<BSectionModel>>> calculationTask;
 
     public SummaryFragment() {
         // Required empty public constructor
@@ -85,6 +87,10 @@ public class SummaryFragment extends BaseFragment {
         // handle item selection
         switch (item.getItemId()) {
             case R.id.next:
+                // start options fragment
+                SchedulesFragment fragment =
+                        SchedulesFragment.newInstance(getString(R.string.fragment_schedule_builder_schedules), mySchedulesList);
+                displayFragment(fragment);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -102,6 +108,7 @@ public class SummaryFragment extends BaseFragment {
         // initialize variables
         myCourseList = new Gson().fromJson(getArguments().getString(COURSES_LIST), COURSES_LIST_TYPE);
         if (myCourseList == null){
+            myCourseList = new ArrayList<>();
             Dialog dialog = infoDialog("Sorry","Some thing goes wrong pleas try again later.", "Cancel");
             dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
@@ -112,30 +119,37 @@ public class SummaryFragment extends BaseFragment {
             dialog.show();
         }
 
-        AsyncTask.execute(new Runnable() {
+        mySchedulesList = new ArrayList<>();
+
+        calculationTask = new AsyncTask<Void, Void, Set<List<BSectionModel>>>() {
             @Override
-            public void run() {
+            protected Set<List<BSectionModel>> doInBackground(Void... voids) {
                 List<List<BSectionModel>> allSectionsList = new ArrayList<>();
-                for (BCourseModel course:myCourseList){
+                for (BCourseModel course : myCourseList){
                     allSectionsList.add(course.sections);
                 }
-
-                Set<List<BSectionModel>> allSectionsSet = getCombinations(allSectionsList);
-                final int count =  allSectionsSet.size();
-                runOnUi(new Runnable() {
-                    @Override
-                    public void run() {
-                        progressBar.setVisibility(View.GONE);
-                        lblCombinations.setText(String.valueOf(count));
-                        if (count > 0) {
-                            nextMenuItem.setEnabled(true);
-                        } else {
-                            infoDialog("Not found", "No schedule found. Pleas go back and choose other options or other coerces","Close").show();
-                        }
-                    }
-                });
+                return getCombinations(allSectionsList);
             }
-        });
+
+            @Override
+            protected void onPostExecute(Set<List<BSectionModel>> lists) {
+                super.onPostExecute(lists);
+                if (!isCancelled()) {
+                    mySchedulesList =  new ArrayList(lists);
+                    int count = lists.size();
+                    progressBar.setVisibility(View.GONE);
+                    lblCombinations.setText(String.valueOf(count));
+                    if (count > 0) {
+                        nextMenuItem.setEnabled(true);
+                    } else {
+                        infoDialog("Not found", "No schedule found. Pleas go back and choose other " +
+                                "options or other coerces", "Close").show();
+                    }
+                }
+            }
+        };
+
+        calculationTask.execute();
     }
 
 
@@ -188,5 +202,12 @@ public class SummaryFragment extends BaseFragment {
             }
         }
         return false;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // stop calculating
+        calculationTask.cancel(true);
     }
 }

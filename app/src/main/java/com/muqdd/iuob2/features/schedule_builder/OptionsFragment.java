@@ -162,6 +162,7 @@ public class OptionsFragment extends BaseFragment {
         // initialize variables
         allCourseList = new Gson().fromJson(getArguments().getString(COURSES_LIST), COURSES_LIST_TYPE);
         if (allCourseList == null){
+            allCourseList = new ArrayList<>();
             Dialog dialog = infoDialog("Sorry","Some thing goes wrong pleas try again later.", "Cancel");
             dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override

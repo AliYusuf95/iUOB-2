@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?android:attr/selectableItemBackground">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.8">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/lbl_number"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:maxWidth="40dp"
+                tools:text="5"
+                android:textColor="@color/white"
+                android:textSize="@dimen/row_primary_text"
+                android:maxLines="1"
+                android:background="@color/colorPrimaryDark"
+                android:paddingStart="8dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="8dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Summary"
+                android:textColor="@color/colorPrimaryDark"
+                android:gravity="start|center_vertical"
+                android:layout_marginStart="10dp"
+                android:textSize="@dimen/row_primary_text" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/lbl_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
+            android:textSize="@dimen/row_primary_text"
+            android:textColor="@color/colorPrimaryText"
+            tools:text="[25] CHEMY101 AMeera Al-Hddad MW14:30 H15:30 t ert reterwrwer" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.1"
+        android:src="@drawable/ic_info_outline_black_24dp"
+        android:layout_gravity="center"
+        android:background="?selectableItemBackgroundBorderless"/>
+
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.1"
+        android:src="@drawable/ic_chevron_right_24dp"
+        android:tint="@color/colorPrimary"
+        android:layout_gravity="center"/>
+
+</LinearLayout>

@@ -12,7 +12,6 @@ import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseModel;
 import com.muqdd.iuob2.models.SectionModel;
 import com.muqdd.iuob2.models.SectionTimeModel;
-import com.orhanobut.logger.Logger;
 
 import java.text.DateFormat;
 import java.text.ParseException;
