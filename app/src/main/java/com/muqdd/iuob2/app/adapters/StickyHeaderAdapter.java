@@ -28,7 +28,7 @@ public class StickyHeaderAdapter extends AbstractAdapter implements StickyRecycl
         //in our sample we want a separate header per first letter of our items
         //this if is not necessary for your code, we only use it as this sticky header is reused for different item implementations
         if (item instanceof BSectionModel) {
-            return ((BSectionModel) item).courseId;
+            return (long) ((BSectionModel) item).courseId;
         }
         return -1;
     }

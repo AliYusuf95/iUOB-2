@@ -1,15 +1,12 @@
 package com.muqdd.iuob2.features.schedule_builder;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mikepenz.fastadapter.FastAdapter;
-import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.listeners.ClickEventHook;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseModel;
@@ -17,9 +14,14 @@ import com.muqdd.iuob2.models.SectionModel;
 import com.muqdd.iuob2.models.SectionTimeModel;
 import com.orhanobut.logger.Logger;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -37,7 +39,7 @@ public class BSectionModel extends BaseModel<BSectionModel, BSectionModel.ViewHo
     public String sectionNumber;
     public String doctor;
     public List<SectionTimeModel> times;
-    public int courseId;
+    public float courseId;
 
     public BSectionModel(BCourseModel parentCourse, SectionModel section) {
         this.parentCourse = new BCourseModel(parentCourse);
@@ -72,6 +74,69 @@ public class BSectionModel extends BaseModel<BSectionModel, BSectionModel.ViewHo
             }
         }
         return courses;
+    }
+
+    public boolean hasClash(BSectionModel section){
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        for (SectionTimeModel sectionATime : times) {
+            try {
+                Date sectionAStartTime = dateFormat.parse(sectionATime.from);
+                Date sectionAEndTime = dateFormat.parse(sectionATime.to);
+                for (SectionTimeModel sectionBTime : section.times) {
+                    try {
+                        Date sectionBStartTime  = dateFormat.parse(sectionBTime.from);
+                        Date sectionBEndTime = dateFormat.parse(sectionBTime.to);
+                        boolean sameDays = false;
+                        for (char c : sectionBTime.days.toCharArray()){
+                            sameDays = sectionATime.days.indexOf(c) > -1 || sameDays;
+                        }
+                        if(sameDays &&
+                                ((afterOrEqual(sectionAStartTime, sectionBStartTime) &&
+                                    beforeOrEqual(sectionAStartTime, sectionBEndTime)) ||
+                            (afterOrEqual(sectionAEndTime, sectionBStartTime) &&
+                                    beforeOrEqual(sectionAEndTime,  sectionBEndTime)) ||
+                            (afterOrEqual(sectionBStartTime, sectionAStartTime) &&
+                                    beforeOrEqual(sectionBStartTime, sectionAEndTime)) ||
+                            (afterOrEqual(sectionBEndTime, sectionAStartTime) &&
+                                    beforeOrEqual(sectionBEndTime, sectionAEndTime))))
+                        {
+                            // if start or end time is between other lectures times -> CLASH
+                            return true;
+                        }
+                    } catch (ParseException e) {
+                        // wong time format don't pass this sections
+                        return true;
+                    }
+                }
+            } catch (ParseException e) {
+                // wong time format don't pass this sections
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean afterOrEqual(Date a, Date b){
+        return a.after(b) || a.equals(b);
+    }
+
+    private boolean beforeOrEqual(Date a, Date b){
+        return a.before(b) || a.equals(b);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || !(o instanceof BSectionModel))
+            return false;
+        else if (o == this)
+            return true;
+        return courseId == ((BSectionModel) o).courseId &&
+                sectionNumber.equals(((BSectionModel) o).sectionNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(courseId,sectionNumber);
     }
 
     @Override

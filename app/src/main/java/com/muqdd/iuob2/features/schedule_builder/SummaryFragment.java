@@ -1,53 +1,32 @@
 package com.muqdd.iuob2.features.schedule_builder;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
-import com.muqdd.iuob2.app.Constants;
-import com.muqdd.iuob2.models.SectionTimeModel;
-import com.muqdd.iuob2.network.ConnectivityInterceptor.NoConnectivityException;
-import com.muqdd.iuob2.network.ServiceGenerator;
-import com.muqdd.iuob2.network.UOBSchedule;
 import com.orhanobut.logger.Logger;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
-import info.hoang8f.android.segmented.SegmentedGroup;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * Created by Ali Yusuf on 3/11/2017.
@@ -60,6 +39,8 @@ public class SummaryFragment extends BaseFragment {
     private final static Type COURSES_LIST_TYPE = new TypeToken<List<BCourseModel>>() {}.getType();
 
     @BindView(R.id.main_content) LinearLayout mainContent;
+    @BindView(R.id.progress_bar) ProgressBar progressBar;
+    @BindView(R.id.lbl_combinations) TextView lblCombinations;
 
     private View mView;
     private List<BCourseModel> myCourseList; // filtered courses data
@@ -119,7 +100,7 @@ public class SummaryFragment extends BaseFragment {
 
     private void initiate() {
         // initialize variables
-//        myCourseList = new Gson().fromJson(getArguments().getString(COURSES_LIST), COURSES_LIST_TYPE);
+        myCourseList = new Gson().fromJson(getArguments().getString(COURSES_LIST), COURSES_LIST_TYPE);
         if (myCourseList == null){
             Dialog dialog = infoDialog("Sorry","Some thing goes wrong pleas try again later.", "Cancel");
             dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -130,5 +111,82 @@ public class SummaryFragment extends BaseFragment {
             });
             dialog.show();
         }
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                List<List<BSectionModel>> allSectionsList = new ArrayList<>();
+                for (BCourseModel course:myCourseList){
+                    allSectionsList.add(course.sections);
+                }
+
+                Set<List<BSectionModel>> allSectionsSet = getCombinations(allSectionsList);
+                final int count =  allSectionsSet.size();
+                runOnUi(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressBar.setVisibility(View.GONE);
+                        lblCombinations.setText(String.valueOf(count));
+                        if (count > 0) {
+                            nextMenuItem.setEnabled(true);
+                        } else {
+                            infoDialog("Not found", "No schedule found. Pleas go back and choose other options or other coerces","Close").show();
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+
+    private Set<List<BSectionModel>> getCombinations(List<List<BSectionModel>> lists) {
+        Set<List<BSectionModel>> combinations = new HashSet<>();
+        Set<List<BSectionModel>> newCombinations;
+
+        // just to make sure is not empty list
+        if (lists.size() == 0) {
+            return combinations;
+        }
+
+        int index = 0;
+
+        // extract each of the element in the first list
+        // and add each to ints as a new list
+        for(BSectionModel i: lists.get(0)) {
+            List<BSectionModel> newList = new ArrayList<>();
+            newList.add(i);
+            combinations.add(newList);
+        }
+        index++;
+
+        while(index < lists.size()) {
+            List<BSectionModel> nextList = lists.get(index);
+            newCombinations = new HashSet<>();
+            for(List<BSectionModel> first: combinations) {
+                for(BSectionModel second: nextList) {
+                    List<BSectionModel> newList = new ArrayList<>();
+                    newList.addAll(first);
+                    newList.add(second);
+                    if (sectionsHasClash(newList)) {
+                        continue;
+                    }
+                    newCombinations.add(newList);
+                }
+            }
+            combinations = newCombinations;
+            index++;
+        }
+        return combinations;
+    }
+
+    private boolean sectionsHasClash(List<BSectionModel> sections) {
+        for (int i=0 ; i<sections.size()-1 ; i++){
+            for (int j=i+1 ; j<sections.size() ; j++) {
+                if (sections.get(i).hasClash(sections.get(j))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

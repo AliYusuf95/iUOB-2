@@ -389,6 +389,8 @@ public class OptionsFragment extends BaseFragment {
         if (cCount < 1){
             // clear filtered courses list if combinations count = 0
             myCourseList.clear();
+            alertText.setVisibility(View.INVISIBLE);
+            nextMenuItem.setEnabled(false);
         } else if (cCount > 20000) {
             alertText.setVisibility(View.VISIBLE);
             nextMenuItem.setEnabled(false);
@@ -456,6 +458,9 @@ public class OptionsFragment extends BaseFragment {
     }
 
     private void setSegmentGroupEnabled(SegmentedGroup segmentedGroup, boolean enabled) {
+        // avoid null exception
+        if (getContext() == null)
+            return;
         segmentedGroup.setTintColor(ContextCompat.getColor(getContext(),
                 enabled ? R.color.colorPrimaryDark : R.color.colorPrimaryLight));
         for(int i = 0; i < segmentedGroup.getChildCount(); i++){

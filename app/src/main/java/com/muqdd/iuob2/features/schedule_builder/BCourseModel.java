@@ -30,7 +30,8 @@ public class BCourseModel extends BaseModel<BCourseModel, BCourseModel.ViewHolde
     public String courseName;
     public String courseNumber;
     public String departmentCode;
-    public int courseId;
+    public float courseId;
+    public int courseColor;
     public List<BSectionModel> sections;
 
     public BCourseModel(String courseName, String courseNumber) {
@@ -41,9 +42,10 @@ public class BCourseModel extends BaseModel<BCourseModel, BCourseModel.ViewHolde
         for (char b : courseName.toCharArray()){
             rand += b%2 == 0 ? b*b : b*10;
         }
+        this.courseId = (float) (rand + Integer.parseInt(courseNumber));
         float caj = (float) (((Integer.parseInt(courseNumber) * Integer.parseInt(courseNumber) * 13) % 15) / 100.0);
         float hue = (float) (rand % 255) + caj;
-        this.courseId = Color.HSVToColor(30, new float[]{hue, 0.7f,0.8f});
+        this.courseColor = Color.HSVToColor(30, new float[]{hue, 0.7f,0.8f});
         this.sections = new ArrayList<>();
     }
 
