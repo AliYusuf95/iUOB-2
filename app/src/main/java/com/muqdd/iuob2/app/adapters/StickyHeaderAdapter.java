@@ -10,7 +10,6 @@ import com.mikepenz.fastadapter.AbstractAdapter;
 import com.mikepenz.fastadapter.IItem;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.features.schedule_builder.BSectionModel;
-import com.muqdd.iuob2.models.MyCourseModel;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 
 import java.util.List;

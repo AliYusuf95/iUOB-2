@@ -7,8 +7,8 @@
     <string name="about_twitter" translatable="false">\@aliyusuf_95</string>
     <string name="about_website" translatable="false">iuob.net</string>
     <string name="row_icon" translatable="false">row icon</string>
-    <string name="menu_sakheer">Sakheer</string>
-    <string name="menu_isa_town">Isa Town</string>
+    <string name="sakheer">Sakheer</string>
+    <string name="isa_town">Isa Town</string>
     <string name="map_terrain">Terrain</string>
     <string name="map_hybrid">Hybrid</string>
     <string name="map_satellite">Satellite</string>
@@ -46,4 +46,38 @@
     <string name="share">Share</string>
     <string name="fragment_schedule_details">Schedule Details</string>
     <string name="copy">Copy</string>
+    <string name="semester">Semester</string>
+    <string name="first">First</string>
+    <string name="second">Second</string>
+    <string name="summer">Summer</string>
+    <string name="course">Course</string>
+    <string name="course_hint">HIST122</string>
+    <string name="possible_combinations">Possible Combinations</string>
+    <string name="zero">0</string>
+    <string name="combination_error">Should be less than 20000</string>
+    <string name="working_days">Working Days</string>
+    <string name="any">Any</string>
+    <string name="uth">UTH</string>
+    <string name="mw">MW</string>
+    <string name="umth">UMTH</string>
+    <string name="utwh">UTWH</string>
+    <string name="start_at">Start At</string>
+    <string name="time_9_am">9 AM</string>
+    <string name="time_10_am">10 AM</string>
+    <string name="time_11_am">11 AM</string>
+    <string name="time_12_pm">12 PM</string>
+    <string name="finish_at">Finish At</string>
+    <string name="time_1_pm">1 PM</string>
+    <string name="time_2_pm">2 PM</string>
+    <string name="time_3_pm">3 PM</string>
+    <string name="lectures_location">Lectures Location</string>
+    <string name="sections_filter">Sections Filter</string>
+    <string name="schedules_found">Schedules Found</string>
+    <string name="calculating">Calculating …</string>
+    <string name="u">U</string>
+    <string name="m">M</string>
+    <string name="t">T</string>
+    <string name="w">W</string>
+    <string name="h">H</string>
+    <string name="summary">Summary</string>
 </resources>

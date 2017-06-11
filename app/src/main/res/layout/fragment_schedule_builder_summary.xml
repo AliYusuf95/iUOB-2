@@ -18,7 +18,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Schedules Found"
+            android:text="@string/schedules_found"
             android:gravity="center"
             android:textColor="@color/colorPrimaryText"
             android:textSize="25sp"/>
@@ -31,7 +31,7 @@
             android:id="@+id/lbl_combinations"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Calculating ..."
+            android:text="@string/calculating"
             tools:text="50"
             android:gravity="center"
             android:textColor="@color/colorPrimaryText"

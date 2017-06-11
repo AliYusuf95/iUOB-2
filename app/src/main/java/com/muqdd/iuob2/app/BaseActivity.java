@@ -14,7 +14,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.mikepenz.materialdrawer.Drawer;
 import com.muqdd.iuob2.BuildConfig;
-import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.network.ServiceGenerator;
 import com.muqdd.iuob2.notification.RegistrationIntentService;
 import com.orhanobut.logger.Logger;

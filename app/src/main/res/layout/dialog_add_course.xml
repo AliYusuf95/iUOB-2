@@ -49,18 +49,6 @@
         android:layout_marginBottom="10dp">
 
         <Button
-            android:id="@+id/add"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:text="@string/dialog_btn_add"
-            style="?android:attr/buttonStyle"
-            android:textColor="@color/white"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="5dp"
-            android:backgroundTint="@color/colorPrimaryDark"/>
-
-        <Button
             android:id="@+id/cancel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -71,6 +59,18 @@
             android:layout_marginStart="5dp"
             android:layout_marginEnd="10dp"
             android:backgroundTint="@color/colorSecondaryText"/>
+
+        <Button
+            android:id="@+id/add"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="@string/dialog_btn_add"
+            style="?android:attr/buttonStyle"
+            android:textColor="@color/white"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="5dp"
+            android:backgroundTint="@color/colorPrimaryDark"/>
 
     </LinearLayout>
 

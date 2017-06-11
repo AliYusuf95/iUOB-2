@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseActivity.OnBackPressedListener;
-import com.muqdd.iuob2.features.main.MainActivity;
 
 import java.io.BufferedReader;
 import java.io.File;

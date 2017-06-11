@@ -9,12 +9,8 @@ import com.github.vipulasri.timelineview.TimelineView;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.muqdd.iuob2.R;
-import com.muqdd.iuob2.app.BaseModel;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindDrawable;

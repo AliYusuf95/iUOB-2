@@ -31,8 +31,6 @@ import butterknife.ButterKnife;
 public class SectionModel extends BaseModel<SectionModel, SectionModel.ViewHolder> {
 
     // parsing one section
-    private final static String coursePattern =
-            "<center><B>\\s*?([^\\s][\\S\\s]*?)\\s*?</B></center>";
     private final static String sectionPattern =
             "Sec.*?>(\\d\\d)<.*?size=\"2\">([\\S\\s]*),[\\s\\S]*?(<TR>[\\s\\S]*?)</TABLE>";
     private final static String timesPattern =
@@ -42,7 +40,6 @@ public class SectionModel extends BaseModel<SectionModel, SectionModel.ViewHolde
             "<TD.*?height=\"19\"><FONT color=\"#0000FF\">[\\S ]*?"+
             "<[\\s\\S]*?TD.*?>.*?>([\\S ]*?)</FONT><[\\s\\S]*?TD.*?>.*?>([\\S ]*?)"+
             "</FONT><[\\s\\S]*?TD.*?>.*?>([\\S ]*?)</FONT></TD>";
-    private final static Pattern pCourse = Pattern.compile(coursePattern,Pattern.CASE_INSENSITIVE);
     private final static Pattern pData = Pattern.compile(sectionPattern,Pattern.CASE_INSENSITIVE);
     private final static Pattern pTimes = Pattern.compile(timesPattern,Pattern.CASE_INSENSITIVE);
     private final static Pattern pFinal = Pattern.compile(finalPattern,Pattern.CASE_INSENSITIVE);
@@ -82,7 +79,6 @@ public class SectionModel extends BaseModel<SectionModel, SectionModel.ViewHolde
                 finalExamTime = mFinal.group(2)+"-"+mFinal.group(3);
             }
         }
-        Matcher mCourse = pCourse.matcher(data);
         this.title = title;
         this.showSeats = false;
     }

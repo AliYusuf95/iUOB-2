@@ -1,23 +1,16 @@
 package com.muqdd.iuob2.features.schedule_builder;
 
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseModel;
-import com.muqdd.iuob2.app.Constants;
-import com.muqdd.iuob2.models.SectionModel;
 import com.muqdd.iuob2.models.SectionTimeModel;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

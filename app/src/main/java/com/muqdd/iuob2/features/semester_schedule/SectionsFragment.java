@@ -25,7 +25,6 @@ import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.models.CourseModel;
-import com.muqdd.iuob2.models.MyCourseModel;
 import com.muqdd.iuob2.models.SectionModel;
 import com.muqdd.iuob2.network.ServiceGenerator;
 import com.muqdd.iuob2.network.UOBSchedule;

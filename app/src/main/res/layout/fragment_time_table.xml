@@ -23,7 +23,7 @@
                     android:layout_weight="1"
                     android:textColor="@color/colorPrimaryText"
                     android:gravity="center"
-                    android:text="U"
+                    android:text="@string/u"
                     />
 
                 <TextView
@@ -32,7 +32,7 @@
                     android:layout_weight="1"
                     android:textColor="@color/colorPrimaryText"
                     android:gravity="center"
-                    android:text="M"
+                    android:text="@string/m"
                     />
 
                 <TextView
@@ -41,7 +41,7 @@
                     android:layout_weight="1"
                     android:textColor="@color/colorPrimaryText"
                     android:gravity="center"
-                    android:text="T"
+                    android:text="@string/t"
                     />
 
                 <TextView
@@ -50,7 +50,7 @@
                     android:layout_weight="1"
                     android:textColor="@color/colorPrimaryText"
                     android:gravity="center"
-                    android:text="W"
+                    android:text="@string/w"
                     />
 
                 <TextView
@@ -59,7 +59,7 @@
                     android:layout_weight="1"
                     android:textColor="@color/colorPrimaryText"
                     android:gravity="center"
-                    android:text="H"
+                    android:text="@string/h"
                     />
 
             </LinearLayout>

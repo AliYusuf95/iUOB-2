@@ -7,7 +7,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -50,7 +49,6 @@ public class SemestersHolderFragment extends BaseFragment {
     protected @BindView(R.id.progress_bar) ProgressBar progressBar;
 
     private SemesterPagerAdapter pagerAdapter;
-    private int currentPage;
     private View mView;
     private Map<String,SearchTextListener> searchTextListeners;
 
@@ -224,14 +222,13 @@ public class SemestersHolderFragment extends BaseFragment {
         return list;
     }
 
-    public interface SearchTextListener {
+    interface SearchTextListener {
         void onTextChange(String s);
     }
 
     private class PageListener extends ViewPager.SimpleOnPageChangeListener {
         public void onPageSelected(int position) {
             Logger.i("page selected " + position);
-            currentPage = position;
         }
     }
 }

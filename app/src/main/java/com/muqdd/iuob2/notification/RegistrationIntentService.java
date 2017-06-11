@@ -32,7 +32,7 @@ public class RegistrationIntentService extends IntentService {
         }
         // Make a call to Instance API
         FirebaseInstanceId instanceID = FirebaseInstanceId.getInstance();
-        String senderId = getResources().getString(R.string.gcm_defaultSenderId);
+        // String senderId = getResources().getString(R.string.gcm_defaultSenderId);
 
         // Subscribe into topics
         if (BuildConfig.DEBUG)

@@ -22,8 +22,8 @@ public class FCMMessageHandler extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        Map<String, String> data = remoteMessage.getData();
-        String from = remoteMessage.getFrom();
+        // Map<String, String> data = remoteMessage.getData();
+        // String from = remoteMessage.getFrom();
 
         // get notification details
         RemoteMessage.Notification notification = remoteMessage.getNotification();

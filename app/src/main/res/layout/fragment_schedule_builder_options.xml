@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:segmentedgroup="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -26,7 +24,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:text="Possible Combinations"
+                android:text="@string/possible_combinations"
                 android:gravity="center_vertical"
                 android:layout_marginEnd="20dp"
                 android:textColor="@color/colorPrimaryText"
@@ -37,7 +35,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.5"
-                android:text="0"
+                android:text="@string/zero"
                 android:gravity="center_vertical"
                 android:textColor="@color/colorPrimaryText"
                 android:textSize="@dimen/medium_text"
@@ -59,7 +57,7 @@
             android:visibility="invisible"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Should be less than 20000"
+            android:text="@string/combination_error"
             android:layout_marginStart="10dp"
             android:textColor="@color/red_500"
             android:textSize="@dimen/medium_text"/>
@@ -67,7 +65,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Working Days"
+            android:text="@string/working_days"
             android:gravity="center"
             android:textSize="@dimen/title_text"
             android:textStyle="bold"
@@ -92,7 +90,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Any"
+                android:text="@string/any"
                 android:checked="true"
                 style="@style/RadioButton" />
 
@@ -101,7 +99,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="UTH"
+                android:text="@string/uth"
                 style="@style/RadioButton" />
 
             <RadioButton
@@ -109,7 +107,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="MW"
+                android:text="@string/mw"
                 style="@style/RadioButton" />
 
             <RadioButton
@@ -117,7 +115,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="UMTH"
+                android:text="@string/umth"
                 style="@style/RadioButton" />
 
             <RadioButton
@@ -125,7 +123,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="UTWH"
+                android:text="@string/utwh"
                 style="@style/RadioButton" />
 
         </info.hoang8f.android.segmented.SegmentedGroup>
@@ -137,7 +135,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Start At"
+            android:text="@string/start_at"
             android:gravity="center"
             android:textSize="@dimen/title_text"
             android:textStyle="bold"
@@ -162,7 +160,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Any"
+                android:text="@string/any"
                 android:checked="true"
                 style="@style/RadioButton" />
 
@@ -171,7 +169,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="9 AM"
+                android:text="@string/time_9_am"
                 style="@style/RadioButton" />
 
             <RadioButton
@@ -179,7 +177,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="10 AM"
+                android:text="@string/time_10_am"
                 style="@style/RadioButton" />
 
             <RadioButton
@@ -187,7 +185,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="11 AM"
+                android:text="@string/time_11_am"
                 style="@style/RadioButton" />
 
             <RadioButton
@@ -195,7 +193,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="12 PM"
+                android:text="@string/time_12_pm"
                 style="@style/RadioButton" />
 
         </info.hoang8f.android.segmented.SegmentedGroup>
@@ -207,7 +205,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Finish At"
+            android:text="@string/finish_at"
             android:gravity="center"
             android:textSize="@dimen/title_text"
             android:textStyle="bold"
@@ -232,7 +230,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Any"
+                android:text="@string/any"
                 android:checked="true"
                 style="@style/RadioButton" />
 
@@ -241,7 +239,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="12 PM"
+                android:text="@string/time_12_pm"
                 style="@style/RadioButton" />
 
             <RadioButton
@@ -249,7 +247,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="1 PM"
+                android:text="@string/time_1_pm"
                 style="@style/RadioButton" />
 
             <RadioButton
@@ -257,7 +255,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="2 PM"
+                android:text="@string/time_2_pm"
                 style="@style/RadioButton" />
 
             <RadioButton
@@ -265,7 +263,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="3 PM"
+                android:text="@string/time_3_pm"
                 style="@style/RadioButton" />
 
         </info.hoang8f.android.segmented.SegmentedGroup>
@@ -277,7 +275,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Lectures Location"
+            android:text="@string/lectures_location"
             android:gravity="center"
             android:textSize="@dimen/title_text"
             android:textStyle="bold"
@@ -303,7 +301,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Any"
+                android:text="@string/any"
                 android:checked="true"
                 style="@style/RadioButton" />
 
@@ -312,7 +310,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/menu_sakheer"
+                android:text="@string/sakheer"
                 style="@style/RadioButton" />
 
             <RadioButton
@@ -320,7 +318,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/menu_isa_town"
+                android:text="@string/isa_town"
                 style="@style/RadioButton" />
 
         </info.hoang8f.android.segmented.SegmentedGroup>
@@ -351,7 +349,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.3"
-                android:text="Sections Filter"
+                android:text="@string/sections_filter"
                 style="?android:attr/buttonStyle"
                 android:textColor="@color/white"
                 android:layout_gravity="center"

@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Semester"
+        android:text="@string/semester"
         android:gravity="center"
         android:textSize="@dimen/title_text"
         android:textStyle="bold"
@@ -35,7 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.3"
-            android:text="First"
+            android:text="@string/first"
             style="@style/RadioButton" />
 
         <RadioButton
@@ -43,7 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.3"
-            android:text="Second"
+            android:text="@string/second"
             tools:checked="true"
             style="@style/RadioButton" />
 
@@ -52,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.3"
-            android:text="Summer"
+            android:text="@string/summer"
             style="@style/RadioButton" />
         
     </info.hoang8f.android.segmented.SegmentedGroup>
@@ -69,14 +69,14 @@
             android:textSize="@dimen/title_text"
             android:textStyle="bold"
             android:textColor="@color/colorPrimaryText"
-            android:text="Course"
+            android:text="@string/course"
             android:labelFor="@id/course"/>
         
         <AutoCompleteTextView
             android:id="@id/course"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="HIST122"
+            android:hint="@string/course_hint"
             android:ems="10"
             android:maxLines="1"
             android:inputType="text"

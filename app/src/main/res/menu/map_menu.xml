@@ -2,10 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/sakheer"
-        android:title="@string/menu_sakheer"
+        android:title="@string/sakheer"
         />
     <item
         android:id="@+id/isa_town"
-        android:title="@string/menu_isa_town"
+        android:title="@string/isa_town"
         />
 </menu>
