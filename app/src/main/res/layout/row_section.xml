@@ -61,7 +61,7 @@
                     android:textSize="@dimen/row_primary_text"
                     android:drawablePadding="12dp"
                     android:padding="10dp"
-                    android:drawableEnd="@drawable/ic_event_seat_dark_18dp"
+                    android:drawableEnd="@drawable/ic_event_seat_18dp"
                     android:textColor="@color/colorPrimaryText"
                     android:textAppearance="?android:textAppearanceListItem" />
 

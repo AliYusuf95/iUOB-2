@@ -1,34 +1,35 @@
-package com.muqdd.iuob2.features.my_schedule;
+package com.muqdd.iuob2.features.schedule_builder;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.app.User;
-import com.muqdd.iuob2.features.main.Menu;
 import com.muqdd.iuob2.models.MyCourseModel;
 import com.muqdd.iuob2.models.SectionTimeModel;
 import com.orhanobut.logger.Logger;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -37,7 +38,10 @@ import butterknife.ButterKnife;
  * iUOB-2
  */
 @SuppressWarnings("FieldCanBeLocal")
-public class MyScheduleFragment extends BaseFragment {
+public class TimeTableFragment extends BaseFragment {
+
+    private final static String SCHEDULE = "SCHEDULE";
+    private static final int MENU_DETAILS = Menu.FIRST;
 
     @BindView(R.id.main_content) SwipeRefreshLayout mainContent;
     @BindView(R.id.u_layout) LinearLayout uLayout;
@@ -45,8 +49,6 @@ public class MyScheduleFragment extends BaseFragment {
     @BindView(R.id.t_layout) LinearLayout tLayout;
     @BindView(R.id.w_layout) LinearLayout wLayout;
     @BindView(R.id.h_layout) LinearLayout hLayout;
-    @BindDrawable(R.drawable.ic_notifications_active_24dp) Drawable notificationActive;
-    @BindDrawable(R.drawable.ic_notifications_off_24dp) Drawable notificationOff;
 
     private View mView;
     private Map<SectionTimeModel, MyCourseModel> uList;
@@ -54,15 +56,18 @@ public class MyScheduleFragment extends BaseFragment {
     private Map<SectionTimeModel, MyCourseModel> tList;
     private Map<SectionTimeModel, MyCourseModel> wList;
     private Map<SectionTimeModel, MyCourseModel> hList;
+    private List<MyCourseModel> mCourses;
+    private BScheduleModel mSchedule;
 
-    public MyScheduleFragment() {
+    public TimeTableFragment() {
         // Required empty public constructor
     }
 
-    public static MyScheduleFragment newInstance() {
-        MyScheduleFragment fragment = new MyScheduleFragment();
+    public static TimeTableFragment newInstance(String title, BScheduleModel schedule) {
+        TimeTableFragment fragment = new TimeTableFragment();
         Bundle bundle = new Bundle();
-        bundle.putString(TITLE, Menu.MY_SCHEDULE.toString());
+        bundle.putString(TITLE, title);
+        bundle.putString(SCHEDULE, new Gson().toJson(schedule, BScheduleModel.class));
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -81,30 +86,27 @@ public class MyScheduleFragment extends BaseFragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(android.view.Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.my_schedule_menu, menu);
-        // init notification icon
-        menu.findItem(R.id.notification)
-                .setIcon(User.isNotificationOn(getContext()) ? notificationActive : notificationOff)
-                .setVisible(false);
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
+        MenuItem detailsMenuItem = menu.add(0, MENU_DETAILS, Menu.NONE, R.string.share)
+                .setIcon(R.drawable.ic_info_outline_24dp);
+        detailsMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        detailsMenuItem.getIcon().setTint(ContextCompat.getColor(getContext(), R.color.white));
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // handle item selection
         switch (item.getItemId()) {
-            case R.id.edit:
-                if (User.isFetchingData()){
-                    Snackbar.make(mainContent,"Please wait fetching data",Snackbar.LENGTH_SHORT).show();
-                } else {
-                    AddCoursesFragment fragment =
-                            AddCoursesFragment.newInstance(getString(R.string.fragment_add_courses));
-                    displayFragment(fragment);
+            case MENU_DETAILS:
+                // just skip that
+                if (mSchedule == null){
+                    return true;
                 }
-                return true;
-            case R.id.notification:
-                changeNotificationState(item);
+                // start schedule details fragment
+                ScheduleDetailsFragment fragment =
+                        ScheduleDetailsFragment.newInstance(getString(R.string.fragment_schedule_details), mSchedule);
+                displayFragment(fragment);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -117,26 +119,42 @@ public class MyScheduleFragment extends BaseFragment {
         toolbar.setTitle(title);
         // stop hiding toolbar
         params.setScrollFlags(0);
-        // build schedule
-        mainContent.setRefreshing(true);
-        if (User.isCoursesUpdated(getContext())) {
-            // update UI
-            buildMySchedule();
-        } else {
-            fetchMyScheduleData();
+        // check primary data
+        checkPrimaryData();
+        buildMySchedule();
+    }
+
+    private void checkPrimaryData() {
+        if (mSchedule == null) {
+            mSchedule = new BScheduleModel(new ArrayList<BSectionModel>());
+            Dialog dialog = infoDialog("Sorry","Some thing goes wrong pleas try again later.", "Cancel");
+            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialogInterface) {
+                    getActivity().onBackPressed();
+                }
+            });
+            dialog.show();
         }
     }
 
     private void initiate() {
-        //mainContent.setRefreshing(true);
-        mainContent.setColorSchemeResources(
-                R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryLight);
-        mainContent.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                fetchMyScheduleData();
-            }
-        });
+        mSchedule = new Gson().fromJson(getArguments().getString(SCHEDULE), BScheduleModel.class);
+        checkPrimaryData();
+        // convert courses data
+        mCourses = new ArrayList<>();
+        for (BSectionModel section : mSchedule.sections) {
+            MyCourseModel course = new MyCourseModel(section.parentCourse.courseName,
+                    section.parentCourse.courseNumber, section.sectionNumber);
+            course.doctor = section.doctor;
+            course.times = section.times;
+            course.finalExamDate = section.finalExamDate;
+            course.finalExamTime = section.finalExamTime;
+            mCourses.add(course);
+        }
+
+        // disable swipe to refresh
+        mainContent.setEnabled(false);
 
         // section time comparator
         Comparator comparator = new Comparator<SectionTimeModel>(){
@@ -157,28 +175,6 @@ public class MyScheduleFragment extends BaseFragment {
         hList = new TreeMap<>(comparator);
     }
 
-    private void fetchMyScheduleData() {
-        User.fetchCoursesData(getContext(), new Runnable() {
-            @Override
-            public void run() {
-                if (!User.isCoursesUpdated(getContext())) {
-                    User.setFetchingData(false);
-                    Logger.e("error accord while fetching data");
-                    runOnUi(new Runnable() {
-                        @Override
-                        public void run() {
-                            mainContent.setRefreshing(false);
-                        }
-                    });
-                } else {
-                    // update UI
-                    Logger.d("build");
-                    buildMySchedule();
-                }
-            }
-        });
-    }
-
     private void buildMySchedule() {
         // clear lists
         uList.clear();
@@ -186,7 +182,7 @@ public class MyScheduleFragment extends BaseFragment {
         tList.clear();
         wList.clear();
         hList.clear();
-        for (MyCourseModel course : User.getCourses(getContext())) {
+        for (MyCourseModel course : mCourses) {
             if (course.times != null) {
                 for (SectionTimeModel time : course.times) {
                     if (time.days.contains("U")) {
@@ -274,12 +270,5 @@ public class MyScheduleFragment extends BaseFragment {
             }
         });
         return view;
-    }
-
-    private void changeNotificationState(MenuItem item) {
-        // change current notification state
-        boolean notificationState = User.setNotification(getContext(), !User.isNotificationOn(getContext()));
-        // set new icon based on state
-        item.setIcon(notificationState ? notificationActive : notificationOff);
     }
 }

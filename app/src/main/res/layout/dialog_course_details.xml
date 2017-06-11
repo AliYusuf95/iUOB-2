@@ -28,7 +28,9 @@
         android:id="@+id/doctor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="Section: 01"
+        tools:text="Ali yusuf Ahmed"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         android:textSize="@dimen/row_title_text"
         android:textColor="@color/colorSecondaryText"
         android:layout_marginBottom="5dp"/>
@@ -41,6 +43,8 @@
         android:ems="18"
         android:gravity="center"
         android:textSize="@dimen/row_title_text"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         android:textColor="@color/colorSecondaryText"
         android:layout_marginBottom="5dp"/>
 

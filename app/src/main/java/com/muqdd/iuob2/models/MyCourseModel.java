@@ -65,7 +65,7 @@ public class MyCourseModel extends BaseModel<MyCourseModel, MyCourseModel.ViewHo
             rand += b%2 == 0 ? b*b : b*10;
         }
         float caj = (float) (((Integer.parseInt(courseNumber) * Integer.parseInt(courseNumber) * 13) % 15) / 100.0);
-        float hue = (float) (rand % 255) + caj;
+        float hue = (float) (rand % 255) + (caj*2);
         this.bgColor = Color.HSVToColor(30, new float[]{hue, 0.7f,0.8f});
         this.times = new ArrayList<>();
         this.sections = new ArrayList<>();

@@ -37,6 +37,8 @@ public class BSectionModel extends BaseModel<BSectionModel, BSectionModel.ViewHo
     public String headerTitle;
     public String sectionNumber;
     public String doctor;
+    public String finalExamDate;
+    public String finalExamTime;
     public List<SectionTimeModel> times;
     public float courseId;
 
@@ -46,6 +48,8 @@ public class BSectionModel extends BaseModel<BSectionModel, BSectionModel.ViewHo
         this.sectionNumber = section.number;
         this.doctor = section.doctor;
         this.times = section.times;
+        this.finalExamDate = section.finalExamDate;
+        this.finalExamTime = section.finalExamTime;
         this.courseId = parentCourse.courseId;
         this.mSelected = true;
         this.mSelectable = true;
@@ -121,6 +125,10 @@ public class BSectionModel extends BaseModel<BSectionModel, BSectionModel.ViewHo
 
     private boolean beforeOrEqual(Date a, Date b){
         return a.before(b) || a.equals(b);
+    }
+
+    public String getFinalExam() {
+        return finalExamDate.trim().equals("")? "" : finalExamDate+" @ "+finalExamTime;
     }
 
     @Override

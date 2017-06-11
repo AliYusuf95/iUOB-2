@@ -51,6 +51,9 @@ public class MainActivity extends BaseActivity {
 
         init(savedInstanceState);
         initDrawerMenu(savedInstanceState);
+
+        // send tracker
+        sendAnalyticTracker(R.string.app_name);
     }
 
     @Override
@@ -269,11 +272,7 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    /**
-     * Replace current fragment with another one
-     *
-     * @param fragment Fragment instance
-     */
+    @Override
     public void replaceFragment(Fragment fragment){
         Fragment currentFragment = fragmentManager.findFragmentById(R.id.frameLayout);
         if (currentFragment == null || !fragment.getClass().toString().equals(currentFragment.getTag())) {
@@ -284,9 +283,7 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    /**
-     * @param fragment Fragment instance
-     */
+    @Override
     public void displayFragment(Fragment fragment){
         Fragment currentFragment = fragmentManager.findFragmentById(R.id.frameLayout);
         if (currentFragment == null || !fragment.getClass().toString().equals(currentFragment.getTag())) {

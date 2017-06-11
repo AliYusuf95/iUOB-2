@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -47,7 +48,6 @@ public class BScheduleModel extends BaseModel<BScheduleModel, BScheduleModel.Vie
         for (SectionTimeModel time : times){
             str += time.days+time.from+" ";
         }
-        str = str.substring(0, str.length() - 1); // remove lase space
         return str;
     }
 
@@ -90,6 +90,7 @@ public class BScheduleModel extends BaseModel<BScheduleModel, BScheduleModel.Vie
 
         @BindView(R.id.lbl_number) TextView lblNumber;
         @BindView(R.id.lbl_desc) TextView lblDesc;
+        @BindView(R.id.img_info) ImageView imgInfo;
 
         public ViewHolder(View view) {
             super(view);

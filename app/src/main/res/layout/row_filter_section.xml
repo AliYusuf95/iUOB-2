@@ -51,7 +51,7 @@
         android:id="@+id/selection"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:src="@drawable/ic_check_black_24dp"
+        android:src="@drawable/ic_check_24dp"
         android:tint="@color/colorPrimaryDark"
         android:layout_marginEnd="10dp" />
 

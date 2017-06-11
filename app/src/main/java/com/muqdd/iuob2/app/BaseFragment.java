@@ -53,10 +53,21 @@ public class BaseFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        // check in the parent activity is BaseActivity or not
+        if (!(getActivity() instanceof BaseActivity)){
+            throw new IllegalStateException("Parent activity must be BaseActivity");
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // setup toolbar and tabLayout
-        if (getArguments() != null && getArguments().containsKey(TITLE))
+        if (getArguments() != null && getArguments().containsKey(TITLE)) {
             title = getArguments().getString(TITLE);
+            getBaseActivity().sendAnalyticTracker(title);
+        }
         toolbar = ButterKnife.findById(getActivity(), R.id.toolbar);
         tabLayout = ButterKnife.findById(getActivity(), R.id.tabLayout);
         tabLayout.setVisibility(View.GONE);
@@ -66,6 +77,10 @@ public class BaseFragment extends Fragment {
                 AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS);
         setHasOptionsMenu(false);
         return null;
+    }
+
+    protected BaseActivity getBaseActivity() {
+        return (BaseActivity) getActivity();
     }
 
     protected Dialog infoDialog(String title, String message, String cancel){
@@ -93,9 +108,7 @@ public class BaseFragment extends Fragment {
     }
 
     protected void setOnBackPressedListener(OnBackPressedListener listener) {
-        if (getActivity() instanceof MainActivity){
-            ((MainActivity) getActivity()).setOnBackPressedListener(listener);
-        }
+        getBaseActivity().setOnBackPressedListener(listener);
     }
 
     protected String readHTMLDataToCache(String fileName) throws IOException {
@@ -121,9 +134,7 @@ public class BaseFragment extends Fragment {
     }
 
     protected void displayFragment(Fragment fragment){
-        if (getActivity() instanceof MainActivity){
-            ((MainActivity) getActivity()).displayFragment(fragment);
-        }
+        getBaseActivity().displayFragment(fragment);
     }
 
     protected void runOnUi(@NonNull Runnable runnable){

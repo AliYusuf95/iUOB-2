@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,7 +18,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
-import com.orhanobut.logger.Logger;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -36,15 +36,17 @@ import butterknife.ButterKnife;
 public class SummaryFragment extends BaseFragment {
 
     private final static String COURSES_LIST = "COURSES_LIST";
+    private final static String SCHEDULES_LIST = "SCHEDULES_LIST";
     private final static Type COURSES_LIST_TYPE = new TypeToken<List<BCourseModel>>() {}.getType();
+    private final static Type SCHEDULES_LIST_TYPE = new TypeToken<List<List<BSectionModel>>>() {}.getType();
 
     @BindView(R.id.main_content) LinearLayout mainContent;
     @BindView(R.id.progress_bar) ProgressBar progressBar;
     @BindView(R.id.lbl_combinations) TextView lblCombinations;
 
     private View mView;
-    private List<BCourseModel> myCourseList; // filtered courses data
-    private List<List<BSectionModel>> mySchedulesList; // available schedules
+    private List<BCourseModel> mCourseList; // filtered courses data
+    private List<List<BSectionModel>> mSchedulesList; // available schedules
     private MenuItem nextMenuItem;
     private AsyncTask<Void, Void, Set<List<BSectionModel>>> calculationTask;
 
@@ -68,18 +70,20 @@ public class SummaryFragment extends BaseFragment {
             // Inflate the layout for this fragment
             mView = inflater.inflate(R.layout.fragment_schedule_builder_summary, container, false);
             ButterKnife.bind(this, mView);
-            initiate();
+            initiate(savedInstanceState);
         }
         setHasOptionsMenu(true);
         return mView;
     }
 
     @Override
-    public void onCreateOptionsMenu(android.view.Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.schedule_builder_menu, menu);
         nextMenuItem = menu.findItem(R.id.next);
-        nextMenuItem.setEnabled(false); // false by default
+        if (mSchedulesList != null) {
+            nextMenuItem.setEnabled(mSchedulesList.size() > 0); // default value
+        }
     }
 
     @Override
@@ -89,7 +93,7 @@ public class SummaryFragment extends BaseFragment {
             case R.id.next:
                 // start options fragment
                 SchedulesFragment fragment =
-                        SchedulesFragment.newInstance(getString(R.string.fragment_schedule_builder_schedules), mySchedulesList);
+                        SchedulesFragment.newInstance(getString(R.string.fragment_schedule_builder_schedules), mSchedulesList);
                 displayFragment(fragment);
                 return true;
             default:
@@ -102,13 +106,17 @@ public class SummaryFragment extends BaseFragment {
         super.onResume();
         toolbar.setTitle(title);
         params.setScrollFlags(0); // stop hiding toolbar
+        checkPrimaryData();
+        if (nextMenuItem != null && mSchedulesList != null) {
+            nextMenuItem.setEnabled(mSchedulesList.size() > 0);
+        } else if (nextMenuItem != null){
+            nextMenuItem.setEnabled(false);
+        }
     }
 
-    private void initiate() {
-        // initialize variables
-        myCourseList = new Gson().fromJson(getArguments().getString(COURSES_LIST), COURSES_LIST_TYPE);
-        if (myCourseList == null){
-            myCourseList = new ArrayList<>();
+    private void checkPrimaryData() {
+        if (mCourseList == null){
+            mCourseList = new ArrayList<>();
             Dialog dialog = infoDialog("Sorry","Some thing goes wrong pleas try again later.", "Cancel");
             dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
@@ -118,14 +126,19 @@ public class SummaryFragment extends BaseFragment {
             });
             dialog.show();
         }
+    }
 
-        mySchedulesList = new ArrayList<>();
+    private void initiate(Bundle savedInstanceState) {
+        // initialize variables
+        mCourseList = new Gson().fromJson(getArguments().getString(COURSES_LIST), COURSES_LIST_TYPE);
+        checkPrimaryData();
+        mSchedulesList = new ArrayList<>();
 
         calculationTask = new AsyncTask<Void, Void, Set<List<BSectionModel>>>() {
             @Override
             protected Set<List<BSectionModel>> doInBackground(Void... voids) {
                 List<List<BSectionModel>> allSectionsList = new ArrayList<>();
-                for (BCourseModel course : myCourseList){
+                for (BCourseModel course : mCourseList){
                     allSectionsList.add(course.sections);
                 }
                 return getCombinations(allSectionsList);
@@ -135,11 +148,11 @@ public class SummaryFragment extends BaseFragment {
             protected void onPostExecute(Set<List<BSectionModel>> lists) {
                 super.onPostExecute(lists);
                 if (!isCancelled()) {
-                    mySchedulesList =  new ArrayList(lists);
-                    int count = lists.size();
+                    mSchedulesList =  new ArrayList(lists);
+                    int count = mSchedulesList.size();
                     progressBar.setVisibility(View.GONE);
                     lblCombinations.setText(String.valueOf(count));
-                    if (count > 0) {
+                    if (count > 0 && nextMenuItem != null) {
                         nextMenuItem.setEnabled(true);
                     } else {
                         infoDialog("Not found", "No schedule found. Pleas go back and choose other " +
@@ -149,7 +162,26 @@ public class SummaryFragment extends BaseFragment {
             }
         };
 
-        calculationTask.execute();
+        if (savedInstanceState != null && savedInstanceState.containsKey(SCHEDULES_LIST)) {
+            // get data from arguments
+            mSchedulesList = new Gson().fromJson(savedInstanceState.getString(SCHEDULES_LIST), SCHEDULES_LIST_TYPE);
+            // if wrong happen in the parsing
+            if (mSchedulesList == null) {
+                // run the task
+                calculationTask.execute();
+            } else {
+                int count = mSchedulesList.size();
+                progressBar.setVisibility(View.GONE);
+                lblCombinations.setText(String.valueOf(count));
+                if (count == 0) {
+                    infoDialog("Not found", "No schedule found. Pleas go back and choose other " +
+                            "options or other coerces", "Close").show();
+                }
+            }
+        } else {
+            // run the task
+            calculationTask.execute();
+        }
     }
 
 
@@ -202,6 +234,14 @@ public class SummaryFragment extends BaseFragment {
             }
         }
         return false;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if (mSchedulesList != null){
+            outState.putString(SCHEDULES_LIST, new Gson().toJson(mSchedulesList, SCHEDULES_LIST_TYPE));
+        }
+        super.onSaveInstanceState(outState);
     }
 
     @Override

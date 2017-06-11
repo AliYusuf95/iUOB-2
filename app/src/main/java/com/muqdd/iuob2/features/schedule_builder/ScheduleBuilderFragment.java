@@ -21,6 +21,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.malinskiy.superrecyclerview.SuperRecyclerView;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
@@ -30,10 +32,13 @@ import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.app.Constants;
 import com.muqdd.iuob2.features.main.Menu;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,6 +52,12 @@ import info.hoang8f.android.segmented.SegmentedGroup;
 
 public class ScheduleBuilderFragment extends BaseFragment {
 
+    private final static String COURSES_LIST = "COURSES_LIST";
+    private final static Type COURSES_LIST_TYPE = new TypeToken<List<BCourseModel>>() {}.getType();
+
+    private final static Pattern pCourse =
+            Pattern.compile("^([\\w]+[a-z])\\s*?([\\d]{3})$",Pattern.CASE_INSENSITIVE);
+
     @BindView(R.id.main_content) LinearLayout mainContent;
     @BindView(R.id.semester) SegmentedGroup semesterRadio;
     @BindView(R.id.course) AutoCompleteTextView course;
@@ -54,7 +65,7 @@ public class ScheduleBuilderFragment extends BaseFragment {
 
     private View mView;
     private FastItemAdapter<BCourseModel> fastItemAdapter;
-    private List<BCourseModel> myCourseList;
+    private List<BCourseModel> mCourseList;
     private MenuItem nextMenuItem;
     private String semester;
 
@@ -77,7 +88,7 @@ public class ScheduleBuilderFragment extends BaseFragment {
             // Inflate the layout for this fragment
             mView = inflater.inflate(R.layout.fragment_schedule_builder, container, false);
             ButterKnife.bind(this, mView);
-            initiate();
+            initiate(savedInstanceState);
         }
         setHasOptionsMenu(true);
         return mView;
@@ -87,7 +98,6 @@ public class ScheduleBuilderFragment extends BaseFragment {
     public void onCreateOptionsMenu(android.view.Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.schedule_builder_menu, menu);
-
         nextMenuItem = menu.findItem(R.id.next);
         refreshNextMenuItem();
     }
@@ -97,7 +107,7 @@ public class ScheduleBuilderFragment extends BaseFragment {
         // handle item selection
         switch (item.getItemId()) {
             case R.id.next:
-                if (myCourseList.size() == 0) {
+                if (mCourseList.size() == 0) {
                     Snackbar.make(mainContent, "Please add courses first", Snackbar.LENGTH_LONG).show();
                 } else {
                     // hide keyboard
@@ -107,7 +117,7 @@ public class ScheduleBuilderFragment extends BaseFragment {
                     imm.hideSoftInputFromWindow(course.getWindowToken(), 0);
                     // start options fragment
                     OptionsFragment fragment =
-                            OptionsFragment.newInstance(getString(R.string.fragment_schedule_builder_options), semester, myCourseList);
+                            OptionsFragment.newInstance(getString(R.string.fragment_schedule_builder_options), semester, mCourseList);
                     displayFragment(fragment);
                 }
                 return true;
@@ -123,10 +133,10 @@ public class ScheduleBuilderFragment extends BaseFragment {
         params.setScrollFlags(0);
     }
 
-    private void initiate() {
+    private void initiate(Bundle savedInstanceState) {
         // initialize variables
         fastItemAdapter = new FastItemAdapter<>();
-        myCourseList = new ArrayList<>();
+        mCourseList = new ArrayList<>();
 
         fastItemAdapter.withItemEvent(new ClickEventHook<BCourseModel>() {
             @Nullable
@@ -140,11 +150,17 @@ public class ScheduleBuilderFragment extends BaseFragment {
 
             @Override
             public void onClick(View v, int position, FastAdapter<BCourseModel> fastAdapter, BCourseModel item) {
-                myCourseList.remove(position);
+                mCourseList.remove(position);
                 fastItemAdapter.remove(position);
                 refreshNextMenuItem();
             }
         });
+
+        // load data from savedInstanceState
+        if (savedInstanceState != null && savedInstanceState.containsKey(COURSES_LIST)) {
+            mCourseList = new Gson().fromJson(savedInstanceState.getString(COURSES_LIST), COURSES_LIST_TYPE);
+            fastItemAdapter.add(mCourseList);
+        }
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         // disable refreshable list
@@ -195,8 +211,10 @@ public class ScheduleBuilderFragment extends BaseFragment {
         course.setValidator(new AutoCompleteTextView.Validator() {
             @Override
             public boolean isValid(CharSequence charSequence) {
-                Arrays.sort(Constants.coursesList);
-                return Arrays.binarySearch(Constants.coursesList, charSequence.toString()) > 0;
+                Matcher m = pCourse.matcher(charSequence.toString());
+                if (!m.find()) {return false;}
+                String courseName = m.group(1);
+                return Arrays.binarySearch(Constants.coursesNameList, courseName) > 0;
             }
 
             @Override
@@ -222,20 +240,21 @@ public class ScheduleBuilderFragment extends BaseFragment {
     }
 
     private void refreshNextMenuItem(){
-        nextMenuItem.setEnabled(myCourseList.size() > 0);
-        nextMenuItem.setCheckable(myCourseList.size() > 0);
+        nextMenuItem.setEnabled(mCourseList.size() > 0);
+        nextMenuItem.setCheckable(mCourseList.size() > 0);
     }
 
     @OnClick(R.id.add)
     void addCourse(){
         course.performValidation();
-        if (!course.getText().toString().trim().equals("")) {
-            String courseString = course.getText().toString().trim();
-            String courseNumber = courseString.substring(courseString.length()-3);
-            String CourseName = courseString.substring(0,courseString.length()-3);
-            BCourseModel myCourse = new BCourseModel(CourseName, courseNumber);
-            if (!myCourseList.contains(myCourse)) {
-                myCourseList.add(myCourse);
+        String courseString = course.getText().toString().trim();
+        Matcher m = pCourse.matcher(courseString);
+        if (!courseString.equals("") && m.find()) {
+            String courseName = m.group(1);
+            String courseNumber = m.group(2);
+            BCourseModel myCourse = new BCourseModel(courseName, courseNumber);
+            if (!mCourseList.contains(myCourse)) {
+                mCourseList.add(myCourse);
                 fastItemAdapter.add(myCourse);
                 course.setText("");
             } else {
@@ -243,5 +262,13 @@ public class ScheduleBuilderFragment extends BaseFragment {
             }
         }
         refreshNextMenuItem();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if (mCourseList != null){
+            outState.putString(COURSES_LIST, new Gson().toJson(mCourseList, COURSES_LIST_TYPE));
+        }
+        super.onSaveInstanceState(outState);
     }
 }

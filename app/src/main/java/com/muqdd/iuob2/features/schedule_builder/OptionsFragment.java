@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -76,6 +77,7 @@ public class OptionsFragment extends BaseFragment {
     private List<BCourseModel> myCourseList; // filtered courses data
     private Dialog failDialog;
     private int dataLoadingCounter; // check if all courses data loaded
+    private int cCount; // combinations count
     private MenuItem nextMenuItem;
     private boolean sectionFilter;
     // selected filter options
@@ -126,10 +128,11 @@ public class OptionsFragment extends BaseFragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(android.view.Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.schedule_builder_menu, menu);
         nextMenuItem = menu.findItem(R.id.next);
+        nextMenuItem.setEnabled(cCount > 0 && cCount < 20000);
         if (btnSectionFilter != null) {
             nextMenuItem.setEnabled(btnSectionFilter.isEnabled());
         }
@@ -140,7 +143,7 @@ public class OptionsFragment extends BaseFragment {
         // handle item selection
         switch (item.getItemId()) {
             case R.id.next:
-                // start options fragment
+                // start summary fragment
                 SummaryFragment fragment =
                         SummaryFragment.newInstance(getString(R.string.fragment_schedule_builder_summary), myCourseList);
                 displayFragment(fragment);
@@ -156,11 +159,11 @@ public class OptionsFragment extends BaseFragment {
         toolbar.setTitle(title);
         // stop hiding toolbar
         params.setScrollFlags(0);
+        // check primary data
+        checkPrimaryData();
     }
 
-    private void initiate() {
-        // initialize variables
-        allCourseList = new Gson().fromJson(getArguments().getString(COURSES_LIST), COURSES_LIST_TYPE);
+    private void checkPrimaryData() {
         if (allCourseList == null){
             allCourseList = new ArrayList<>();
             Dialog dialog = infoDialog("Sorry","Some thing goes wrong pleas try again later.", "Cancel");
@@ -172,6 +175,12 @@ public class OptionsFragment extends BaseFragment {
             });
             dialog.show();
         }
+    }
+
+    private void initiate() {
+        // initialize variables
+        allCourseList = new Gson().fromJson(getArguments().getString(COURSES_LIST), COURSES_LIST_TYPE);
+        checkPrimaryData();
         myCourseList = new ArrayList<>();
         sectionFilter = false;
 
@@ -287,6 +296,7 @@ public class OptionsFragment extends BaseFragment {
 
         // fetching data
         dataLoadingCounter = 0;
+        Logger.d(allCourseList.size());
         for (int i = 0; i < allCourseList.size() ; i++){
             getCourseData(i, allCourseList.get(i), String.valueOf(year), semester);
         }
@@ -304,10 +314,15 @@ public class OptionsFragment extends BaseFragment {
                                 String responseString = response.body().string();
                                 if (responseString.contains("The Schedule Will Be Announced Later") ||
                                         responseString.trim().isEmpty()){
-                                    throw new IllegalStateException();
+                                    throw new IllegalStateException("Schedule for " + year + "\\" + semester + " is not " +
+                                            "available. Make sure you select the right semester.");
                                 }
                                 // add sections list to the course
                                 BCourseModel.parseSectionsData(allCourseList.get(index),responseString);
+                                if (allCourseList.get(index).sections.size() == 0){
+                                    throw new IllegalStateException("Course [" + allCourseList.get(index).courseName +
+                                            allCourseList.get(index).courseNumber + "] not found.");
+                                }
                             } catch (IOException e) {
                                 if (failDialog == null) {
                                     failDialog = infoDialog("Sorry", "Some thing goes wrong while " +
@@ -317,8 +332,7 @@ public class OptionsFragment extends BaseFragment {
                                 Logger.w("Something goes wrong");
                             } catch (IllegalStateException e){
                                 if (failDialog == null) {
-                                    failDialog = infoDialog("Sorry", "Schedule for " + year + "\\" + semester + " is not " +
-                                            "available. Make sure you select the right semester.", "close");
+                                    failDialog = infoDialog("Sorry", e.getMessage(), "close");
                                     failDialog.show();
                                 }
                                 Logger.w("Something goes wrong");
@@ -352,7 +366,7 @@ public class OptionsFragment extends BaseFragment {
     }
 
     private void calculateCombinations(){
-        int cCount = 0; // combinations count
+        cCount = 0; // combinations count
         myCourseList.clear(); // clear filtered courses list
         for (BCourseModel course : allCourseList){
             int sCount = 0; // available sections count
@@ -391,13 +405,19 @@ public class OptionsFragment extends BaseFragment {
             // clear filtered courses list if combinations count = 0
             myCourseList.clear();
             alertText.setVisibility(View.INVISIBLE);
-            nextMenuItem.setEnabled(false);
+            if (nextMenuItem != null) {
+                nextMenuItem.setEnabled(false);
+            }
         } else if (cCount > 20000) {
             alertText.setVisibility(View.VISIBLE);
-            nextMenuItem.setEnabled(false);
+            if (nextMenuItem != null) {
+                nextMenuItem.setEnabled(false);
+            }
         } else {
             alertText.setVisibility(View.INVISIBLE);
-            nextMenuItem.setEnabled(true);
+            if (nextMenuItem != null) {
+                nextMenuItem.setEnabled(true);
+            }
         }
         combinations.setText(String.valueOf(cCount));
     }

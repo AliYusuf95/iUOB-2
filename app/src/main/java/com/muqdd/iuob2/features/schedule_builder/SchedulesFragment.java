@@ -3,9 +3,11 @@ package com.muqdd.iuob2.features.schedule_builder;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,12 +16,15 @@ import android.widget.LinearLayout;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.malinskiy.superrecyclerview.SuperRecyclerView;
+import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
+import com.mikepenz.fastadapter.listeners.ClickEventHook;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
@@ -41,6 +46,7 @@ public class SchedulesFragment extends BaseFragment {
     private View mView;
     private List<BScheduleModel> mySchedulesList;
     private FastItemAdapter<BScheduleModel> fastAdapter;
+    private List<List<BSectionModel>> allSectionsList;
 
     public SchedulesFragment() {
         // Required empty public constructor
@@ -68,21 +74,16 @@ public class SchedulesFragment extends BaseFragment {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         toolbar.setTitle(title);
         // stop hiding toolbar
         params.setScrollFlags(0);
+        // check primary data
+        checkPrimaryData();
     }
 
-    private void initiate() {
-        // initialize variables
-        List<List<BSectionModel>> allSectionsList = new Gson().fromJson(getArguments().getString(SCHEDULES_LIST), SCHEDULES_LIST_TYPE);
+    private void checkPrimaryData() {
         if (allSectionsList == null){
             allSectionsList = new ArrayList<>();
             Dialog dialog = infoDialog("Sorry","Some thing goes wrong pleas try again later.", "Cancel");
@@ -94,7 +95,12 @@ public class SchedulesFragment extends BaseFragment {
             });
             dialog.show();
         }
+    }
 
+    private void initiate() {
+        // initialize variables
+        allSectionsList = new Gson().fromJson(getArguments().getString(SCHEDULES_LIST), SCHEDULES_LIST_TYPE);
+        checkPrimaryData();
         mySchedulesList = new ArrayList<>();
 
         for (List<BSectionModel> list : allSectionsList){
@@ -102,6 +108,33 @@ public class SchedulesFragment extends BaseFragment {
         }
 
         fastAdapter = new FastItemAdapter<>();
+        fastAdapter.withItemEvent(new ClickEventHook<BScheduleModel>() {
+            @Nullable
+            @Override
+            public List<View> onBindMany(@NonNull RecyclerView.ViewHolder viewHolder) {
+                if (viewHolder instanceof BScheduleModel.ViewHolder){
+                    return Arrays.asList(viewHolder.itemView, ((BScheduleModel.ViewHolder) viewHolder).imgInfo);
+                }
+                return null;
+            }
+
+            @Override
+            public void onClick(View v, int position, FastAdapter<BScheduleModel> fastAdapter, BScheduleModel item) {
+                if (v.getId() == R.id.img_info){
+                    // start schedule details fragment
+                    ScheduleDetailsFragment fragment =
+                            ScheduleDetailsFragment.newInstance(getString(R.string.fragment_schedule_details), item);
+                    displayFragment(fragment);
+                } else {
+                    // start time table fragment
+                    TimeTableFragment fragment =
+                            TimeTableFragment.newInstance(getString(R.string.fragment_time_table), item);
+                    displayFragment(fragment);
+                }
+            }
+        });
+
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 layoutManager.getOrientation());

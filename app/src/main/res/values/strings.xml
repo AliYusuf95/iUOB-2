@@ -42,4 +42,8 @@
     <string name="menu_deselect_to_be_announced">Deselect [To Be Announced]</string>
     <string name="fragment_schedule_builder_summary">Summary</string>
     <string name="fragment_schedule_builder_schedules">Schedules</string>
+    <string name="fragment_time_table">TimeTable</string>
+    <string name="share">Share</string>
+    <string name="fragment_schedule_details">Schedule Details</string>
+    <string name="copy">Copy</string>
 </resources>

@@ -129,7 +129,7 @@ public class SectionsFilterActivity extends BaseActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         //add the values which need to be saved from the adapter to the bundel
-        outState = mItemAdapter.saveInstanceState(outState);
+        outState = mItemAdapter.saveInstanceState(outState,"LIST_DATA");
         super.onSaveInstanceState(outState);
     }
 

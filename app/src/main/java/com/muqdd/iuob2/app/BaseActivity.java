@@ -3,6 +3,8 @@ package com.muqdd.iuob2.app;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
@@ -22,7 +24,7 @@ import com.orhanobut.logger.Logger;
  * iUOB-2
  */
 
-public class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity {
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 123;
 
     protected Drawer drawerMenu;
@@ -37,11 +39,18 @@ public class BaseActivity extends AppCompatActivity {
             Intent intent = new Intent(this, RegistrationIntentService.class);
             startService(intent);
         }
+    }
+
+    public void sendAnalyticTracker(@StringRes int screenName) {
+        sendAnalyticTracker(getString(screenName));
+    }
+
+    public void sendAnalyticTracker(String screenName) {
         // deniable google analytic in debug
         GoogleAnalytics.getInstance(this).setDryRun(BuildConfig.DEBUG);
         // Send analytic event
         Tracker tracker = ((iUobApplication) this.getApplication()).getDefaultTracker();
-        tracker.setScreenName(getString(R.string.app_name));
+        tracker.setScreenName(screenName);
         // Send a screen view.
         tracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
@@ -78,10 +87,25 @@ public class BaseActivity extends AppCompatActivity {
     }
 
 
+
     public interface OnBackPressedListener{
         /**
-         * @return true to prevent default onBackPressed; false otherwise
+         * @return return true to prevent default onBackPressed; false otherwise
          */
         boolean onBack();
     }
+
+    /**
+     * Replace current fragment with another one
+     *
+     * @param fragment Fragment instance
+     */
+    public void replaceFragment(Fragment fragment){}
+
+    /**
+     * Display fragment and add the old one to the back stack
+     *
+     * @param fragment Fragment instance
+     */
+    public void displayFragment(Fragment fragment){}
 }
