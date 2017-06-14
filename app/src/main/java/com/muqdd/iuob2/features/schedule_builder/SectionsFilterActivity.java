@@ -31,13 +31,15 @@ import butterknife.ButterKnife;
 
 public class SectionsFilterActivity extends BaseActivity {
 
+    private final static String SECTIONS_LIST = "SECTIONS_LIST";
     private final static Type COURSES_LIST_TYPE = new TypeToken<List<BCourseModel>>() {}.getType();
+    private final static Type SECTIONS_LIST_TYPE = new TypeToken<List<BSectionModel>>() {}.getType();
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.main_content) CoordinatorLayout mainContent;
     @BindView(R.id.recycler_view) SuperRecyclerView recyclerView;
 
-    private List<BCourseModel> myCourseList; // filtered courses data
+    private List<BCourseModel> mCourseList; // filtered courses data
     private FastItemAdapter<BSectionModel> mItemAdapter;
 
     @Override
@@ -47,6 +49,7 @@ public class SectionsFilterActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         init(savedInstanceState);
+        sendAnalyticTracker(R.string.activity_sections_filter);
     }
 
     @Override
@@ -62,16 +65,16 @@ public class SectionsFilterActivity extends BaseActivity {
 
         if (getIntent().hasExtra(Constants.INTENT_SECTIONS_LIST)){
             String json = getIntent().getStringExtra(Constants.INTENT_SECTIONS_LIST);
-            myCourseList = new Gson().fromJson(json, COURSES_LIST_TYPE);
+            mCourseList = new Gson().fromJson(json, COURSES_LIST_TYPE);
         }
-        if (myCourseList == null || myCourseList.size() == 0) {
+        if (mCourseList == null || mCourseList.size() == 0) {
             setResult(Activity.RESULT_CANCELED);
             finish();
         }
 
         // init adapter
         mItemAdapter = new FastItemAdapter<>();
-        List<BSectionModel> sectionList = BSectionModel.getSectionsFromCourseList(myCourseList);
+        List<BSectionModel> sectionList = BSectionModel.getSectionsFromCourseList(mCourseList);
         mItemAdapter.withSelectable(true);
         mItemAdapter.withMultiSelect(true);
         mItemAdapter.withPositionBasedStateManagement(false);
@@ -87,10 +90,14 @@ public class SectionsFilterActivity extends BaseActivity {
         recyclerView.addItemDecoration(decoration);
         recyclerView.setAdapter(stickyHeaderAdapter.wrap(mItemAdapter));
 
+        if (savedInstanceState != null && savedInstanceState.containsKey(SECTIONS_LIST)) {
+            List<BSectionModel> savedSectionList =
+                    new Gson().fromJson(savedInstanceState.getString(SECTIONS_LIST), SECTIONS_LIST_TYPE);
+            if (savedSectionList != null && savedSectionList.size() > 0){
+                sectionList = savedSectionList;
+            }
+        }
         mItemAdapter.add(sectionList);
-        //restore selections (this has to be done after the items were added
-        mItemAdapter.withSavedInstanceState(savedInstanceState);
-
         stickyHeaderAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
@@ -111,8 +118,8 @@ public class SectionsFilterActivity extends BaseActivity {
         switch (item.getItemId()){
             case R.id.done:
                 Intent intent = new Intent();
-                myCourseList = BSectionModel.getCoursesFromSectionsList(mItemAdapter.getAdapterItems());
-                intent.putExtra(Constants.INTENT_SECTIONS_LIST, new Gson().toJson(myCourseList, COURSES_LIST_TYPE));
+                mCourseList = BSectionModel.getCoursesFromSectionsList(mItemAdapter.getAdapterItems());
+                intent.putExtra(Constants.INTENT_SECTIONS_LIST, new Gson().toJson(mCourseList, COURSES_LIST_TYPE));
                 setResult(Activity.RESULT_OK, intent);
                 finish();
                 break;
@@ -128,8 +135,9 @@ public class SectionsFilterActivity extends BaseActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        //add the values which need to be saved from the adapter to the bundel
-        outState = mItemAdapter.saveInstanceState(outState,"LIST_DATA");
+        if (mItemAdapter != null) {
+            outState.putString(SECTIONS_LIST, new Gson().toJson(mItemAdapter.getAdapterItems(), SECTIONS_LIST_TYPE));
+        }
         super.onSaveInstanceState(outState);
     }
 

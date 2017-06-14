@@ -65,6 +65,7 @@ public class BaseFragment extends Fragment {
         // setup toolbar and tabLayout
         if (getArguments() != null && getArguments().containsKey(TITLE)) {
             title = getArguments().getString(TITLE);
+            // send Analytic Tracker with fragment title
             getBaseActivity().sendAnalyticTracker(title);
         }
         toolbar = ButterKnife.findById(getActivity(), R.id.toolbar);

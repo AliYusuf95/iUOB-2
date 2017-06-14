@@ -9,17 +9,20 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputFilter;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -60,7 +63,7 @@ public class ScheduleBuilderFragment extends BaseFragment {
 
     @BindView(R.id.main_content) LinearLayout mainContent;
     @BindView(R.id.semester) SegmentedGroup semesterRadio;
-    @BindView(R.id.course) AutoCompleteTextView course;
+    @BindView(R.id.course) AutoCompleteTextView txtCourse;
     @BindView(R.id.recycler_view) SuperRecyclerView recyclerView;
 
     private View mView;
@@ -111,10 +114,10 @@ public class ScheduleBuilderFragment extends BaseFragment {
                     Snackbar.make(mainContent, "Please add courses first", Snackbar.LENGTH_LONG).show();
                 } else {
                     // hide keyboard
-                    course.requestFocus();
+                    txtCourse.requestFocus();
                     InputMethodManager imm =
                             (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(course.getWindowToken(), 0);
+                    imm.hideSoftInputFromWindow(txtCourse.getWindowToken(), 0);
                     // start options fragment
                     OptionsFragment fragment =
                             OptionsFragment.newInstance(getString(R.string.fragment_schedule_builder_options), semester, mCourseList);
@@ -204,14 +207,12 @@ public class ScheduleBuilderFragment extends BaseFragment {
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_dropdown_item_1line, Constants.coursesList);
-        course.setAdapter(adapter);
-        // force all caps
-        course.setFilters(new InputFilter[]{new InputFilter.AllCaps()});
+        txtCourse.setAdapter(adapter);
         // validate input
-        course.setValidator(new AutoCompleteTextView.Validator() {
+        txtCourse.setValidator(new AutoCompleteTextView.Validator() {
             @Override
             public boolean isValid(CharSequence charSequence) {
-                Matcher m = pCourse.matcher(charSequence.toString());
+                Matcher m = pCourse.matcher(charSequence.toString().toUpperCase().trim());
                 if (!m.find()) {return false;}
                 String courseName = m.group(1);
                 return Arrays.binarySearch(Constants.coursesNameList, courseName) > 0;
@@ -223,7 +224,17 @@ public class ScheduleBuilderFragment extends BaseFragment {
                 return "";
             }
         });
-        course.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        txtCourse.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    addCourse();
+                    return true;
+                }
+                return false;
+            }
+        });
+        txtCourse.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
                 if (view.getId() == R.id.course && !hasFocus) {
@@ -231,7 +242,7 @@ public class ScheduleBuilderFragment extends BaseFragment {
                 }
             }
         });
-        course.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        txtCourse.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 addCourse();
@@ -246,8 +257,8 @@ public class ScheduleBuilderFragment extends BaseFragment {
 
     @OnClick(R.id.add)
     void addCourse(){
-        course.performValidation();
-        String courseString = course.getText().toString().trim();
+        txtCourse.performValidation();
+        String courseString = txtCourse.getText().toString().toUpperCase().trim();
         Matcher m = pCourse.matcher(courseString);
         if (!courseString.equals("") && m.find()) {
             String courseName = m.group(1);
@@ -256,7 +267,7 @@ public class ScheduleBuilderFragment extends BaseFragment {
             if (!mCourseList.contains(myCourse)) {
                 mCourseList.add(myCourse);
                 fastItemAdapter.add(myCourse);
-                course.setText("");
+                txtCourse.setText("");
             } else {
                 Snackbar.make(mainContent, "This course already added", Snackbar.LENGTH_LONG).show();
             }

@@ -79,8 +79,9 @@
             android:hint="@string/course_hint"
             android:ems="10"
             android:maxLines="1"
-            android:inputType="text"
-            android:imeOptions="actionNext"
+            android:textAllCaps="true"
+            android:inputType="textCapCharacters"
+            android:imeOptions="actionDone"
             android:layout_marginStart="5dp"
             android:layout_marginEnd="5dp"
             />

@@ -70,7 +70,7 @@ public class SummaryFragment extends BaseFragment {
             // Inflate the layout for this fragment
             mView = inflater.inflate(R.layout.fragment_schedule_builder_summary, container, false);
             ButterKnife.bind(this, mView);
-            initiate(savedInstanceState);
+            initiate();
         }
         setHasOptionsMenu(true);
         return mView;
@@ -128,7 +128,7 @@ public class SummaryFragment extends BaseFragment {
         }
     }
 
-    private void initiate(Bundle savedInstanceState) {
+    private void initiate() {
         // initialize variables
         mCourseList = new Gson().fromJson(getArguments().getString(COURSES_LIST), COURSES_LIST_TYPE);
         checkPrimaryData();
@@ -162,26 +162,8 @@ public class SummaryFragment extends BaseFragment {
             }
         };
 
-        if (savedInstanceState != null && savedInstanceState.containsKey(SCHEDULES_LIST)) {
-            // get data from arguments
-            mSchedulesList = new Gson().fromJson(savedInstanceState.getString(SCHEDULES_LIST), SCHEDULES_LIST_TYPE);
-            // if wrong happen in the parsing
-            if (mSchedulesList == null) {
-                // run the task
-                calculationTask.execute();
-            } else {
-                int count = mSchedulesList.size();
-                progressBar.setVisibility(View.GONE);
-                lblCombinations.setText(String.valueOf(count));
-                if (count == 0) {
-                    infoDialog("Not found", "No schedule found. Pleas go back and choose other " +
-                            "options or other coerces", "Close").show();
-                }
-            }
-        } else {
-            // run the task
-            calculationTask.execute();
-        }
+        // run the task
+        calculationTask.execute();
     }
 
 
@@ -234,14 +216,6 @@ public class SummaryFragment extends BaseFragment {
             }
         }
         return false;
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        if (mSchedulesList != null){
-            outState.putString(SCHEDULES_LIST, new Gson().toJson(mSchedulesList, SCHEDULES_LIST_TYPE));
-        }
-        super.onSaveInstanceState(outState);
     }
 
     @Override

@@ -180,6 +180,9 @@ public class SectionsFragment extends BaseFragment {
     }
 
     private void addFinalExamView() {
+        // avoid some crashes
+        if (getContext() == null)
+            return;
         // remove final view if exist
         mainContent.removeView(finalView);
         // create new view
