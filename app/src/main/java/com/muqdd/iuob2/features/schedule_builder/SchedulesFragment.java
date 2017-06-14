@@ -84,7 +84,7 @@ public class SchedulesFragment extends BaseFragment {
     }
 
     private void checkPrimaryData() {
-        if (allSectionsList == null){
+        if (allSectionsList == null && getContext() != null){
             allSectionsList = new ArrayList<>();
             Dialog dialog = infoDialog("Sorry","Some thing goes wrong pleas try again later.", "Cancel");
             dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {

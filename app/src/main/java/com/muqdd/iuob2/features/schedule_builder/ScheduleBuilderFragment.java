@@ -33,6 +33,7 @@ import com.mikepenz.fastadapter.listeners.ClickEventHook;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.app.Constants;
+import com.muqdd.iuob2.features.main.MainActivity;
 import com.muqdd.iuob2.features.main.Menu;
 
 import java.lang.reflect.Type;
@@ -113,11 +114,6 @@ public class ScheduleBuilderFragment extends BaseFragment {
                 if (mCourseList.size() == 0) {
                     Snackbar.make(mainContent, "Please add courses first", Snackbar.LENGTH_LONG).show();
                 } else {
-                    // hide keyboard
-                    txtCourse.requestFocus();
-                    InputMethodManager imm =
-                            (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(txtCourse.getWindowToken(), 0);
                     // start options fragment
                     OptionsFragment fragment =
                             OptionsFragment.newInstance(getString(R.string.fragment_schedule_builder_options), semester, mCourseList);
@@ -248,6 +244,10 @@ public class ScheduleBuilderFragment extends BaseFragment {
                 addCourse();
             }
         });
+
+        if (getBaseActivity() instanceof MainActivity) {
+            
+        }
     }
 
     private void refreshNextMenuItem(){
@@ -273,6 +273,16 @@ public class ScheduleBuilderFragment extends BaseFragment {
             }
         }
         refreshNextMenuItem();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        // hide keyboard
+        txtCourse.requestFocus();
+        InputMethodManager imm =
+                (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(txtCourse.getWindowToken(), 0);
     }
 
     @Override

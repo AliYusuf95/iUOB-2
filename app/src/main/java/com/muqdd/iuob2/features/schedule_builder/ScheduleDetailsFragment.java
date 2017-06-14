@@ -117,7 +117,7 @@ public class ScheduleDetailsFragment extends BaseFragment {
     }
 
     private void checkPrimaryData() {
-        if (mSchedule == null) {
+        if (mSchedule == null && getContext() != null) {
             mSchedule = new BScheduleModel(new ArrayList<BSectionModel>());
             Dialog dialog = infoDialog("Sorry","Some thing goes wrong pleas try again later.", "Cancel");
             dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {

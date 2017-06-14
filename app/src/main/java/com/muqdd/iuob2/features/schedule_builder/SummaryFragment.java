@@ -115,7 +115,7 @@ public class SummaryFragment extends BaseFragment {
     }
 
     private void checkPrimaryData() {
-        if (mCourseList == null){
+        if (mCourseList == null && getContext() != null){
             mCourseList = new ArrayList<>();
             Dialog dialog = infoDialog("Sorry","Some thing goes wrong pleas try again later.", "Cancel");
             dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -154,7 +154,7 @@ public class SummaryFragment extends BaseFragment {
                     lblCombinations.setText(String.valueOf(count));
                     if (count > 0 && nextMenuItem != null) {
                         nextMenuItem.setEnabled(true);
-                    } else {
+                    } else if (getContext() != null){
                         infoDialog("Not found", "No schedule found. Pleas go back and choose other " +
                                 "options or other coerces", "Close").show();
                     }

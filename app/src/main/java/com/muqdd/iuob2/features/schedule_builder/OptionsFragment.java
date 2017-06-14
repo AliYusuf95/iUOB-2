@@ -164,7 +164,7 @@ public class OptionsFragment extends BaseFragment {
     }
 
     private void checkPrimaryData() {
-        if (allCourseList == null){
+        if (allCourseList == null && getContext() != null){
             allCourseList = new ArrayList<>();
             Dialog dialog = infoDialog("Sorry","Some thing goes wrong pleas try again later.", "Cancel");
             dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -324,14 +324,14 @@ public class OptionsFragment extends BaseFragment {
                                             allCourseList.get(index).courseNumber + "] not found.");
                                 }
                             } catch (IOException e) {
-                                if (failDialog == null) {
+                                if (failDialog == null && getContext() != null) {
                                     failDialog = infoDialog("Sorry", "Some thing goes wrong while " +
                                             "getting data. Please try again later.", "close");
                                     failDialog.show();
                                 }
                                 Logger.w("Something goes wrong");
                             } catch (IllegalStateException e){
-                                if (failDialog == null) {
+                                if (failDialog == null && getContext() != null) {
                                     failDialog = infoDialog("Sorry", e.getMessage(), "close");
                                     failDialog.show();
                                 }
@@ -354,7 +354,7 @@ public class OptionsFragment extends BaseFragment {
 
                     @Override
                     public void onFailure(Call<ResponseBody> call, Throwable t) {
-                        if (failDialog == null) {
+                        if (failDialog == null && getContext() != null) {
                             failDialog = t instanceof NoConnectivityException ?
                                     infoDialog("Error", "The Internet Connection appears to be offline.", "close") :
                                     infoDialog("Sorry", "Schedule for " + year + "\\" + semester + " is not " +
@@ -490,7 +490,7 @@ public class OptionsFragment extends BaseFragment {
     }
 
     private void removeSectionFilter() {
-        if (sectionFilter){
+        if (sectionFilter && getContext() != null){
             infoDialog("Reset","[Section Filter] has been reset. Please reselect your options again.","close").show();
             sectionFilter = false;
             imgSectionFilter.setVisibility(View.INVISIBLE);
@@ -499,6 +499,9 @@ public class OptionsFragment extends BaseFragment {
 
     @OnClick(R.id.probability_info)
     protected void showProbabilityInfo() {
+        if (getContext() == null){
+            return;
+        }
         infoDialog("Info","Number of possible combinations is the sectionNumber of MAXIMUM possible " +
                 "combinations for the courses you entered. It should be less than 20000 in order to " +
                 "continue to the next step which will show you the TRUE sectionNumber of combinations. " +
@@ -509,6 +512,9 @@ public class OptionsFragment extends BaseFragment {
 
     @OnClick(R.id.filter_info)
     protected void showFilterInfo() {
+        if (getContext() == null){
+            return;
+        }
         infoDialog("Info","Use [Section Filter] for extra options. You can choose what section you" +
                 "want to be included individually. Please use [Section Filter] after selecting the " +
                 "Working Days/Times/Location.","Close")

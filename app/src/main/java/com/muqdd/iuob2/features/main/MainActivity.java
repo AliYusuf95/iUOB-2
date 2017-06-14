@@ -1,5 +1,6 @@
 package com.muqdd.iuob2.features.main;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -8,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
@@ -163,13 +165,6 @@ public class MainActivity extends BaseActivity {
                         links,
                         about
                 )
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        // do something with the clicked item :D
-                        return true;
-                    }
-                })
                 .withSavedInstance(savedInstanceState)
                 .withCloseOnClick(true)
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -219,8 +214,27 @@ public class MainActivity extends BaseActivity {
                         //this method is only called if the Arrow icon is shown.
                         //if the back arrow is shown.
                         onBackPressed();
-                        //return true if we have consumed the event
                         return true;
+                    }
+                })
+                .withOnDrawerListener(new Drawer.OnDrawerListener() {
+                    @Override
+                    public void onDrawerOpened(View drawerView) {
+                        if (getCurrentFocus() != null) {
+                            InputMethodManager inputMethodManager =
+                                    (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+                            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                        }
+                    }
+
+                    @Override
+                    public void onDrawerClosed(View drawerView) {
+
+                    }
+
+                    @Override
+                    public void onDrawerSlide(View drawerView, float slideOffset) {
+
                     }
                 })
                 .build();
