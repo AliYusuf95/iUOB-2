@@ -13,6 +13,4 @@ app/app-release.apk
 app/libs/
 keystore.jks
 /screanshots/
-/.idea/inspectionProfiles/
-/.idea/dictionaries/
-/.idea/copyright/
+/.idea/
