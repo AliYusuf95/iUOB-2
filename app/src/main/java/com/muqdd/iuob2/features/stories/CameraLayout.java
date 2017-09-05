@@ -4,9 +4,12 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.PictureCallback;
+import android.media.ExifInterface;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -41,6 +44,7 @@ public class CameraLayout extends RelativeLayout {
     private CameraPreview mPreview;
     private ProgressButton mButton;
     private Camera mCamera;
+    private Camera.CameraInfo mCameraInfo;
     private boolean safeToTakePicture = false;
     private PictureCallback mPicture = new PictureCallback() {
         @Override
@@ -55,7 +59,12 @@ public class CameraLayout extends RelativeLayout {
             }
             try {
                 FileOutputStream fos = new FileOutputStream(pictureFile);
-                fos.write(data);
+                Bitmap realImage = BitmapFactory.decodeByteArray(data, 0, data.length);
+
+                // change image orientation
+                realImage = Utils.bitmapRotate(realImage, 90);
+                realImage.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                //fos.write(data);
                 fos.close();
                 Log.d(TAG, "File saved");
             } catch (FileNotFoundException e) {
@@ -90,6 +99,9 @@ public class CameraLayout extends RelativeLayout {
         if (ContextCompat.checkSelfPermission(context,
                 Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             mCamera = getCameraInstance();
+            if (mCamera != null){
+                mCamera.setDisplayOrientation(90);
+            }
         }
 
         LayoutParams parentParams =
@@ -143,7 +155,7 @@ public class CameraLayout extends RelativeLayout {
             int numberOfCameras = Camera.getNumberOfCameras();
             for (int i = 0; i < numberOfCameras; i++) {
                 CameraInfo info = new CameraInfo();
-                Camera.getCameraInfo(i, info);
+                Camera.getCameraInfo(i, mCameraInfo);
                 if (info.facing == CameraInfo.CAMERA_FACING_BACK) {
                     Log.d(TAG, "Camera found");
                     cameraId = i;
@@ -171,6 +183,7 @@ public class CameraLayout extends RelativeLayout {
             mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         }
 
+        @Override
         public void surfaceCreated(SurfaceHolder holder) {
             // The Surface has been created, now tell the camera where to draw the preview.
             try {
@@ -181,10 +194,12 @@ public class CameraLayout extends RelativeLayout {
             }
         }
 
+        @Override
         public void surfaceDestroyed(SurfaceHolder holder) {
             // empty. Take care of releasing the Camera preview in your activity.
         }
 
+        @Override
         public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
             // If your preview can change or rotate, take care of those events here.
             // Make sure to stop the preview before resizing or reformatting it.

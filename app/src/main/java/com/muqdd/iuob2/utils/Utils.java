@@ -2,6 +2,8 @@ package com.muqdd.iuob2.utils;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.DisplayMetrics;
@@ -88,5 +90,18 @@ public class Utils {
             return mediaFile;
         }
         return null;
+    }
+
+
+    /** Rotate bitmap */
+    public static Bitmap bitmapRotate(Bitmap bitmap, int degree) {
+        int w = bitmap.getWidth();
+        int h = bitmap.getHeight();
+
+        Matrix mtx = new Matrix();
+        //       mtx.postRotate(degree);
+        mtx.setRotate(degree);
+
+        return Bitmap.createBitmap(bitmap, 0, 0, w, h, mtx, true);
     }
 }
