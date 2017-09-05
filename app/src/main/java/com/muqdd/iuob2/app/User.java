@@ -8,6 +8,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.muqdd.iuob2.models.MyCourseModel;
 import com.muqdd.iuob2.models.SectionTimeModel;
@@ -39,12 +41,118 @@ import retrofit2.Response;
  */
 
 public class User {
-    private final static String TAG = User.class.getSimpleName();
-    private final static String NOTIFICATION = "notification";
-    private static final String MY_COURSES = "my_courses";
-    private static final String MY_COURSES_UPDATE = "my_courses_update";
-    private static final Type MY_COURSES_TYPE = new TypeToken<List<MyCourseModel>>() {}.getType();
-    private static boolean fetchingData = false;
+
+    @SerializedName("updatedAt")
+    @Expose
+    private String updatedAt;
+    @SerializedName("createdAt")
+    @Expose
+    private String createdAt;
+    @SerializedName("name")
+    @Expose
+    private String name;
+    @SerializedName("email")
+    @Expose
+    private String email;
+    @SerializedName("studentID")
+    @Expose
+    private String studentID;
+    @SerializedName("dateOfBirth")
+    @Expose
+    private String dateOfBirth;
+    @SerializedName("lastLogin")
+    @Expose
+    private String lastLogin;
+    @SerializedName("_id")
+    @Expose
+    private String id;
+    @SerializedName("token")
+    @Expose
+    private String token;
+
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getStudentID() {
+        return studentID;
+    }
+
+    public void setStudentID(String studentID) {
+        this.studentID = studentID;
+    }
+
+    public String getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(String dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public String getLastLogin() {
+        return lastLogin;
+    }
+
+    public void setLastLogin(String lastLogin) {
+        this.lastLogin = lastLogin;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public String getAuthHeader() {
+        return "Token "+token;
+    }
+
+    /* Transient variables */
+    private transient final static String TAG = User.class.getSimpleName();
+    private transient final static String NOTIFICATION = "notification";
+    private transient static final String MY_COURSES = "my_courses";
+    private transient static final String MY_COURSES_UPDATE = "my_courses_update";
+    private transient static final Type MY_COURSES_TYPE = new TypeToken<List<MyCourseModel>>() {}.getType();
+    private transient static boolean fetchingData = false;
 
     public static boolean setNotification(Context context, boolean state) {
         if (state) {
@@ -174,6 +282,7 @@ public class User {
                     }
                 }
                 setCoursesUpdated(context, !hasError);
+                fetchingData = false;
                 callback.run();
             }
         });
@@ -309,5 +418,9 @@ public class User {
         AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY * 7, pendingIntent);
+    }
+
+    public static User fromJson(String json) {
+        return json == null ? null : new Gson().fromJson(json, User.class);
     }
 }

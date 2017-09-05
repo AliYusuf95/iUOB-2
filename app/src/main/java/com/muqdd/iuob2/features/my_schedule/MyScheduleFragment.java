@@ -139,7 +139,7 @@ public class MyScheduleFragment extends BaseFragment {
         });
 
         // section time comparator
-        Comparator comparator = new Comparator<SectionTimeModel>(){
+        Comparator<SectionTimeModel> comparator = new Comparator<SectionTimeModel>(){
             @Override
             public int compare(SectionTimeModel t1, SectionTimeModel t2) {
                 // compare from then to then room to sort sections

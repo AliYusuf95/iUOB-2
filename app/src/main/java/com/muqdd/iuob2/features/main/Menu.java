@@ -6,11 +6,13 @@ package com.muqdd.iuob2.features.main;
  */
 
 public enum Menu {
+    STORIES ("Stories"),
     SEMESTER_SCHEDULE ("Semester Schedule"),
     CALENDAR ("Calendar"),
     MY_SCHEDULE ("My Schedule"),
     SCHEDULE_BUILDER ("Schedule Builder"),
     MAP ("UOB Map"),
+    ACCOUNT ("Account"),
     LINKS ("Useful Links"),
     ABOUT ("About");
 
