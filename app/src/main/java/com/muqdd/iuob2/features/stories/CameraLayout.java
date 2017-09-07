@@ -6,10 +6,15 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.PictureCallback;
+import android.media.CamcorderProfile;
 import android.media.ExifInterface;
+import android.media.MediaPlayer;
+import android.media.MediaRecorder;
+import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -21,7 +26,9 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.VideoView;
 
 import com.muqdd.iuob2.utils.Utils;
 
@@ -29,23 +36,34 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
+import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO;
 
 /**
  * Created by Ali Yusuf on 9/4/2017.
  * iUOB-2
  */
 
-public class CameraLayout extends RelativeLayout {
+public class CameraLayout extends RelativeLayout implements ProgressButton.EventListener {
 
     private static final String TAG = CameraLayout.class.getSimpleName();
 
     private CameraPreview mPreview;
+    private VideoView mVideoView;
+    private ImageView mImageView;
     private ProgressButton mButton;
     private Camera mCamera;
+    private MediaRecorder mMediaRecorder;
     private Camera.CameraInfo mCameraInfo;
+
+    private Uri videoResultFile;
+
+    /* Flags */
     private boolean safeToTakePicture = false;
+    private boolean isRecording = false;
+
     private PictureCallback mPicture = new PictureCallback() {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
@@ -63,9 +81,19 @@ public class CameraLayout extends RelativeLayout {
 
                 // change image orientation
                 realImage = Utils.bitmapRotate(realImage, 90);
-                realImage.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                realImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
                 //fos.write(data);
                 fos.close();
+
+//                Canvas bitmapCanvas = new Canvas();
+//                realImage = Bitmap.createBitmap(mPreview.getWidth(), mPreview.getHeight(), Bitmap.Config.ARGB_8888);
+//                bitmapCanvas.setBitmap(realImage);
+//                bitmapCanvas.scale(2.0f, 2.0f);
+//                mPreview.draw(bitmapCanvas);
+//                realImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
+
+                showImageView(realImage);
+
                 Log.d(TAG, "File saved");
             } catch (FileNotFoundException e) {
                 Log.w(TAG, "File not found: " + e.getMessage());
@@ -101,23 +129,42 @@ public class CameraLayout extends RelativeLayout {
             mCamera = getCameraInstance();
             if (mCamera != null){
                 mCamera.setDisplayOrientation(90);
+                Camera.Parameters params = mCamera.getParameters();
+                List<String> focusModes = params.getSupportedFocusModes();
+                if (focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+                    params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+                }
+                mCamera.setParameters(params);
             }
         }
 
         LayoutParams parentParams =
                 new LayoutParams(LayoutParams.MATCH_PARENT,
                         LayoutParams.MATCH_PARENT);
+        parentParams.addRule(CENTER_IN_PARENT);
         setLayoutParams(parentParams);
 
+        // init VideoView
+        mVideoView = new VideoView(getContext());
+        mVideoView.setLayoutParams(parentParams);
+        mVideoView.setVisibility(GONE);
+        mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            public void onPrepared(MediaPlayer mp) {
+                mp.setLooping(true);
+                mVideoView.start();
+            }
+        });
+        addView(mVideoView);
+
+        mImageView = new ImageView(getContext());
+        mImageView.setLayoutParams(parentParams);
+        mImageView.setVisibility(GONE);
+        addView(mImageView);
+
         // init camera preview
-        LayoutParams camViewParams =
-                new LayoutParams(LayoutParams.MATCH_PARENT,
-                        LayoutParams.MATCH_PARENT);
-        mPreview = new CameraPreview(getContext(), mCamera);
-        mPreview.setLayoutParams(camViewParams);
-        addView(mPreview);
+        addCameraView();
 
-
+        // init button
         LayoutParams btnParams =
                 new LayoutParams(LayoutParams.WRAP_CONTENT,
                         LayoutParams.WRAP_CONTENT);
@@ -129,23 +176,91 @@ public class CameraLayout extends RelativeLayout {
         mButton.setLayoutParams(btnParams);
         mButton.setGravity(Gravity.CENTER_HORIZONTAL);
         mButton.setPadding(0,0,0,(int) Utils.dpToPx(getContext(), 10));
-        mButton.setMax(100);
+        mButton.setMax(200);
         mButton.setInnerSize((int) Utils.dpToPx(getContext(), 50));
         mButton.setProgressSpace((int) Utils.dpToPx(getContext(), 15));
         mButton.setProgressWidth((int) Utils.dpToPx(getContext(), 3));
-        mButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mCamera != null && safeToTakePicture) {
-                    // get an image from the camera
-                    mCamera.takePicture(null, null, mPicture);
-                    safeToTakePicture = false;
-                }
-            }
-        });
+        mButton.setEventListener(this);
         addView(mButton);
     }
 
+    /**
+     * Implement Progress Button listeners {@link ProgressButton.EventListener}
+     */
+    @Override
+    public void onClick(View view) {
+        if (mCamera != null && safeToTakePicture) {
+            // get an image from the camera
+            mCamera.takePicture(null, null, mPicture);
+            safeToTakePicture = false;
+        }
+    }
+
+    @Override
+    public void onLongClick(View view) {
+        if (safeToTakePicture){
+            // initialize video camera
+            mButton.stopAnimating();
+            if (prepareVideoRecorder()) {
+                // Camera is available and unlocked, MediaRecorder is prepared,
+                // now you can start recording
+                mMediaRecorder.start();
+                mButton.startAnimating();
+                isRecording = true;
+            } else {
+                // prepare didn't work, release the camera
+                releaseMediaRecorder();
+                // inform user
+            }
+        }
+    }
+
+    @Override
+    public void onLongClickUp(View view) {
+        if (isRecording) {
+            // stop recording and release camera
+            try {
+                mMediaRecorder.stop();  // stop the recording
+            } catch (RuntimeException ignored) {
+                //handle cleanup here
+            }
+            releaseMediaRecorder(); // release the MediaRecorder object
+            mCamera.lock();         // take camera access back from MediaRecorder
+
+            isRecording = false;
+            showVideoView();
+        }
+    }
+
+    @Override
+    public void onProgress(View view, int progress) {
+
+    }
+
+    @Override
+    public void onProgressStop(View view, int progress) {
+        if (isRecording) {
+            // stop recording and release camera
+            mMediaRecorder.stop();  // stop the recording
+            releaseMediaRecorder(); // release the MediaRecorder object
+            mCamera.lock();         // take camera access back from MediaRecorder
+
+            isRecording = false;
+            showVideoView();
+        }
+    }
+
+    private void addCameraView() {
+        if (mPreview != null){
+            removeView(mPreview);
+        }
+        LayoutParams camViewParams =
+                new LayoutParams(LayoutParams.MATCH_PARENT,
+                        LayoutParams.MATCH_PARENT);
+        mPreview = new CameraPreview(getContext(), mCamera);
+        mPreview.setLayoutParams(camViewParams);
+        addView(mPreview, 0);
+    }
 
     private Camera getCameraInstance(){
         Camera c = Camera.open(); // attempt to get a Camera instance
@@ -165,6 +280,117 @@ public class CameraLayout extends RelativeLayout {
             c = Camera.open(cameraId);
         }
         return c; // returns null if camera is unavailable
+    }
+
+    private boolean prepareVideoRecorder(){
+        mCamera = getCameraInstance();
+        mMediaRecorder = new MediaRecorder();
+
+        // Step 1: Unlock and set camera to MediaRecorder
+        mCamera.unlock();
+        mMediaRecorder.setCamera(mCamera);
+
+        // Step 2: Set sources
+        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
+
+        mMediaRecorder.setOrientationHint(90);
+        mMediaRecorder.setMaxDuration(10000);
+
+        // Step 3: Set a CamcorderProfile
+        mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
+
+        // Step 4: Set output file
+        videoResultFile = Utils.getOutputMediaFileUri(MEDIA_TYPE_VIDEO);
+        if (videoResultFile != null) {
+            mMediaRecorder.setOutputFile(videoResultFile.getPath());
+        } else {
+            Log.d(TAG, "Can't create file");
+            videoResultFile = null;
+            releaseMediaRecorder();
+            return false;
+        }
+
+        // Step 5: Set the preview output
+        mMediaRecorder.setPreviewDisplay(mPreview.getHolder().getSurface());
+
+        // Step 6: Prepare configured MediaRecorder
+        try {
+            mMediaRecorder.prepare();
+        } catch (IllegalStateException e) {
+            Log.d(TAG, "IllegalStateException preparing MediaRecorder: " + e.getMessage());
+            releaseMediaRecorder();
+            return false;
+        } catch (IOException e) {
+            Log.d(TAG, "IOException preparing MediaRecorder: " + e.getMessage());
+            releaseMediaRecorder();
+            return false;
+        }
+        return true;
+    }
+
+    private void showImageView(Bitmap bitmap) {
+        mImageView.setImageBitmap(bitmap);
+        mPreview.setVisibility(INVISIBLE);
+        mVideoView.setVisibility(GONE);
+        mImageView.setVisibility(VISIBLE);
+        mImageView.bringToFront();
+        invalidate();
+    }
+
+    private void showVideoView() {
+        Log.d(TAG, (videoResultFile != null)+" - "+!isRecording);
+        if (!isRecording && videoResultFile != null) {
+            mVideoView.setVideoURI(videoResultFile);
+            mVideoView.setMediaController(null);
+            mVideoView.requestFocus();
+
+            mPreview.setVisibility(INVISIBLE);
+            mVideoView.setVisibility(VISIBLE);
+            mImageView.setVisibility(GONE);
+            mVideoView.bringToFront();
+            invalidate();
+        }
+    }
+
+    public void hideViews() {
+        mImageView.setImageBitmap(null);
+        mVideoView.setVisibility(GONE);
+        mImageView.setVisibility(GONE);
+        startCameraPreview();
+    }
+
+    public void releaseMediaRecorder(){
+        if (mMediaRecorder != null) {
+            mButton.stopAnimating();
+            mMediaRecorder.reset();   // clear recorder configuration
+            mMediaRecorder.release(); // release the recorder object
+            mMediaRecorder = null;
+            mCamera.lock();           // lock camera for later use
+        }
+    }
+
+    public void releaseCamera(){
+        if (mCamera != null){
+            mCamera.release();        // release the camera for other applications
+            mCamera = null;
+        }
+    }
+
+    public void startCameraPreview(){
+        mCamera = getCameraInstance();
+        addCameraView();
+        if (mCamera != null){
+            mCamera.setDisplayOrientation(90);
+            Camera.Parameters params = mCamera.getParameters();
+            List<String> focusModes = params.getSupportedFocusModes();
+            if (focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+                params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+            }
+            mCamera.setParameters(params);
+            mCamera.startPreview();
+            safeToTakePicture = true;
+        }
     }
 
     public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
