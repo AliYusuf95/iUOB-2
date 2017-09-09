@@ -1,8 +1,7 @@
 *.iml
+*.apk
 .gradle
 /local.properties
-/.idea/workspace.xml
-/.idea/libraries
 .DS_Store
 /build
 /captures
@@ -15,3 +14,6 @@ keystore.jks
 /screanshots/
 /.idea/
 /keystore.properties
+/pepk.jar
+/private_key.pky
+/upload_certificate.pemcryp
