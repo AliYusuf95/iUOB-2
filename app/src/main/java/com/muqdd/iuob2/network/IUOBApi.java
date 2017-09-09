@@ -2,12 +2,11 @@ package com.muqdd.iuob2.network;
 
 import com.muqdd.iuob2.app.Auth;
 import com.muqdd.iuob2.features.my_schedule.MyCourse;
+import com.muqdd.iuob2.features.schedule_builder.BCourse;
 import com.muqdd.iuob2.models.Course;
-import com.muqdd.iuob2.models.CoursePrefix;
 import com.muqdd.iuob2.models.RestResponse;
 import com.muqdd.iuob2.models.Section;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +15,6 @@ import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.DELETE;
 import retrofit2.http.Field;
-import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
@@ -30,7 +28,7 @@ import retrofit2.http.QueryMap;
  * iUOB-2
  */
 
-public interface iUOBApi {
+public interface IUOBApi {
 
     @FormUrlEncoded
     @POST("signup")
@@ -132,4 +130,13 @@ public interface iUOBApi {
             @Query("sem") int semester,
             @QueryMap Map<String,String> sections
     );
+
+    @GET("ucs/fetch-sections-for-courses")
+    Call<RestResponse<List<BCourse>>> coursesSectionsList(
+            @Query("year") int year,
+            @Query("sem") int semester,
+            @Query("coursesId[]") List<String> coursesId
+    );
+
+
 }

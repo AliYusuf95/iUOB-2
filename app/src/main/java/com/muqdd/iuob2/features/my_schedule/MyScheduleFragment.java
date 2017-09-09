@@ -22,12 +22,10 @@ import com.muqdd.iuob2.features.main.Menu;
 import com.muqdd.iuob2.models.RestResponse;
 import com.muqdd.iuob2.models.Timing;
 import com.muqdd.iuob2.network.ServiceGenerator;
-import com.muqdd.iuob2.network.iUOBApi;
+import com.muqdd.iuob2.network.IUOBApi;
 import com.orhanobut.logger.Logger;
 
-import java.util.Calendar;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -167,7 +165,7 @@ public class MyScheduleFragment extends BaseFragment {
 
     private void fetchMyScheduleData() {
         MySchedule mySchedule = User.getMySchedule(getContext());
-        ServiceGenerator.createService(iUOBApi.class).sectionsList(mySchedule.getYear(),
+        ServiceGenerator.createService(IUOBApi.class).sectionsList(mySchedule.getYear(),
                 mySchedule.getSemester(), mySchedule.getSectionsParam())
                 .enqueue(new Callback<RestResponse<List<List<MyCourse>>>>() {
             @Override
@@ -260,8 +258,11 @@ public class MyScheduleFragment extends BaseFragment {
                 ((TextView)dialogView.findViewById((R.id.title))).setText(course.getCourseId());
                 ((TextView)dialogView.findViewById((R.id.section))).setText("Section: "+course.getSectionNo());
                 ((TextView)dialogView.findViewById((R.id.doctor))).setText("Doctor: "+course.getInstructor());
-                // TODO: Set exam date
-                ((TextView)dialogView.findViewById((R.id.final_time))).setVisibility(View.GONE);
+                if (course.getExam() != null) {
+                    ((TextView) dialogView.findViewById((R.id.final_time))).setText("Final : " + course.getExam().toString());
+                } else {
+                    dialogView.findViewById((R.id.final_time)).setVisibility(View.GONE);
+                }
                 dialogView.findViewById((R.id.close)).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

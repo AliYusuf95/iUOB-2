@@ -20,7 +20,7 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
-import com.muqdd.iuob2.models.SectionTimeModel;
+import com.muqdd.iuob2.models.Timing;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -44,17 +44,17 @@ public class ScheduleDetailsFragment extends BaseFragment {
 
     private View mView;
     private String summaryText;
-    private BScheduleModel mSchedule;
+    private BSchedule mSchedule;
 
     public ScheduleDetailsFragment() {
         // Required empty public constructor
     }
 
-    public static ScheduleDetailsFragment newInstance(String title, BScheduleModel schedule) {
+    public static ScheduleDetailsFragment newInstance(String title, BSchedule schedule) {
         ScheduleDetailsFragment fragment = new ScheduleDetailsFragment();
         Bundle bundle = new Bundle();
         bundle.putString(TITLE, title);
-        bundle.putString(SCHEDULE, new Gson().toJson(schedule, BScheduleModel.class));
+        bundle.putString(SCHEDULE, new Gson().toJson(schedule, BSchedule.class));
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -118,7 +118,7 @@ public class ScheduleDetailsFragment extends BaseFragment {
 
     private void checkPrimaryData() {
         if (mSchedule == null && getContext() != null) {
-            mSchedule = new BScheduleModel(new ArrayList<BSectionModel>());
+            mSchedule = new BSchedule(new ArrayList<BSection>());
             Dialog dialog = infoDialog("Sorry","Some thing goes wrong pleas try again later.", "Cancel");
             dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
@@ -132,17 +132,16 @@ public class ScheduleDetailsFragment extends BaseFragment {
 
     private void initiate() {
         // initialize variables
-        mSchedule = new Gson().fromJson(getArguments().getString(SCHEDULE), BScheduleModel.class);
+        mSchedule = new Gson().fromJson(getArguments().getString(SCHEDULE), BSchedule.class);
         checkPrimaryData();
         summaryText = "";
-        for (BSectionModel section : mSchedule.sections) {
+        for (BSection section : mSchedule.sections) {
             Locale locale = Locale.getDefault();
-            summaryText += String.format(locale, "Course: %s%s\n",
-                    section.parentCourse.courseName, section.parentCourse.courseNumber);
+            summaryText += String.format(locale, "Course: %s\n", section.getCourseId());
             summaryText += String.format(locale, "Final Exam: %s\n", section.getFinalExam());
             String timeStr = "";
-            for (SectionTimeModel time : section.times){
-                timeStr += String.format(locale, "%s [%s] in [%s]\n", time.days, time.getDuration(), time.room);
+            for (Timing time : section.getTimingLegacy()){
+                timeStr += String.format(locale, "%s [%s] in [%s]\n", time.getDay(), time.getDuration(), time.getLocation());
             }
             summaryText += String.format(locale, "Time: %s", timeStr);
             summaryText += "-------------------------------\n";

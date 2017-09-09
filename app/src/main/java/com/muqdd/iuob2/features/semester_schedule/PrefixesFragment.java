@@ -22,7 +22,7 @@ import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.models.CoursePrefix;
 import com.muqdd.iuob2.models.RestResponse;
 import com.muqdd.iuob2.network.ServiceGenerator;
-import com.muqdd.iuob2.network.iUOBApi;
+import com.muqdd.iuob2.network.IUOBApi;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -100,7 +100,7 @@ public class PrefixesFragment extends BaseFragment {
     private void initiate() {
         // initialize variables
         fastAdapter = new FastItemAdapter<>();
-        fastAdapter.withFilterPredicate(new IItemAdapter.Predicate<CoursePrefix>() {
+        fastAdapter.getItemFilter().withFilterPredicate(new IItemAdapter.Predicate<CoursePrefix>() {
             @Override
             public boolean filter(CoursePrefix item, CharSequence constraint) {
                 return !item.getPrefix().toLowerCase().contains(constraint.toString().toLowerCase());
@@ -154,7 +154,7 @@ public class PrefixesFragment extends BaseFragment {
     }
 
     public void getPrefixes() {
-        ServiceGenerator.createService(iUOBApi.class)
+        ServiceGenerator.createService(IUOBApi.class)
                 .coursesPrefix(year, semester).enqueue(new Callback<RestResponse<List<String>>>() {
             @Override
             public void onResponse(Call<RestResponse<List<String>>> call, final Response<RestResponse<List<String>>> response) {

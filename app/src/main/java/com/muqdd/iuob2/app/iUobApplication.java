@@ -3,7 +3,6 @@ package com.muqdd.iuob2.app;
 import android.app.Application;
 import android.util.Log;
 
-import com.facebook.stetho.Stetho;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.muqdd.iuob2.BuildConfig;
@@ -23,8 +22,6 @@ public class iUobApplication extends Application {
         super.onCreate();
 
         if (BuildConfig.DEBUG) {
-            // init Stetho
-            Stetho.initializeWithDefaults(this);
             // disable Firebase crashes
             Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                 @Override

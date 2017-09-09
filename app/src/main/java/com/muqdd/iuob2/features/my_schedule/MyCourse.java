@@ -11,6 +11,8 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseModel;
+import com.muqdd.iuob2.features.schedule_builder.BSection;
+import com.muqdd.iuob2.models.FinalExam;
 import com.muqdd.iuob2.models.Timing;
 import com.orhanobut.logger.Logger;
 
@@ -23,6 +25,10 @@ import butterknife.ButterKnife;
 /**
  * Created by Ali Yusuf on 9/8/2017.
  * iUOB-2
+ *
+ * This class is behave like section {@link com.muqdd.iuob2.models.Section},
+ * but with course details as well.
+ *
  */
 
 public class MyCourse extends BaseModel<MyCourse, MyCourse.ViewHolder> {
@@ -60,10 +66,27 @@ public class MyCourse extends BaseModel<MyCourse, MyCourse.ViewHolder> {
     @SerializedName("timing")
     @Expose
     private List<Timing> timing = null;
+    @SerializedName("exam")
+    @Expose
+    private FinalExam exam;
 
     public MyCourse(String courseId, String sectionNo) {
         this.courseId = courseId;
         this.sectionNo = sectionNo;
+    }
+
+    public MyCourse(BSection section) {
+        this.id = section.getId();
+        this.courseId = section.getCourseId();
+        this.sectionNo = section.getSectionNo();
+        this.instructor = section.getInstructor();
+        this.examLocation = section.getExamLocation();
+        this.status = section.getStatus();
+        this.remarks = section.getRemarks();
+        this.year = section.getYear();
+        this.sem = section.getSemester();
+        this.timingLegacy = section.getTimingLegacy();
+        this.exam = section.getExam();
     }
 
     public String getId() {
@@ -136,6 +159,14 @@ public class MyCourse extends BaseModel<MyCourse, MyCourse.ViewHolder> {
 
     public void setTimingLegacy(List<Timing> timingLegacy) {
         this.timingLegacy = timingLegacy;
+    }
+
+    public FinalExam getExam() {
+        return exam;
+    }
+
+    public void setExam(FinalExam exam) {
+        this.exam = exam;
     }
 
     public int getBgColor() {

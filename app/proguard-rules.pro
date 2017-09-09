@@ -16,6 +16,11 @@
 #   public *;
 #}
 -keep class io.codetail.animation.arcanimator.** { *; }
+-keep class android.support.v7.widget.SearchView { *; }
+-dontwarn okio.**
+-dontwarn retrofit2.Platform$Java8
+-dontwarn javax.annotation.**
+-dontwarn com.viewpagerindicator.LinePageIndicator
 
 # Uncomment this to preserve the line sectionNumber information for
 # debugging stack traces.

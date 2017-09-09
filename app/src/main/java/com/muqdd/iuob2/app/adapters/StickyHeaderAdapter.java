@@ -9,10 +9,11 @@ import android.widget.TextView;
 import com.mikepenz.fastadapter.AbstractAdapter;
 import com.mikepenz.fastadapter.IItem;
 import com.muqdd.iuob2.R;
-import com.muqdd.iuob2.features.schedule_builder.BSectionModel;
+import com.muqdd.iuob2.features.schedule_builder.BSection;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Ali Yusuf on 6/5/2017.
@@ -24,10 +25,8 @@ public class StickyHeaderAdapter extends AbstractAdapter implements StickyRecycl
     public long getHeaderId(int position) {
         IItem item = getItem(position);
 
-        //in our sample we want a separate header per first letter of our items
-        //this if is not necessary for your code, we only use it as this sticky header is reused for different item implementations
-        if (item instanceof BSectionModel) {
-            return (long) ((BSectionModel) item).courseId;
+        if (item instanceof BSection) {
+            return (long) ((BSection) item).getHeaderId();
         }
         return -1;
     }
@@ -45,8 +44,8 @@ public class StickyHeaderAdapter extends AbstractAdapter implements StickyRecycl
         TextView textView = (TextView) holder.itemView;
 
         IItem item = getItem(position);
-        if (item instanceof BSectionModel) {
-            textView.setText(((BSectionModel) item).headerTitle);
+        if (item instanceof BSection) {
+            textView.setText(String.format(Locale.getDefault(), "%s", ((BSection) item).getCourseId()));
         }
     }
 

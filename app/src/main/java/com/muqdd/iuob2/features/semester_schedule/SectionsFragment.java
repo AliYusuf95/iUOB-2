@@ -3,7 +3,6 @@ package com.muqdd.iuob2.features.semester_schedule;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -26,21 +25,15 @@ import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.models.Course;
 import com.muqdd.iuob2.models.RestResponse;
 import com.muqdd.iuob2.models.Section;
-import com.muqdd.iuob2.models.SectionModel;
 import com.muqdd.iuob2.network.ServiceGenerator;
-import com.muqdd.iuob2.network.UOBSchedule;
-import com.muqdd.iuob2.network.iUOBApi;
+import com.muqdd.iuob2.network.IUOBApi;
 import com.orhanobut.logger.Logger;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.regex.Matcher;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -132,7 +125,7 @@ public class SectionsFragment extends BaseFragment {
     }
 
     public void getSectionsList() {
-        ServiceGenerator.createService(iUOBApi.class)
+        ServiceGenerator.createService(IUOBApi.class)
                 .sections(course.getYear(), course.getSemester(), course.getCode())
                 .enqueue(new Callback<RestResponse<List<Section>>>() {
                     @Override

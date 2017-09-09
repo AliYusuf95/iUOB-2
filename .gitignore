@@ -14,3 +14,4 @@ app/libs/
 keystore.jks
 /screanshots/
 /.idea/
+/keystore.properties

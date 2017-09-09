@@ -170,22 +170,22 @@ public class StoriesActivity extends BaseActivity implements View.OnClickListene
         Typeface newFont = Typeface.createFromAsset(getAssets(), "Eventtus-Icons.ttf");
         emojiFont = Typeface.createFromAsset(getAssets(), "emojione-android.ttf");
 
-        BrushDrawingView brushDrawingView = (BrushDrawingView) findViewById(R.id.drawing_view);
-        TextView closeTextView = (TextView) findViewById(R.id.close_tv);
-        TextView addTextView = (TextView) findViewById(R.id.add_text_tv);
-        TextView addPencil = (TextView) findViewById(R.id.add_pencil_tv);
-        RelativeLayout deleteRelativeLayout = (RelativeLayout) findViewById(R.id.delete_rl);
-        TextView deleteTextView = (TextView) findViewById(R.id.delete_tv);
-        TextView addImageEmojiTextView = (TextView) findViewById(R.id.add_image_emoji_tv);
-        TextView saveTextView = (TextView) findViewById(R.id.save_tv);
-        TextView saveTextTextView = (TextView) findViewById(R.id.save_text_tv);
-        TextView clearAllTextView = (TextView) findViewById(R.id.clear_all_tv);
-        TextView clearAllTextTextView = (TextView) findViewById(R.id.clear_all_text_tv);
-        TextView goToNextTextView = (TextView) findViewById(R.id.go_to_next_screen_tv);
-        ImageView photoEditImageView = (ImageView) findViewById(R.id.photo_edit_iv);
+        BrushDrawingView brushDrawingView = findViewById(R.id.drawing_view);
+        TextView closeTextView = findViewById(R.id.close_tv);
+        TextView addTextView = findViewById(R.id.add_text_tv);
+        TextView addPencil = findViewById(R.id.add_pencil_tv);
+        RelativeLayout deleteRelativeLayout = findViewById(R.id.delete_rl);
+        TextView deleteTextView = findViewById(R.id.delete_tv);
+        TextView addImageEmojiTextView = findViewById(R.id.add_image_emoji_tv);
+        TextView saveTextView = findViewById(R.id.save_tv);
+        TextView saveTextTextView = findViewById(R.id.save_text_tv);
+        TextView clearAllTextView = findViewById(R.id.clear_all_tv);
+        TextView clearAllTextTextView = findViewById(R.id.clear_all_text_tv);
+        TextView goToNextTextView = findViewById(R.id.go_to_next_screen_tv);
+        ImageView photoEditImageView = findViewById(R.id.photo_edit_iv);
 
-        ViewPager pager = (ViewPager) findViewById(R.id.image_emoji_view_pager);
-        PageIndicator indicator = (PageIndicator) findViewById(R.id.image_emoji_indicator);
+        ViewPager pager = findViewById(R.id.image_emoji_view_pager);
+        PageIndicator indicator = findViewById(R.id.image_emoji_indicator);
 
         photoEditImageView.setImageBitmap(bitmap);
 
@@ -313,9 +313,9 @@ public class StoriesActivity extends BaseActivity implements View.OnClickListene
         colorCodeTextView = colorCode;
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View addTextPopupWindowRootView = inflater.inflate(R.layout.add_text_popup_window, null);
-        final EditText addTextEditText = (EditText) addTextPopupWindowRootView.findViewById(R.id.add_text_edit_text);
-        TextView addTextDoneTextView = (TextView) addTextPopupWindowRootView.findViewById(R.id.add_text_done_tv);
-        RecyclerView addTextColorPickerRecyclerView = (RecyclerView) addTextPopupWindowRootView.findViewById(R.id.add_text_color_picker_recycler_view);
+        final EditText addTextEditText = addTextPopupWindowRootView.findViewById(R.id.add_text_edit_text);
+        TextView addTextDoneTextView = addTextPopupWindowRootView.findViewById(R.id.add_text_done_tv);
+        RecyclerView addTextColorPickerRecyclerView = addTextPopupWindowRootView.findViewById(R.id.add_text_color_picker_recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         addTextColorPickerRecyclerView.setLayoutManager(layoutManager);
         addTextColorPickerRecyclerView.setHasFixedSize(true);

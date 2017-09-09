@@ -38,21 +38,21 @@ import butterknife.ButterKnife;
 public class SchedulesFragment extends BaseFragment {
 
     private final static String SCHEDULES_LIST = "SCHEDULES_LIST";
-    private final static Type SCHEDULES_LIST_TYPE = new TypeToken<List<List<BSectionModel>>>() {}.getType();
+    private final static Type SCHEDULES_LIST_TYPE = new TypeToken<List<List<BSection>>>() {}.getType();
 
     @BindView(R.id.main_content) LinearLayout mainContent;
     @BindView(R.id.recycler_view) SuperRecyclerView recyclerView;
 
     private View mView;
-    private List<BScheduleModel> mySchedulesList;
-    private FastItemAdapter<BScheduleModel> fastAdapter;
-    private List<List<BSectionModel>> allSectionsList;
+    private List<BSchedule> mySchedulesList;
+    private FastItemAdapter<BSchedule> fastAdapter;
+    private List<List<BSection>> allSectionsList;
 
     public SchedulesFragment() {
         // Required empty public constructor
     }
 
-    public static SchedulesFragment newInstance(String title, List<List<BSectionModel>> list) {
+    public static SchedulesFragment newInstance(String title, List<List<BSection>> list) {
         SchedulesFragment fragment = new SchedulesFragment();
         Bundle bundle = new Bundle();
         bundle.putString(TITLE, title);
@@ -103,23 +103,23 @@ public class SchedulesFragment extends BaseFragment {
         checkPrimaryData();
         mySchedulesList = new ArrayList<>();
 
-        for (List<BSectionModel> list : allSectionsList){
-            mySchedulesList.add(new BScheduleModel(list));
+        for (List<BSection> list : allSectionsList){
+            mySchedulesList.add(new BSchedule(list));
         }
 
         fastAdapter = new FastItemAdapter<>();
-        fastAdapter.withItemEvent(new ClickEventHook<BScheduleModel>() {
+        fastAdapter.withItemEvent(new ClickEventHook<BSchedule>() {
             @Nullable
             @Override
             public List<View> onBindMany(@NonNull RecyclerView.ViewHolder viewHolder) {
-                if (viewHolder instanceof BScheduleModel.ViewHolder){
-                    return Arrays.asList(viewHolder.itemView, ((BScheduleModel.ViewHolder) viewHolder).imgInfo);
+                if (viewHolder instanceof BSchedule.ViewHolder){
+                    return Arrays.asList(viewHolder.itemView, ((BSchedule.ViewHolder) viewHolder).imgInfo);
                 }
                 return null;
             }
 
             @Override
-            public void onClick(View v, int position, FastAdapter<BScheduleModel> fastAdapter, BScheduleModel item) {
+            public void onClick(View v, int position, FastAdapter<BSchedule> fastAdapter, BSchedule item) {
                 if (v.getId() == R.id.img_info){
                     // start schedule details fragment
                     ScheduleDetailsFragment fragment =

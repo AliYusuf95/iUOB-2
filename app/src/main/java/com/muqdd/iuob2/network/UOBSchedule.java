@@ -1,6 +1,6 @@
 package com.muqdd.iuob2.network;
 
-import com.muqdd.iuob2.models.CalendarSemesterModel;
+import com.muqdd.iuob2.models.CalendarSemester;
 
 import java.util.List;
 
@@ -50,5 +50,5 @@ public interface UOBSchedule {
     );
 
     @GET("uobmo/uobmo.calendar")
-    Call<List<CalendarSemesterModel>> semesterCalendar();
+    Call<List<CalendarSemester>> semesterCalendar();
 }

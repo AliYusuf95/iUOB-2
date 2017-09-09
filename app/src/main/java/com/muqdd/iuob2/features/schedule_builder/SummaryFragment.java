@@ -37,24 +37,24 @@ public class SummaryFragment extends BaseFragment {
 
     private final static String COURSES_LIST = "COURSES_LIST";
     private final static String SCHEDULES_LIST = "SCHEDULES_LIST";
-    private final static Type COURSES_LIST_TYPE = new TypeToken<List<BCourseModel>>() {}.getType();
-    private final static Type SCHEDULES_LIST_TYPE = new TypeToken<List<List<BSectionModel>>>() {}.getType();
+    private final static Type COURSES_LIST_TYPE = new TypeToken<List<BCourse>>() {}.getType();
+    private final static Type SCHEDULES_LIST_TYPE = new TypeToken<List<List<BSection>>>() {}.getType();
 
     @BindView(R.id.main_content) LinearLayout mainContent;
     @BindView(R.id.progress_bar) ProgressBar progressBar;
     @BindView(R.id.lbl_combinations) TextView lblCombinations;
 
     private View mView;
-    private List<BCourseModel> mCourseList; // filtered courses data
-    private List<List<BSectionModel>> mSchedulesList; // available schedules
+    private List<BCourse> mCourseList; // filtered courses data
+    private List<List<BSection>> mSchedulesList; // available schedules
     private MenuItem nextMenuItem;
-    private AsyncTask<Void, Void, Set<List<BSectionModel>>> calculationTask;
+    private AsyncTask<Void, Void, Set<List<BSection>>> calculationTask;
 
     public SummaryFragment() {
         // Required empty public constructor
     }
 
-    public static SummaryFragment newInstance(String title, List<BCourseModel> courseList) {
+    public static SummaryFragment newInstance(String title, List<BCourse> courseList) {
         SummaryFragment fragment = new SummaryFragment();
         Bundle bundle = new Bundle();
         bundle.putString(TITLE, title);
@@ -93,7 +93,8 @@ public class SummaryFragment extends BaseFragment {
             case R.id.next:
                 // start options fragment
                 SchedulesFragment fragment =
-                        SchedulesFragment.newInstance(getString(R.string.fragment_schedule_builder_schedules), mSchedulesList);
+                        SchedulesFragment.newInstance(getString(R.string.fragment_schedule_builder_schedules),
+                                mSchedulesList);
                 displayFragment(fragment);
                 return true;
             default:
@@ -134,21 +135,21 @@ public class SummaryFragment extends BaseFragment {
         checkPrimaryData();
         mSchedulesList = new ArrayList<>();
 
-        calculationTask = new AsyncTask<Void, Void, Set<List<BSectionModel>>>() {
+        calculationTask = new AsyncTask<Void, Void, Set<List<BSection>>>() {
             @Override
-            protected Set<List<BSectionModel>> doInBackground(Void... voids) {
-                List<List<BSectionModel>> allSectionsList = new ArrayList<>();
-                for (BCourseModel course : mCourseList){
-                    allSectionsList.add(course.sections);
+            protected Set<List<BSection>> doInBackground(Void... voids) {
+                List<List<BSection>> allSectionsList = new ArrayList<>();
+                for (BCourse course : mCourseList){
+                    allSectionsList.add(course.getSections());
                 }
                 return getCombinations(allSectionsList);
             }
 
             @Override
-            protected void onPostExecute(Set<List<BSectionModel>> lists) {
+            protected void onPostExecute(Set<List<BSection>> lists) {
                 super.onPostExecute(lists);
                 if (!isCancelled()) {
-                    mSchedulesList =  new ArrayList(lists);
+                    mSchedulesList =  new ArrayList<>(lists);
                     int count = mSchedulesList.size();
                     progressBar.setVisibility(View.GONE);
                     lblCombinations.setText(String.valueOf(count));
@@ -167,9 +168,9 @@ public class SummaryFragment extends BaseFragment {
     }
 
 
-    private Set<List<BSectionModel>> getCombinations(List<List<BSectionModel>> lists) {
-        Set<List<BSectionModel>> combinations = new HashSet<>();
-        Set<List<BSectionModel>> newCombinations;
+    private Set<List<BSection>> getCombinations(List<List<BSection>> lists) {
+        Set<List<BSection>> combinations = new HashSet<>();
+        Set<List<BSection>> newCombinations;
 
         // just to make sure is not empty list
         if (lists.size() == 0) {
@@ -180,19 +181,19 @@ public class SummaryFragment extends BaseFragment {
 
         // extract each of the element in the first list
         // and add each to ints as a new list
-        for(BSectionModel i: lists.get(0)) {
-            List<BSectionModel> newList = new ArrayList<>();
+        for(BSection i: lists.get(0)) {
+            List<BSection> newList = new ArrayList<>();
             newList.add(i);
             combinations.add(newList);
         }
         index++;
 
         while(index < lists.size()) {
-            List<BSectionModel> nextList = lists.get(index);
+            List<BSection> nextList = lists.get(index);
             newCombinations = new HashSet<>();
-            for(List<BSectionModel> first: combinations) {
-                for(BSectionModel second: nextList) {
-                    List<BSectionModel> newList = new ArrayList<>();
+            for(List<BSection> first: combinations) {
+                for(BSection second: nextList) {
+                    List<BSection> newList = new ArrayList<>();
                     newList.addAll(first);
                     newList.add(second);
                     if (sectionsHasClash(newList)) {
@@ -207,7 +208,7 @@ public class SummaryFragment extends BaseFragment {
         return combinations;
     }
 
-    private boolean sectionsHasClash(List<BSectionModel> sections) {
+    private boolean sectionsHasClash(List<BSection> sections) {
         for (int i=0 ; i<sections.size()-1 ; i++){
             for (int j=i+1 ; j<sections.size() ; j++) {
                 if (sections.get(i).hasClash(sections.get(j))) {

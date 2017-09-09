@@ -20,8 +20,8 @@ import com.google.gson.Gson;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.app.User;
-import com.muqdd.iuob2.models.MyCourseModel;
-import com.muqdd.iuob2.models.SectionTimeModel;
+import com.muqdd.iuob2.features.my_schedule.MyCourse;
+import com.muqdd.iuob2.models.Timing;
 import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
@@ -51,23 +51,23 @@ public class TimeTableFragment extends BaseFragment {
     @BindView(R.id.h_layout) LinearLayout hLayout;
 
     private View mView;
-    private Map<SectionTimeModel, MyCourseModel> uList;
-    private Map<SectionTimeModel, MyCourseModel> mList;
-    private Map<SectionTimeModel, MyCourseModel> tList;
-    private Map<SectionTimeModel, MyCourseModel> wList;
-    private Map<SectionTimeModel, MyCourseModel> hList;
-    private List<MyCourseModel> mCourses;
-    private BScheduleModel mSchedule;
+    private Map<Timing, MyCourse> uList;
+    private Map<Timing, MyCourse> mList;
+    private Map<Timing, MyCourse> tList;
+    private Map<Timing, MyCourse> wList;
+    private Map<Timing, MyCourse> hList;
+    private List<MyCourse> mCourses;
+    private BSchedule mSchedule;
 
     public TimeTableFragment() {
         // Required empty public constructor
     }
 
-    public static TimeTableFragment newInstance(String title, BScheduleModel schedule) {
+    public static TimeTableFragment newInstance(String title, BSchedule schedule) {
         TimeTableFragment fragment = new TimeTableFragment();
         Bundle bundle = new Bundle();
         bundle.putString(TITLE, title);
-        bundle.putString(SCHEDULE, new Gson().toJson(schedule, BScheduleModel.class));
+        bundle.putString(SCHEDULE, new Gson().toJson(schedule, BSchedule.class));
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -126,7 +126,7 @@ public class TimeTableFragment extends BaseFragment {
 
     private void checkPrimaryData() {
         if (mSchedule == null && getContext() != null) {
-            mSchedule = new BScheduleModel(new ArrayList<BSectionModel>());
+            mSchedule = new BSchedule(new ArrayList<BSection>());
             Dialog dialog = infoDialog("Sorry","Some thing goes wrong pleas try again later.", "Cancel");
             dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
@@ -139,17 +139,12 @@ public class TimeTableFragment extends BaseFragment {
     }
 
     private void initiate() {
-        mSchedule = new Gson().fromJson(getArguments().getString(SCHEDULE), BScheduleModel.class);
+        mSchedule = new Gson().fromJson(getArguments().getString(SCHEDULE), BSchedule.class);
         checkPrimaryData();
         // convert courses data
         mCourses = new ArrayList<>();
-        for (BSectionModel section : mSchedule.sections) {
-            MyCourseModel course = new MyCourseModel(section.parentCourse.courseName,
-                    section.parentCourse.courseNumber, section.sectionNumber);
-            course.doctor = section.doctor;
-            course.times = section.times;
-            course.finalExamDate = section.finalExamDate;
-            course.finalExamTime = section.finalExamTime;
+        for (BSection section : mSchedule.sections) {
+            MyCourse course = new MyCourse(section);
             mCourses.add(course);
         }
 
@@ -157,13 +152,14 @@ public class TimeTableFragment extends BaseFragment {
         mainContent.setEnabled(false);
 
         // section time comparator
-        Comparator comparator = new Comparator<SectionTimeModel>(){
+        Comparator<Timing> comparator = new Comparator<Timing>(){
             @Override
-            public int compare(SectionTimeModel t1, SectionTimeModel t2) {
+            public int compare(Timing t1, Timing t2) {
                 // compare from then to then room to sort sections
                 int f,t;
-                return (f = t1.from.compareTo(t2.from)) == 0 ?
-                        ((t = t1.room.compareTo(t2.room)) == 0 ? t1.room.compareTo(t2.room) : t ): f;
+                return (f = t1.getTimeFrom().compareTo(t2.getTimeFrom())) == 0 ?
+                        ((t = t1.getLocation().compareTo(t2.getLocation())) == 0 ?
+                                t1.getLocation().compareTo(t2.getLocation()) : t ): f;
             }
         };
 
@@ -182,22 +178,22 @@ public class TimeTableFragment extends BaseFragment {
         tList.clear();
         wList.clear();
         hList.clear();
-        for (MyCourseModel course : mCourses) {
-            if (course.times != null) {
-                for (SectionTimeModel time : course.times) {
-                    if (time.days.contains("U")) {
+        for (MyCourse course : mCourses) {
+            if (course.getTimingLegacy() != null) {
+                for (Timing time : course.getTimingLegacy()) {
+                    if (time.getDay().contains("U")) {
                         uList.put(time, course);
                     }
-                    if (time.days.contains("M")) {
+                    if (time.getDay().contains("M")) {
                         mList.put(time, course);
                     }
-                    if (time.days.contains("T")) {
+                    if (time.getDay().contains("T")) {
                         tList.put(time, course);
                     }
-                    if (time.days.contains("W")) {
+                    if (time.getDay().contains("W")) {
                         wList.put(time, course);
                     }
-                    if (time.days.contains("H")) {
+                    if (time.getDay().contains("H")) {
                         hList.put(time, course);
                     }
                 }
@@ -224,9 +220,9 @@ public class TimeTableFragment extends BaseFragment {
         });
     }
 
-    private void addCoursesForLayout(LinearLayout layout, Map<SectionTimeModel, MyCourseModel> list) {
+    private void addCoursesForLayout(LinearLayout layout, Map<Timing, MyCourse> list) {
         layout.removeAllViews();
-        for (SectionTimeModel time : list.keySet()){
+        for (Timing time : list.keySet()){
             if(list.get(time) != null)
                 layout.addView(createScheduleCell(list.get(time), time));
             else {
@@ -237,13 +233,13 @@ public class TimeTableFragment extends BaseFragment {
     }
 
     @SuppressLint("SetTextI18n")
-    private View createScheduleCell(final MyCourseModel course, SectionTimeModel time) {
+    private View createScheduleCell(final MyCourse course, Timing time) {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.cell_schedule, null, false);
-        view.findViewById(R.id.layout).setBackgroundColor(course.bgColor);
-        ((TextView)view.findViewById(R.id.course)).setText(course.getCourseTitle());
-        ((TextView)view.findViewById(R.id.time_from)).setText(time.from);
-        ((TextView)view.findViewById(R.id.time_to)).setText(time.to);
-        ((TextView)view.findViewById(R.id.room)).setText(time.room);
+        view.findViewById(R.id.layout).setBackgroundColor(course.getBgColor());
+        ((TextView)view.findViewById(R.id.course)).setText(course.getCourseId());
+        ((TextView)view.findViewById(R.id.time_from)).setText(time.getTimeFrom());
+        ((TextView)view.findViewById(R.id.time_to)).setText(time.getTimeTo());
+        ((TextView)view.findViewById(R.id.room)).setText(time.getLocation());
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -253,10 +249,14 @@ public class TimeTableFragment extends BaseFragment {
                 LayoutInflater inflater =
                         (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 final View dialogView = inflater.inflate(R.layout.dialog_course_details, null);
-                ((TextView)dialogView.findViewById((R.id.title))).setText(course.getCourseTitle());
-                ((TextView)dialogView.findViewById((R.id.section))).setText("Section: "+course.sectionNumber);
-                ((TextView)dialogView.findViewById((R.id.doctor))).setText("Doctor: "+course.doctor);
-                ((TextView)dialogView.findViewById((R.id.final_time))).setText("Final : "+course.getFinalExam());
+                ((TextView)dialogView.findViewById((R.id.title))).setText(course.getCourseId());
+                ((TextView)dialogView.findViewById((R.id.section))).setText("Section: "+course.getSectionNo());
+                ((TextView)dialogView.findViewById((R.id.doctor))).setText("Doctor: "+course.getInstructor());
+                if (course.getExam() != null) {
+                    ((TextView) dialogView.findViewById((R.id.final_time))).setText("Final : " + course.getExam().toString());
+                } else {
+                    dialogView.findViewById((R.id.final_time)).setVisibility(View.GONE);
+                }
                 dialogView.findViewById((R.id.close)).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

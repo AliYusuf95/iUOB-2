@@ -3,10 +3,12 @@ package com.muqdd.iuob2.features.semester_schedule;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -16,17 +18,10 @@ import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.features.main.Menu;
 import com.muqdd.iuob2.models.CoursePrefix;
 import com.muqdd.iuob2.models.RestResponse;
-import com.muqdd.iuob2.models.SemesterCourseModel;
+import com.muqdd.iuob2.network.IUOBApi;
 import com.muqdd.iuob2.network.ServiceGenerator;
-import com.muqdd.iuob2.network.iUOBApi;
 import com.orhanobut.logger.Logger;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -81,7 +76,8 @@ public class SemestersHolderFragment extends BaseFragment {
     public void onCreateOptionsMenu(android.view.Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.search_menu, menu);
-        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        MenuItem searchItem = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
         if (searchView != null) { // just in case
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
@@ -136,7 +132,6 @@ public class SemestersHolderFragment extends BaseFragment {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH)+1;
-        List<SemesterCourseModel> requests = new ArrayList<>();
         // Second semester
         if (month > 3 && month < 7){
             getSemesterCourses(0, year-1, 2);
@@ -161,7 +156,7 @@ public class SemestersHolderFragment extends BaseFragment {
     }
 
     public void getSemesterCourses(final int pos, final int year, final int semester) {
-        ServiceGenerator.createService(iUOBApi.class)
+        ServiceGenerator.createService(IUOBApi.class)
                 .coursesPrefix(year, semester).enqueue(new Callback<RestResponse<List<String>>>() {
             @Override
             public void onResponse(Call<RestResponse<List<String>>> call, Response<RestResponse<List<String>>> response) {
@@ -183,18 +178,6 @@ public class SemestersHolderFragment extends BaseFragment {
 
     public void addSearchTextListeners(String k, SearchTextListener listener) {
         searchTextListeners.put(k,listener);
-    }
-
-    private ArrayList<SemesterCourseModel> parseSemesterCoursesData (String data) {
-        ArrayList<SemesterCourseModel> list = new ArrayList<>();
-        Document document = Jsoup.parse(data);
-        Elements subjects = document.body().select("a");
-        for (Element subject : subjects) {
-            if (!subject.text().endsWith(".")) {
-                list.add(new SemesterCourseModel(subject.text(), subject.attr("href")));
-            }
-        }
-        return list;
     }
 
     interface SearchTextListener {

@@ -24,13 +24,13 @@ import com.google.gson.reflect.TypeToken;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.app.Constants;
-import com.muqdd.iuob2.models.SectionTimeModel;
+import com.muqdd.iuob2.models.RestResponse;
+import com.muqdd.iuob2.models.Timing;
 import com.muqdd.iuob2.network.ConnectivityInterceptor.NoConnectivityException;
+import com.muqdd.iuob2.network.IUOBApi;
 import com.muqdd.iuob2.network.ServiceGenerator;
-import com.muqdd.iuob2.network.UOBSchedule;
 import com.orhanobut.logger.Logger;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -45,7 +45,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import info.hoang8f.android.segmented.SegmentedGroup;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -59,7 +58,7 @@ public class OptionsFragment extends BaseFragment {
 
     private final static String COURSES_LIST = "COURSES_LIST";
     private final static String SEMESTER = "SEMESTER";
-    private final static Type COURSES_LIST_TYPE = new TypeToken<List<BCourseModel>>() {}.getType();
+    private final static Type COURSES_LIST_TYPE = new TypeToken<List<BCourse>>() {}.getType();
     private static final int SECTIONS_FILTER = 1;
 
     @BindView(R.id.main_content) LinearLayout mainContent;
@@ -73,10 +72,10 @@ public class OptionsFragment extends BaseFragment {
     @BindView(R.id.section_filter_status) ImageView imgSectionFilter;
 
     private View mView;
-    private List<BCourseModel> allCourseList; // all courses data
-    private List<BCourseModel> myCourseList; // filtered courses data
+    private List<BCourse> allCourseList; // all courses data
+    private List<BCourse> myCourseList; // filtered courses data
     private Dialog failDialog;
-    private int dataLoadingCounter; // check if all courses data loaded
+//    private int dataLoadingCounter; // check if all courses data loaded
     private int cCount; // combinations count
     private MenuItem nextMenuItem;
     private boolean sectionFilter;
@@ -90,11 +89,11 @@ public class OptionsFragment extends BaseFragment {
         // Required empty public constructor
     }
 
-    public static OptionsFragment newInstance(String title, String semester, List<BCourseModel> courseList) {
+    public static OptionsFragment newInstance(String title, int semester, List<BCourse> courseList) {
         OptionsFragment fragment = new OptionsFragment();
         Bundle bundle = new Bundle();
         bundle.putString(TITLE, title);
-        bundle.putString(SEMESTER, semester);
+        bundle.putInt(SEMESTER, semester);
         bundle.putString(COURSES_LIST, new Gson().toJson(courseList, COURSES_LIST_TYPE));
         fragment.setArguments(bundle);
         return fragment;
@@ -282,10 +281,10 @@ public class OptionsFragment extends BaseFragment {
             }
         });
 
-        String semester = getArguments().getString(SEMESTER);
-        String year = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
-        if ("2".equals(semester) || "3".equals(semester))
-            year = String.valueOf(Integer.parseInt(year)-1);
+        int semester = getArguments().getInt(SEMESTER);
+        int year = Calendar.getInstance().get(Calendar.YEAR);
+        if (2 == semester || 3 == semester)
+            year -= 1;
 
         // disable filter options
         setSegmentGroupEnabled(daySegment, false);
@@ -295,51 +294,32 @@ public class OptionsFragment extends BaseFragment {
         btnSectionFilter.setEnabled(false);
 
         // fetching data
-        dataLoadingCounter = 0;
-        Logger.d(allCourseList.size());
-        for (int i = 0; i < allCourseList.size() ; i++){
-            getCourseData(i, allCourseList.get(i), String.valueOf(year), semester);
-        }
+        getCourseData(year, semester);
     }
 
-    private void getCourseData(final int index, final BCourseModel course, final String year, final String semester){
-        ServiceGenerator.createService(UOBSchedule.class)
-                .sectionsList("1",course.courseName,course.departmentCode,course.courseNumber,
-                        "0", year, semester)
-                .enqueue(new Callback<ResponseBody>() {
+    private void getCourseData(final int year, final int semester){
+        ServiceGenerator.createService(IUOBApi.class)
+                .coursesSectionsList(year, semester, BCourse.getCoursesIds(allCourseList))
+                .enqueue(new Callback<RestResponse<List<BCourse>>>() {
                     @Override
-                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        if (response.code() == 200){
-                            try {
-                                String responseString = response.body().string();
-                                if (responseString.contains("The Schedule Will Be Announced Later") ||
-                                        responseString.trim().isEmpty()){
-                                    throw new IllegalStateException("Schedule for " + year + "\\" + semester + " is not " +
-                                            "available. Make sure you select the right semester.");
-                                }
-                                // add sections list to the course
-                                BCourseModel.parseSectionsData(allCourseList.get(index),responseString);
-                                if (allCourseList.get(index).sections.size() == 0){
-                                    throw new IllegalStateException("Course [" + allCourseList.get(index).courseName +
-                                            allCourseList.get(index).courseNumber + "] not found.");
-                                }
-                            } catch (IOException e) {
+                    public void onResponse(Call<RestResponse<List<BCourse>>> call, Response<RestResponse<List<BCourse>>> response) {
+                        if (response.body().getStatusCode() != 200) {
+                            if (failDialog == null && getContext() != null) {
+                                failDialog = infoDialog("Sorry", "Some thing goes wrong while " +
+                                        "getting data. Please try again later.", "close");
+                                failDialog.show();
+                            }
+                            Logger.w("Something goes wrong");
+                        } else {
+                            if (response.body().getData().size() < 0) {
                                 if (failDialog == null && getContext() != null) {
                                     failDialog = infoDialog("Sorry", "Some thing goes wrong while " +
                                             "getting data. Please try again later.", "close");
                                     failDialog.show();
                                 }
                                 Logger.w("Something goes wrong");
-                            } catch (IllegalStateException e){
-                                if (failDialog == null && getContext() != null) {
-                                    failDialog = infoDialog("Sorry", e.getMessage(), "close");
-                                    failDialog.show();
-                                }
-                                Logger.w("Something goes wrong");
-                            }
-                            // is loading data finished
-                            if (++dataLoadingCounter == allCourseList.size()){
-                                dataLoadingCounter = 0;
+                            } else {
+                                allCourseList = response.body().getData();
                                 // enable filter options
                                 setSegmentGroupEnabled(daySegment, true);
                                 setSegmentGroupEnabled(startSegment, true);
@@ -353,7 +333,7 @@ public class OptionsFragment extends BaseFragment {
                     }
 
                     @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    public void onFailure(Call<RestResponse<List<BCourse>>> call, Throwable t) {
                         if (failDialog == null && getContext() != null) {
                             failDialog = t instanceof NoConnectivityException ?
                                     infoDialog("Error", "The Internet Connection appears to be offline.", "close") :
@@ -363,18 +343,78 @@ public class OptionsFragment extends BaseFragment {
                         }
                     }
                 });
+//        ServiceGenerator.createService(UOBSchedule.class)
+//                .sectionsList("1",course.courseName,course.departmentCode,course.courseNumber,
+//                        "0", year, semester)
+//                .enqueue(new Callback<ResponseBody>() {
+//                    @Override
+//                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                        if (response.code() == 200){
+//                            try {
+//                                String responseString = response.body().string();
+//                                if (responseString.contains("The Schedule Will Be Announced Later") ||
+//                                        responseString.trim().isEmpty()){
+//                                    throw new IllegalStateException("Schedule for " + year + "\\" + semester + " is not " +
+//                                            "available. Make sure you select the right semester.");
+//                                }
+//                                // add sections list to the course
+//                                BCourse.parseSectionsData(allCourseList.get(index),responseString);
+//                                if (allCourseList.get(index).sections.size() == 0){
+//                                    throw new IllegalStateException("Course [" + allCourseList.get(index).courseName +
+//                                            allCourseList.get(index).courseNumber + "] not found.");
+//                                }
+//                            } catch (IOException e) {
+//                                if (failDialog == null && getContext() != null) {
+//                                    failDialog = infoDialog("Sorry", "Some thing goes wrong while " +
+//                                            "getting data. Please try again later.", "close");
+//                                    failDialog.show();
+//                                }
+//                                Logger.w("Something goes wrong");
+//                            } catch (IllegalStateException e){
+//                                if (failDialog == null && getContext() != null) {
+//                                    failDialog = infoDialog("Sorry", e.getMessage(), "close");
+//                                    failDialog.show();
+//                                }
+//                                Logger.w("Something goes wrong");
+//                            }
+//                            // is loading data finished
+//                            if (++dataLoadingCounter == allCourseList.size()){
+//                                dataLoadingCounter = 0;
+//                                // enable filter options
+//                                setSegmentGroupEnabled(daySegment, true);
+//                                setSegmentGroupEnabled(startSegment, true);
+//                                setSegmentGroupEnabled(finishSegment, true);
+//                                setSegmentGroupEnabled(locationSegment, true);
+//                                btnSectionFilter.setEnabled(true);
+//                                // calculate combinations
+//                                calculateCombinations();
+//                            }
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                        if (failDialog == null && getContext() != null) {
+//                            failDialog = t instanceof NoConnectivityException ?
+//                                    infoDialog("Error", "The Internet Connection appears to be offline.", "close") :
+//                                    infoDialog("Sorry", "Schedule for " + year + "\\" + semester + " is not " +
+//                                            "available. Make sure you select the right semester.", "close");
+//                            failDialog.show();
+//                        }
+//                    }
+//                });
     }
 
     private void calculateCombinations(){
         cCount = 0; // combinations count
         myCourseList.clear(); // clear filtered courses list
-        for (BCourseModel course : allCourseList){
+        for (BCourse course : allCourseList){
             int sCount = 0; // available sections count
-            List<BSectionModel> validSections = new ArrayList<>(); // valid section list
-            for (BSectionModel section : course.sections){
+            List<BSection> validSections = new ArrayList<>(); // valid section list
+            for (BSection section : course.getSections()){
                 // check if selection required or not; from [section filter]
                 boolean isValidSection = !sectionFilter || section.isSelected();
-                for (SectionTimeModel time: section.times){
+                for (Timing time: section.getTimingLegacy()){
                     isValidSection = isValidTime(time) && isValidSection;
                 }
                 // add to section count if the section is valid
@@ -395,8 +435,8 @@ public class OptionsFragment extends BaseFragment {
             // init cCount if needed
             cCount = cCount == 0 ? 1 : cCount;
 
-            BCourseModel tempCourse = new BCourseModel(course);
-            tempCourse.sections = validSections; // set valid sections
+            BCourse tempCourse = new BCourse(course);
+            tempCourse.setSections(validSections); // set valid sections
             myCourseList.add(tempCourse); // add course to filtered list
             // multiply cCount with sCount if available
             cCount *= sCount > 0 ? sCount : 1;
@@ -422,16 +462,16 @@ public class OptionsFragment extends BaseFragment {
         combinations.setText(String.valueOf(cCount));
     }
 
-    private boolean isValidTime(SectionTimeModel time){
+    private boolean isValidTime(Timing time){
         DateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
         boolean isValid = true;
 
         if (!days.equals(""))
-            isValid = checkDays(days, time.days);
+            isValid = checkDays(days, time.getDay());
 
         if (!start.equals("")) {
             try {
-                Date from = dateFormat.parse(time.from);
+                Date from = dateFormat.parse(time.getTimeFrom());
                 Date start = dateFormat.parse(this.start);
                 isValid = (from.equals(start) || from.after(start)) && isValid;
             } catch (ParseException e) {
@@ -441,7 +481,7 @@ public class OptionsFragment extends BaseFragment {
 
         if (!finish.equals("")) {
             try {
-                Date to = dateFormat.parse(time.to);
+                Date to = dateFormat.parse(time.getTimeTo());
                 Date finish = dateFormat.parse(this.finish);
                 isValid = (to.equals(finish) || to.before(finish)) && isValid;
             } catch (ParseException e) {
@@ -452,10 +492,10 @@ public class OptionsFragment extends BaseFragment {
         if (!location.equals("")) {
             boolean isSakeer;
             try {
-                int number = Integer.parseInt(time.room.substring(0, time.room.indexOf("-") - 1));
+                int number = Integer.parseInt(time.getLocation().substring(0, time.getLocation().indexOf("-") - 1));
                 isSakeer = !(number > 0 && number < 38);
             } catch (NumberFormatException e) {
-                isSakeer = !time.room.startsWith("A27");
+                isSakeer = !time.getLocation().startsWith("A27");
             }
             isValid = (location.equals("s") == isSakeer) && isValid;
         }

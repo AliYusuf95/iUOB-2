@@ -25,8 +25,9 @@ You can follow me on Twitter [@aliyusuf\_95](https://twitter.com/aliyusuf_95).
 - [x] Student Schedule
 - [x] Map
 - [x] Useful Links
-- [x] Year Calendar
 - [x] Schedule Builder
+- [ ] Year Calendar
+- [ ] iUob Stories 
 - [ ] UOB Auto
 
 

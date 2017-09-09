@@ -12,8 +12,6 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.muqdd.iuob2.features.my_schedule.MyCourse;
 import com.muqdd.iuob2.features.my_schedule.MySchedule;
-import com.muqdd.iuob2.models.MyCourseModel;
-import com.muqdd.iuob2.models.SectionTimeModel;
 import com.muqdd.iuob2.models.Timing;
 import com.muqdd.iuob2.notification.AlarmNotificationReceiver;
 import com.muqdd.iuob2.utils.SPHelper;
@@ -21,7 +19,6 @@ import com.orhanobut.logger.Logger;
 
 import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -256,8 +253,8 @@ public class User {
         SPHelper.saveToPrefs(context,MY_COURSES,coursesJson);
     }
 
-    private static void scheduleNotification(Context context, MyCourseModel course, SectionTimeModel time) {
-        List<String> timeResult = Arrays.asList(time.to.split(":"));
+    private static void scheduleNotification(Context context, MyCourse course, Timing time) {
+        List<String> timeResult = Arrays.asList(time.getTimeTo().split(":"));
         // wrong time
         if (timeResult.size() != 2) {
             Log.e(TAG, "Fail to parse given time");
@@ -275,7 +272,7 @@ public class User {
         cal.set(Calendar.MONTH, cur_cal.get(Calendar.MONTH));
         cal.set(Calendar.YEAR, cur_cal.get(Calendar.YEAR));
 
-        for (char day : time.days.toCharArray()){
+        for (char day : time.getDay().toCharArray()){
             switch (day){
                 case 'U':
                     cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
@@ -298,7 +295,7 @@ public class User {
             }
 
             SimpleDateFormat sdf = new SimpleDateFormat("EEEE HH:mm", Locale.getDefault());
-            Log.i(TAG,"Schedule notification set for "+course.getCourseTitle()+", at: "+
+            Log.i(TAG,"Schedule notification set for "+course.getCourseId()+", at: "+
                     sdf.format(cal.getTimeInMillis())+" on day: "+cal.get(Calendar.DAY_OF_WEEK));
 
             // Check we aren't setting it in the past which would trigger it to fire instantly
@@ -310,11 +307,11 @@ public class User {
             Intent nIntent = new Intent(context, AlarmNotificationReceiver.class);
             // pass notification data
             nIntent.putExtra(AlarmNotificationReceiver.NOTIFICATION_ID,
-                    Integer.valueOf(course.courseNumber));
+                    Integer.valueOf(course.getId()));
             nIntent.putExtra(AlarmNotificationReceiver.NOTIFICATION_TITLE,
-                    course.getCourseTitle());
+                    course.getCourseId());
             nIntent.putExtra(AlarmNotificationReceiver.NOTIFICATION_TEXT,
-                    "Your lecture will start soon at "+time.from);
+                    "Your lecture will start soon at "+time.getTimeFrom());
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
                     (int)System.currentTimeMillis(), nIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 

@@ -7,7 +7,7 @@ import android.widget.TextView;
 
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseModel;
-import com.muqdd.iuob2.models.SectionTimeModel;
+import com.muqdd.iuob2.models.Timing;
 
 import java.util.List;
 import java.util.Locale;
@@ -21,14 +21,14 @@ import butterknife.ButterKnife;
  */
 
 @SuppressWarnings({"unused","WeakerAccess"})
-public class BScheduleModel extends BaseModel<BScheduleModel, BScheduleModel.ViewHolder> {
+public class BSchedule extends BaseModel<BSchedule, BSchedule.ViewHolder> {
 
     private final static int clockEmoji = 0x1F552;
     private final static int teacherEmoji = 0x1F468;
 
-    public List<BSectionModel> sections;
+    public List<BSection> sections;
 
-    public BScheduleModel(List<BSectionModel> sections) {
+    public BSchedule(List<BSection> sections) {
         this.sections = sections;
     }
 
@@ -36,10 +36,10 @@ public class BScheduleModel extends BaseModel<BScheduleModel, BScheduleModel.Vie
         return new String(Character.toChars(unicode));
     }
 
-    private String getTimeBrief(List<SectionTimeModel> times){
+    private String getTimeBrief(List<Timing> times){
         String str = "";
-        for (SectionTimeModel time : times){
-            str += time.days+time.from+" ";
+        for (Timing time : times){
+            str += time.getDay()+time.getTimeFrom()+" ";
         }
         return str;
     }
@@ -59,11 +59,11 @@ public class BScheduleModel extends BaseModel<BScheduleModel, BScheduleModel.Vie
         super.bindView(viewHolder, payloads);
         viewHolder.lblNumber.setText(String.valueOf(viewHolder.getAdapterPosition()+1));
         String desc = "";
-        for (BSectionModel section : sections) {
-            desc += String.format(Locale.getDefault(), "[%s] %s %s %s %s %s\n", section.sectionNumber ,
-                    section.parentCourse.courseName+section.parentCourse.courseNumber,
-                    getEmojiByUnicode(teacherEmoji), section.doctor, getEmojiByUnicode(clockEmoji),
-                    getTimeBrief(section.times));
+        for (BSection section : sections) {
+            desc += String.format(Locale.getDefault(), "[%s] %s %s %s %s %s\n", section.getSectionNo() ,
+                    section.getCourseId(),
+                    getEmojiByUnicode(teacherEmoji), section.getInstructor(), getEmojiByUnicode(clockEmoji),
+                    getTimeBrief(section.getTimingLegacy()));
         }
         desc = desc.substring(0, desc.length() - 2); // remove lase \n
         viewHolder.lblDesc.setText(desc);

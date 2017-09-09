@@ -19,7 +19,7 @@ import butterknife.ButterKnife;
  * iUOB-2
  */
 
-public class CalendarSemesterModel extends BaseModel<SemesterCourseModel, CalendarSemesterModel.ViewHolder> {
+public class CalendarSemester extends BaseModel<CalendarSemester, CalendarSemester.ViewHolder> {
 
     @SerializedName("semester")
     @Expose

@@ -32,15 +32,15 @@ import butterknife.ButterKnife;
 public class SectionsFilterActivity extends BaseActivity {
 
     private final static String SECTIONS_LIST = "SECTIONS_LIST";
-    private final static Type COURSES_LIST_TYPE = new TypeToken<List<BCourseModel>>() {}.getType();
-    private final static Type SECTIONS_LIST_TYPE = new TypeToken<List<BSectionModel>>() {}.getType();
+    private final static Type COURSES_LIST_TYPE = new TypeToken<List<BCourse>>() {}.getType();
+    private final static Type SECTIONS_LIST_TYPE = new TypeToken<List<BSection>>() {}.getType();
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.main_content) CoordinatorLayout mainContent;
     @BindView(R.id.recycler_view) SuperRecyclerView recyclerView;
 
-    private List<BCourseModel> mCourseList; // filtered courses data
-    private FastItemAdapter<BSectionModel> mItemAdapter;
+    private List<BCourse> mCourseList; // filtered courses data
+    private FastItemAdapter<BSection> mItemAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,11 +74,11 @@ public class SectionsFilterActivity extends BaseActivity {
 
         // init adapter
         mItemAdapter = new FastItemAdapter<>();
-        List<BSectionModel> sectionList = BSectionModel.getSectionsFromCourseList(mCourseList);
+        List<BSection> sectionList = BSection.getSectionsFromCourseList(mCourseList);
         mItemAdapter.withSelectable(true);
         mItemAdapter.withMultiSelect(true);
         mItemAdapter.withPositionBasedStateManagement(false);
-        mItemAdapter.withItemEvent(new BSectionModel.ClickEvent());
+        mItemAdapter.withItemEvent(new BSection.ClickEvent());
 
         // init list
         final StickyHeaderAdapter stickyHeaderAdapter = new StickyHeaderAdapter();
@@ -91,7 +91,7 @@ public class SectionsFilterActivity extends BaseActivity {
         recyclerView.setAdapter(stickyHeaderAdapter.wrap(mItemAdapter));
 
         if (savedInstanceState != null && savedInstanceState.containsKey(SECTIONS_LIST)) {
-            List<BSectionModel> savedSectionList =
+            List<BSection> savedSectionList =
                     new Gson().fromJson(savedInstanceState.getString(SECTIONS_LIST), SECTIONS_LIST_TYPE);
             if (savedSectionList != null && savedSectionList.size() > 0){
                 sectionList = savedSectionList;
@@ -118,16 +118,24 @@ public class SectionsFilterActivity extends BaseActivity {
         switch (item.getItemId()){
             case R.id.done:
                 Intent intent = new Intent();
-                mCourseList = BSectionModel.getCoursesFromSectionsList(mItemAdapter.getAdapterItems());
+                BSection.putSectionsIntoCoursesList(mCourseList, mItemAdapter.getAdapterItems());
                 intent.putExtra(Constants.INTENT_SECTIONS_LIST, new Gson().toJson(mCourseList, COURSES_LIST_TYPE));
                 setResult(Activity.RESULT_OK, intent);
                 finish();
                 break;
             case R.id.select_all:
+                mItemAdapter.select();
                 break;
             case R.id.deselect_all:
+                mItemAdapter.deselect();
                 break;
             case R.id.deselect_to_be:
+                for (int i=0; i<mItemAdapter.getAdapterItems().size(); i++) {
+                    String doc = mItemAdapter.getAdapterItems().get(i).getInstructor().trim().toLowerCase();
+                    if (doc.equals("To be announced".trim().toLowerCase())) {
+                        mItemAdapter.deselect(i);
+                    }
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);

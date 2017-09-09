@@ -21,7 +21,7 @@ import com.muqdd.iuob2.models.Course;
 import com.muqdd.iuob2.models.CoursePrefix;
 import com.muqdd.iuob2.models.RestResponse;
 import com.muqdd.iuob2.network.ServiceGenerator;
-import com.muqdd.iuob2.network.iUOBApi;
+import com.muqdd.iuob2.network.IUOBApi;
 
 import java.util.List;
 
@@ -128,7 +128,7 @@ public class CoursesFragment extends BaseFragment {
     }
 
     public void getCoursesList(CoursePrefix request) {
-        ServiceGenerator.createService(iUOBApi.class)
+        ServiceGenerator.createService(IUOBApi.class)
                 .courses(request.getYear(), request.getSemester(), request.getPrefix())
                 .enqueue(new Callback<RestResponse<List<Course>>>() {
                     @Override

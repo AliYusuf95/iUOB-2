@@ -17,12 +17,12 @@ import butterknife.ButterKnife;
  * iUOB-2
  */
 
-public class LinkModel extends BaseModel<LinkModel, LinkModel.ViewHolder> {
+public class Link extends BaseModel<Link, Link.ViewHolder> {
 
     public String title;
     public String url;
 
-    public LinkModel(String title, String url) {
+    public Link(String title, String url) {
         this.title = title;
         this.url = url;
     }
@@ -41,7 +41,7 @@ public class LinkModel extends BaseModel<LinkModel, LinkModel.ViewHolder> {
 
     //The logic to bind your data to the view
     @Override
-    public void bindView(LinkModel.ViewHolder holder, List<Object> payloads) {
+    public void bindView(Link.ViewHolder holder, List<Object> payloads) {
         //call super so the selection is already handled for you
         super.bindView(holder, payloads);
         holder.title.setText(title);
@@ -50,7 +50,7 @@ public class LinkModel extends BaseModel<LinkModel, LinkModel.ViewHolder> {
 
     //reset the view here (this is an optional method, but recommended)
     @Override
-    public void unbindView(LinkModel.ViewHolder holder) {
+    public void unbindView(Link.ViewHolder holder) {
         super.unbindView(holder);
         holder.title.setText(null);
         holder.url.setText(null);

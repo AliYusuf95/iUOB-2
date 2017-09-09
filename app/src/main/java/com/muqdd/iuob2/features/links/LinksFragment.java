@@ -17,7 +17,7 @@ import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.features.main.Menu;
-import com.muqdd.iuob2.models.LinkModel;
+import com.muqdd.iuob2.models.Link;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +36,8 @@ public class LinksFragment extends BaseFragment {
     @BindView(R.id.recycler_view) SuperRecyclerView recyclerView;
 
     private View mView;
-    private List<LinkModel> linksList;
-    private FastItemAdapter<LinkModel> fastAdapter;
+    private List<Link> linksList;
+    private FastItemAdapter<Link> fastAdapter;
 
     public LinksFragment() {
         // Required empty public constructor
@@ -85,22 +85,22 @@ public class LinksFragment extends BaseFragment {
 
         // hard coded links
         linksList = new ArrayList<>();
-        linksList.add(new LinkModel("iUOB", "http://iuob.net"));
-        linksList.add(new LinkModel("UOB Website", "http://www.uob.edu.bh"));
-        linksList.add(new LinkModel("Enrollment", "http://www.online.uob.edu.bh/cgi/enr/all_enroll"));
-        linksList.add(new LinkModel("Exam Location", "http://www.online.uob.edu.bh/cgi/enr/examtable.exam"));
-        linksList.add(new LinkModel("Blackboard", "http://bb.uob.edu.bh"));
-        linksList.add(new LinkModel("Academic Calendar", "http://offline.uob.edu.bh/pages.aspx?module=pages&id=5366&SID=868"));
-        linksList.add(new LinkModel("Phonebook", "http://dir.uob.edu.bh/mainEn.aspx"));
+        linksList.add(new Link("iUOB", "http://iuob.net"));
+        linksList.add(new Link("UOB Website", "http://www.uob.edu.bh"));
+        linksList.add(new Link("Enrollment", "http://www.online.uob.edu.bh/cgi/enr/all_enroll"));
+        linksList.add(new Link("Exam Location", "http://www.online.uob.edu.bh/cgi/enr/examtable.exam"));
+        linksList.add(new Link("Blackboard", "http://bb.uob.edu.bh"));
+        linksList.add(new Link("Academic Calendar", "http://offline.uob.edu.bh/pages.aspx?module=pages&id=5366&SID=868"));
+        linksList.add(new Link("Phonebook", "http://dir.uob.edu.bh/mainEn.aspx"));
 
         // setup adapter
         fastAdapter.set(linksList);
         recyclerView.setAdapter(fastAdapter);
 
         // open link on click
-        fastAdapter.withOnClickListener(new FastAdapter.OnClickListener<LinkModel>() {
+        fastAdapter.withOnClickListener(new FastAdapter.OnClickListener<Link>() {
             @Override
-            public boolean onClick(View v, IAdapter<LinkModel> adapter, LinkModel item, int position) {
+            public boolean onClick(View v, IAdapter<Link> adapter, Link item, int position) {
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse(item.url));
                 startActivity(i);
@@ -109,9 +109,9 @@ public class LinksFragment extends BaseFragment {
         });
         // copy link on hold
         // TODO: need to fix click/long click behavior
-        /*fastAdapter.withOnLongClickListener(new FastAdapter.OnLongClickListener<LinkModel>() {
+        /*fastAdapter.withOnLongClickListener(new FastAdapter.OnLongClickListener<Link>() {
             @Override
-            public boolean onLongClick(View v, IAdapter<LinkModel> adapter, LinkModel item, int position) {
+            public boolean onLongClick(View v, IAdapter<Link> adapter, Link item, int position) {
                 Logger.d(item.toString());
                 ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("iUOB2", item.url);

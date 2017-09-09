@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.InputFilter;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -33,7 +32,6 @@ import com.mikepenz.fastadapter.listeners.ClickEventHook;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.app.Constants;
-import com.muqdd.iuob2.features.main.MainActivity;
 import com.muqdd.iuob2.features.main.Menu;
 
 import java.lang.reflect.Type;
@@ -57,7 +55,7 @@ import info.hoang8f.android.segmented.SegmentedGroup;
 public class ScheduleBuilderFragment extends BaseFragment {
 
     private final static String COURSES_LIST = "COURSES_LIST";
-    private final static Type COURSES_LIST_TYPE = new TypeToken<List<BCourseModel>>() {}.getType();
+    private final static Type COURSES_LIST_TYPE = new TypeToken<List<BCourse>>() {}.getType();
 
     private final static Pattern pCourse =
             Pattern.compile("^([\\w]+[a-z])\\s*?([\\d]{3})$",Pattern.CASE_INSENSITIVE);
@@ -68,10 +66,10 @@ public class ScheduleBuilderFragment extends BaseFragment {
     @BindView(R.id.recycler_view) SuperRecyclerView recyclerView;
 
     private View mView;
-    private FastItemAdapter<BCourseModel> fastItemAdapter;
-    private List<BCourseModel> mCourseList;
+    private FastItemAdapter<BCourse> fastItemAdapter;
+    private List<BCourse> mCourseList;
     private MenuItem nextMenuItem;
-    private String semester;
+    private int semester;
 
     public ScheduleBuilderFragment() {
         // Required empty public constructor
@@ -137,18 +135,18 @@ public class ScheduleBuilderFragment extends BaseFragment {
         fastItemAdapter = new FastItemAdapter<>();
         mCourseList = new ArrayList<>();
 
-        fastItemAdapter.withItemEvent(new ClickEventHook<BCourseModel>() {
+        fastItemAdapter.withItemEvent(new ClickEventHook<BCourse>() {
             @Nullable
             @Override
             public View onBind(@NonNull RecyclerView.ViewHolder viewHolder) {
-                if (viewHolder instanceof BCourseModel.ViewHolder){
-                    return ((BCourseModel.ViewHolder) viewHolder).delete;
+                if (viewHolder instanceof BCourse.ViewHolder){
+                    return ((BCourse.ViewHolder) viewHolder).delete;
                 }
                 return null;
             }
 
             @Override
-            public void onClick(View v, int position, FastAdapter<BCourseModel> fastAdapter, BCourseModel item) {
+            public void onClick(View v, int position, FastAdapter<BCourse> fastAdapter, BCourse item) {
                 mCourseList.remove(position);
                 fastItemAdapter.remove(position);
                 refreshNextMenuItem();
@@ -171,17 +169,17 @@ public class ScheduleBuilderFragment extends BaseFragment {
         // Second semester
         if (month > 3 && month < 7){
             semesterRadio.check(R.id.second);
-            semester = "2";
+            semester = 2;
         }
         // Summer semester
-        else if (month > 6 && month < 10) {
+        else if (month > 6 && month < 9) {
             semesterRadio.check(R.id.summer);
-            semester = "3";
+            semester = 3;
         }
         // First semester (from 9 to 12)
         else {
             semesterRadio.check(R.id.first);
-            semester = "1";
+            semester = 1;
         }
 
         semesterRadio.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -189,13 +187,13 @@ public class ScheduleBuilderFragment extends BaseFragment {
             public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
                 switch (i){
                     case R.id.first:
-                        semester = "1";
+                        semester = 1;
                         break;
                     case R.id.second:
-                        semester = "2";
+                        semester = 2;
                         break;
                     case R.id.summer:
-                        semester = "3";
+                        semester = 3;
                         break;
                 }
             }
@@ -244,10 +242,6 @@ public class ScheduleBuilderFragment extends BaseFragment {
                 addCourse();
             }
         });
-
-        if (getBaseActivity() instanceof MainActivity) {
-            
-        }
     }
 
     private void refreshNextMenuItem(){
@@ -261,9 +255,7 @@ public class ScheduleBuilderFragment extends BaseFragment {
         String courseString = txtCourse.getText().toString().toUpperCase().trim();
         Matcher m = pCourse.matcher(courseString);
         if (!courseString.equals("") && m.find()) {
-            String courseName = m.group(1);
-            String courseNumber = m.group(2);
-            BCourseModel myCourse = new BCourseModel(courseName, courseNumber);
+            BCourse myCourse = new BCourse(courseString);
             if (!mCourseList.contains(myCourse)) {
                 mCourseList.add(myCourse);
                 fastItemAdapter.add(myCourse);

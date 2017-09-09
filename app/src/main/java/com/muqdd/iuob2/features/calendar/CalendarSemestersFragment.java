@@ -16,7 +16,7 @@ import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.features.main.Menu;
-import com.muqdd.iuob2.models.CalendarSemesterModel;
+import com.muqdd.iuob2.models.CalendarSemester;
 import com.muqdd.iuob2.network.ServiceGenerator;
 import com.muqdd.iuob2.network.UOBSchedule;
 
@@ -39,7 +39,7 @@ public class CalendarSemestersFragment extends BaseFragment {
     @BindView(R.id.recycler_view) SuperRecyclerView recyclerView;
 
     private View mView;
-    private FastItemAdapter<CalendarSemesterModel> fastAdapter;
+    private FastItemAdapter<CalendarSemester> fastAdapter;
 
     public CalendarSemestersFragment() {
         // Required empty public constructor
@@ -92,9 +92,9 @@ public class CalendarSemestersFragment extends BaseFragment {
         // init list
 
         // open link on click
-        fastAdapter.withOnClickListener(new FastAdapter.OnClickListener<CalendarSemesterModel>() {
+        fastAdapter.withOnClickListener(new FastAdapter.OnClickListener<CalendarSemester>() {
             @Override
-            public boolean onClick(View v, IAdapter<CalendarSemesterModel> adapter, CalendarSemesterModel item, int position) {
+            public boolean onClick(View v, IAdapter<CalendarSemester> adapter, CalendarSemester item, int position) {
                 CalendarTimeLineFragment fragment = CalendarTimeLineFragment.newInstance(item.getSemesterInfo());
                 displayFragment(fragment);
                 return false;
@@ -104,10 +104,10 @@ public class CalendarSemestersFragment extends BaseFragment {
 
     private void getCalendarFromNet(){
         ServiceGenerator.createService(UOBSchedule.class)
-                .semesterCalendar().enqueue(new Callback<List<CalendarSemesterModel>>() {
+                .semesterCalendar().enqueue(new Callback<List<CalendarSemester>>() {
             @Override
-            public void onResponse(Call<List<CalendarSemesterModel>> call,
-                                   Response<List<CalendarSemesterModel>> response) {
+            public void onResponse(Call<List<CalendarSemester>> call,
+                                   Response<List<CalendarSemester>> response) {
                 if (response.code() == 200 && response.body().size() > 0){
                     fastAdapter.set(response.body());
                     recyclerView.setAdapter(fastAdapter);
@@ -116,7 +116,7 @@ public class CalendarSemestersFragment extends BaseFragment {
             }
 
             @Override
-            public void onFailure(Call<List<CalendarSemesterModel>> call, Throwable t) {
+            public void onFailure(Call<List<CalendarSemester>> call, Throwable t) {
 
             }
         });
