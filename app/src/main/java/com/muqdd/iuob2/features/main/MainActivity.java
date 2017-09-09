@@ -157,7 +157,7 @@ public class MainActivity extends BaseActivity {
                 .withTranslucentStatusBar(false) // for embedded drawer
                 .addDrawerItems(
                         semesterSchedule,
-                        calendarSchedule,
+                        // calendarSchedule,
                         //new DividerDrawerItem(), // just test divider
                         mySchedule,
                         scheduleBuilder,
@@ -265,9 +265,9 @@ public class MainActivity extends BaseActivity {
             if (mFragment instanceof SemestersHolderFragment){
                 drawerMenu.setSelection(semesterSchedule);
             }
-            if (mFragment instanceof CalendarSemestersFragment){
-                drawerMenu.setSelection(calendarSchedule);
-            }
+//            if (mFragment instanceof CalendarSemestersFragment){
+//                drawerMenu.setSelection(calendarSchedule);
+//            }
             if (mFragment instanceof MyScheduleFragment){
                 drawerMenu.setSelection(mySchedule);
             }

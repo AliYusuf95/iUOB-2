@@ -60,6 +60,10 @@ public class ProgressButton extends AppCompatButton implements View.OnClickListe
     private int mProgressSpace = 25;
     /** Inner button size. Defaults to 150. */
     private int mInnerSize = 150;
+    /** Button can listen to click event. Defaults to true */
+    private boolean withClick = true;
+    /** Button can listen to long click event. Defaults to true */
+    private boolean withLongClick = true;
 
     /**
      * The paint to show the progress.
@@ -283,6 +287,22 @@ public class ProgressButton extends AppCompatButton implements View.OnClickListe
         this.eventListener = eventListener;
     }
 
+    public boolean isWithClick() {
+        return withClick;
+    }
+
+    public void setWithClick(boolean withClick) {
+        this.withClick = withClick;
+    }
+
+    public boolean isWithLongClick() {
+        return withLongClick;
+    }
+
+    public void setWithLongClick(boolean withLongClick) {
+        this.withLongClick = withLongClick;
+    }
+
     /** Returns true if the button is animating. */
     public boolean isAnimating() {
         return mAnimating;
@@ -394,6 +414,42 @@ public class ProgressButton extends AppCompatButton implements View.OnClickListe
     }
 
     @Override
+    public void setOnClickListener(@Nullable OnClickListener listener) {
+        onClickListener = listener;
+    }
+
+    @Override
+    public void setOnLongClickListener(@Nullable OnLongClickListener listener) {
+        onLongClickListener = listener;
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (withClick) {
+            if (eventListener != null) {
+                eventListener.onClick(view);
+            }
+            if (onClickListener != null) {
+                onClickListener.onClick(view);
+            }
+        }
+    }
+
+    @Override
+    public boolean onLongClick(View view) {
+        if (withLongClick) {
+            startAnimating();
+            if (eventListener != null) {
+                eventListener.onLongClick(view);
+            }
+            if (onLongClickListener != null) {
+                onLongClickListener.onLongClick(view);
+            }
+        }
+        return true;
+    }
+
+    @Override
     public Parcelable onSaveInstanceState() {
         Parcelable superState = super.onSaveInstanceState();
         if (isSaveEnabled()) {
@@ -417,40 +473,6 @@ public class ProgressButton extends AppCompatButton implements View.OnClickListe
 
         mMax = ss.mMax;
         mProgress = ss.mProgress;
-    }
-
-    @Override
-    public void setOnClickListener(@Nullable OnClickListener listener) {
-        onClickListener = listener;
-    }
-
-    @Override
-    public void setOnLongClickListener(@Nullable OnLongClickListener listener) {
-        onLongClickListener = listener;
-    }
-
-    @Override
-    public void onClick(View view) {
-        Log.d(TAG, "onClick");
-        if (eventListener != null){
-            eventListener.onClick(view);
-        }
-        if (onClickListener != null){
-            onClickListener.onClick(view);
-        }
-    }
-
-    @Override
-    public boolean onLongClick(View view) {
-        Log.d(TAG, "onLongClick");
-        startAnimating();
-        if (eventListener != null){
-            eventListener.onLongClick(view);
-        }
-        if (onLongClickListener != null){
-            onLongClickListener.onLongClick(view);
-        }
-        return true;
     }
 
     /** A {@link android.os.Parcelable} representing the {@link ProgressButton}'s state. */

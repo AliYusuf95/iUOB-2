@@ -17,26 +17,26 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.malinskiy.superrecyclerview.SuperRecyclerView;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
-import com.muqdd.iuob2.models.CourseModel;
+import com.muqdd.iuob2.models.Course;
+import com.muqdd.iuob2.models.RestResponse;
+import com.muqdd.iuob2.models.Section;
 import com.muqdd.iuob2.models.SectionModel;
 import com.muqdd.iuob2.network.ServiceGenerator;
 import com.muqdd.iuob2.network.UOBSchedule;
+import com.muqdd.iuob2.network.iUOBApi;
 import com.orhanobut.logger.Logger;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -53,30 +53,23 @@ import retrofit2.Response;
 public class SectionsFragment extends BaseFragment {
 
     public final static String COURSE = "COURSE";
-    public final static Type TYPE = new TypeToken<CourseModel>() {}.getType();
-
-    // static variables to enhance performance
-    private final static String seatsPattern = "Sec\\.[\\s\\S]*?color=\".*\">(.*?)<[\\s\\S]*?=&gt;[\\s\\S]*?size=\"2\">(\\d*?)<";
-    private final static Pattern pSeats =
-            Pattern.compile(seatsPattern,Pattern.UNIX_LINES | Pattern.CASE_INSENSITIVE);
 
     @BindView(R.id.main_content) LinearLayout mainContent;
     @BindView(R.id.recycler_view) SuperRecyclerView recyclerView;
 
-    private List<SectionModel> sectionsList;
-    private CourseModel course;
-    private FastItemAdapter<SectionModel> fastAdapter;
+    private Course course;
+    private FastItemAdapter<Section> fastAdapter;
     private View finalView;
 
     public SectionsFragment() {
         // Required empty public constructor
     }
 
-    public static SectionsFragment newInstance(String title, CourseModel course) {
+    public static SectionsFragment newInstance(Course course) {
         SectionsFragment fragment = new SectionsFragment();
         Bundle bundle = new Bundle();
-        bundle.putString(TITLE, title);
-        bundle.putString(COURSE, new Gson().toJson(course,TYPE));
+        bundle.putString(TITLE, course.getCode());
+        bundle.putString(COURSE, new Gson().toJson(course, Course.class));
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -90,13 +83,13 @@ public class SectionsFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater,container,savedInstanceState);
         // Inflate the layout for this fragment
-        course = new Gson().fromJson(getArguments().getString(COURSE), TYPE);
+        course = new Gson().fromJson(getArguments().getString(COURSE), Course.class);
         View view = inflater.inflate(R.layout.fragment_list, container, false);
         ButterKnife.bind(this, view);
         // Setup variables and layouts
         initiate();
-        // get courses list
-        getSectionsListFromNet();
+        // get coursesList list
+        getSectionsList();
         return view;
     }
 
@@ -112,7 +105,6 @@ public class SectionsFragment extends BaseFragment {
     private void initiate() {
         // initialize variables
         fastAdapter = new FastItemAdapter<>();
-        sectionsList = new ArrayList<>();
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         // set refreshable list
         recyclerView.getSwipeToRefresh().setEnabled(true);
@@ -123,12 +115,12 @@ public class SectionsFragment extends BaseFragment {
         recyclerView.getSwipeToRefresh().setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                getSectionsListFromNet();
+                getSectionsList();
             }
         });
-        fastAdapter.withOnLongClickListener(new FastAdapter.OnLongClickListener<SectionModel>() {
+        fastAdapter.withOnLongClickListener(new FastAdapter.OnLongClickListener<Section>() {
             @Override
-            public boolean onLongClick(View v, IAdapter<SectionModel> adapter, SectionModel item, int position) {
+            public boolean onLongClick(View v, IAdapter<Section> adapter, Section item, int position) {
                 Logger.d(item.toString());
                 ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("iUOB2", item.toString());
@@ -139,43 +131,23 @@ public class SectionsFragment extends BaseFragment {
         });
     }
 
-    public void getSectionsListFromNet() {
-        ServiceGenerator.createService(UOBSchedule.class)
-                .sectionsList(course.prog,course.abv,course.departmentCode,course.courseNumber,
-                        course.credits,course.year,course.semester)
-                .enqueue(new Callback<ResponseBody>() {
+    public void getSectionsList() {
+        ServiceGenerator.createService(iUOBApi.class)
+                .sections(course.getYear(), course.getSemester(), course.getCode())
+                .enqueue(new Callback<RestResponse<List<Section>>>() {
                     @Override
-                    public void onResponse(Call<ResponseBody> call, final Response<ResponseBody> response) {
-                        if (response.code() == 200) {
-                            // do parsing in background
-                            AsyncTask.execute(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        sectionsList.clear();
-                                        sectionsList.addAll(SectionModel.parseSectionsData(response.body().string()));
-                                        if (sectionsList.size() > 0) {
-                                            getAvailableSeats();
-                                            // attach the adapter
-                                            runOnUi(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    addFinalExamView();
-                                                    fastAdapter.set(sectionsList);
-                                                    recyclerView.setAdapter(fastAdapter);
-                                                }
-                                            });
-                                        }
-                                    } catch (IOException e) {
-                                        Logger.e(e.getMessage());
-                                    }
-                                }
-                            });
+                    public void onResponse(Call<RestResponse<List<Section>>> call, final Response<RestResponse<List<Section>>> response) {
+                        if (response.body().getStatusCode() == 200) {
+                            fastAdapter.set(response.body().getData());
+                            if (recyclerView.getAdapter() == null) {
+                                recyclerView.setAdapter(fastAdapter);
+                            }
+                            addFinalExamView();
                         }
                     }
 
                     @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {}
+                    public void onFailure(Call<RestResponse<List<Section>>> call, Throwable t) {}
                 });
     }
 
@@ -189,7 +161,7 @@ public class SectionsFragment extends BaseFragment {
         finalView =
                 LayoutInflater.from(getContext()).inflate(R.layout.row_finalexam_time,null,false);
         String color = Integer.toHexString(ContextCompat.getColor(getActivity(),R.color.colorAccent) & 0x00ffffff);
-        String finalExam = sectionsList.get(0).getFinalExam();
+        String finalExam = course.getExam().toString();
         finalExam = finalExam.equals("") ? getString(R.string.row_finalexam_time_no_exam) : finalExam;
         String text = String.format(Locale.getDefault(), "<font color=\"#%s\">%s</font> %s",
                 color,
@@ -199,38 +171,4 @@ public class SectionsFragment extends BaseFragment {
         mainContent.addView(finalView,0);
     }
 
-    private void getAvailableSeats(){
-        ServiceGenerator.createService(UOBSchedule.class)
-                .availableSeats(course.courseNumber,course.departmentCode)
-                .enqueue(new Callback<ResponseBody>() {
-                    @Override
-                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        if (response.code() == 200){
-                            try {
-                                parseAvailableSeatsData(response.body().string());
-                            } catch (IOException e) {
-                                Logger.e(e.getMessage());
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-                        Logger.e(t.getMessage());
-                    }
-                });
-    }
-
-    public void parseAvailableSeatsData(String data){
-        final Matcher m = pSeats.matcher(data);
-        while (m.find()){
-            for(SectionModel s : sectionsList){
-                if(s.number != null && s.number.equals(m.group(1))) {
-                    s.seats = m.group(2);
-                    s.showSeats = true;
-                    break;
-                }
-            }
-        }
-    }
 }

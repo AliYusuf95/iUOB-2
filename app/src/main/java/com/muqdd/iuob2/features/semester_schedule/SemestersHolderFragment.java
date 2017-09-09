@@ -14,9 +14,11 @@ import android.widget.ProgressBar;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.features.main.Menu;
+import com.muqdd.iuob2.models.CoursePrefix;
+import com.muqdd.iuob2.models.RestResponse;
 import com.muqdd.iuob2.models.SemesterCourseModel;
 import com.muqdd.iuob2.network.ServiceGenerator;
-import com.muqdd.iuob2.network.UOBSchedule;
+import com.muqdd.iuob2.network.iUOBApi;
 import com.orhanobut.logger.Logger;
 
 import org.jsoup.Jsoup;
@@ -24,7 +26,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -33,7 +34,6 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -122,7 +122,7 @@ public class SemestersHolderFragment extends BaseFragment {
     private void initiate() {
         searchTextListeners = new HashMap<>();
         pagerAdapter = new SemesterPagerAdapter(getChildFragmentManager());
-        //pagerAdapter.addFragment(SemesterFragment.newInstance(), "2017/2");
+        //pagerAdapter.addFragment(PrefixesFragment.newInstance(), "2017/2");
         viewPager.setAdapter(pagerAdapter);
         viewPager.addOnPageChangeListener(new PageListener());
         tabLayout.setupWithViewPager(viewPager);
@@ -139,68 +139,43 @@ public class SemestersHolderFragment extends BaseFragment {
         List<SemesterCourseModel> requests = new ArrayList<>();
         // Second semester
         if (month > 3 && month < 7){
-            requests.add(new SemesterCourseModel(year-1, 2));
-            requests.add(new SemesterCourseModel(year-1, 3));
-            requests.add(new SemesterCourseModel(year, 1));
+            getSemesterCourses(0, year-1, 2);
+//            getSemesterCourses(1, year-1, 3);
+//            getSemesterCourses(2, year, 1);
             Logger.d("case 1");
         }
         // Summer semester
-        else if (month > 6 && month < 10) {
-            requests.add(new SemesterCourseModel(year-1, 3));
-            requests.add(new SemesterCourseModel(year, 1));
-            requests.add(new SemesterCourseModel(year, 2));
+        else if (month > 6 && month < 9) {
+            getSemesterCourses(0, year-1, 3);
+//            getSemesterCourses(1, year, 1);
+//            getSemesterCourses(2, year, 2);
             Logger.d("case 2");
         }
         // First semester (from 9 to 12)
         else {
-            requests.add(new SemesterCourseModel(year-1, 1));
-            requests.add(new SemesterCourseModel(year-1, 2));
-            requests.add(new SemesterCourseModel(year-1, 3));
+            getSemesterCourses(0, year, 1);
+//            getSemesterCourses(1, year, 2);
+//            getSemesterCourses(2, year, 3);
             Logger.d("case 3");
-        }
-
-        for (int i=0 ; i<requests.size() ; i++){
-            getSemesterCoursesFromNet(requests.get(i),i);
         }
     }
 
-    // Data should loaded in semester fragment not here !!
-    /*private void getSemesterCoursesFromCache(SemesterCourseModel request) throws IOException {
-        // Read data
-        String data = readHTMLDataToCache(request.fileName());
-        // Parse data
-        ArrayList<SemesterCourseModel> list = parseSemesterCoursesData(data);
-        if (list.size() > 0) {
-            pagerAdapter.addFragment(SemesterFragment.newInstance(request.semesterTitle(),
-                    request), request.semesterTitle());
-        } else {
-            throw new IOException();
-        }
-    }*/
-
-    public void getSemesterCoursesFromNet(final SemesterCourseModel request, final int pos) {
-        ServiceGenerator.createService(UOBSchedule.class)
-                .semesterCourses("1",request.year,request.semester).enqueue(new Callback<ResponseBody>() {
+    public void getSemesterCourses(final int pos, final int year, final int semester) {
+        ServiceGenerator.createService(iUOBApi.class)
+                .coursesPrefix(year, semester).enqueue(new Callback<RestResponse<List<String>>>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.code() == 200) {
-                    try {
-                        ArrayList<SemesterCourseModel> list = parseSemesterCoursesData(response.body().string());
-                        if (list.size() > 0) {
-                            progressBar.setVisibility(View.GONE);
-                            SemesterFragment fragment =
-                                    SemesterFragment.newInstance(request.semesterTitle(), request);
-                            pagerAdapter.addFragment(fragment, request.semesterTitle(),pos);
-                            //writeHTMLDataToCache(request.fileName(), response.body().string().getBytes());
-                        }
-                    } catch (IOException e) {
-                        Logger.e(e.getMessage());
+            public void onResponse(Call<RestResponse<List<String>>> call, Response<RestResponse<List<String>>> response) {
+                if (response.body().getStatusCode() == 200){
+                    List<CoursePrefix> list = CoursePrefix.createList(response.body().getData(), year, semester);
+                    if (list.size() > 0) {
+                        progressBar.setVisibility(View.GONE);
+                        pagerAdapter.addCoursePrefixFragment(list, year+"/"+semester, pos);
                     }
                 }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<RestResponse<List<String>>> call, Throwable t) {
 
             }
         });

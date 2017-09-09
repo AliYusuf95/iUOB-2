@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.muqdd.iuob2.BuildConfig;
 import com.muqdd.iuob2.app.Auth;
 import com.muqdd.iuob2.app.User;
 
@@ -22,12 +23,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 @SuppressWarnings("WeakerAccess")
 public class ServiceGenerator {
 
-    public static final String API_BASE_URL = "https://www.online.uob.edu.bh/cgi/";
+    public static final String API_BASE_URL = "https://iuob.net/";
 
     private static ConnectivityManager connectivityManager;
 
     private static HttpLoggingInterceptor logging =
-            new HttpLoggingInterceptor().setLevel(Level.NONE);
+            new HttpLoggingInterceptor().setLevel(BuildConfig.DEBUG ? Level.BODY : Level.NONE);
 
     private static OkHttpClient.Builder httpClient =
             new OkHttpClient.Builder().addInterceptor(logging);

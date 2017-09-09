@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.muqdd.iuob2.R;
+import com.muqdd.iuob2.features.stories.StoriesActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,13 +22,13 @@ import java.util.Collections;
 public class EmojiFragment extends Fragment implements EmojiAdapter.OnEmojiClickListener {
 
     private ArrayList<String> emojiIds;
-    private PhotoEditorActivity photoEditorActivity;
-    RecyclerView emojiRecyclerView;
+    private StoriesActivity photoEditorActivity;
+    private RecyclerView emojiRecyclerView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        photoEditorActivity = (PhotoEditorActivity) getActivity();
+        photoEditorActivity = (StoriesActivity) getActivity();
 
         String[] emojis = photoEditorActivity.getResources().getStringArray(R.array.photo_editor_emoji);
 
@@ -48,6 +49,10 @@ public class EmojiFragment extends Fragment implements EmojiAdapter.OnEmojiClick
         emojiRecyclerView.setAdapter(adapter);
 
         return rootView;
+    }
+
+    public RecyclerView getEmojiRecyclerView() {
+        return emojiRecyclerView;
     }
 
     @Override

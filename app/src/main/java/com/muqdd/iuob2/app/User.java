@@ -4,22 +4,21 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
+import com.muqdd.iuob2.features.my_schedule.MyCourse;
+import com.muqdd.iuob2.features.my_schedule.MySchedule;
 import com.muqdd.iuob2.models.MyCourseModel;
 import com.muqdd.iuob2.models.SectionTimeModel;
-import com.muqdd.iuob2.network.ServiceGenerator;
-import com.muqdd.iuob2.network.UOBSchedule;
+import com.muqdd.iuob2.models.Timing;
 import com.muqdd.iuob2.notification.AlarmNotificationReceiver;
 import com.muqdd.iuob2.utils.SPHelper;
 import com.orhanobut.logger.Logger;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,11 +28,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import okhttp3.ResponseBody;
-import retrofit2.Response;
 
 /**
  * Created by Ali Yusuf on 4/7/2017.
@@ -69,6 +63,15 @@ public class User {
     @SerializedName("token")
     @Expose
     private String token;
+
+    /* Transient variables */
+    private transient final static String TAG = User.class.getSimpleName();
+    private transient final static String NOTIFICATION = "notification";
+    private transient static final String MY_COURSES = "my_courses";
+    private transient static final String MY_COURSES_UPDATE = "my_courses_update";
+    private transient static final Type MY_COURSES_TYPE = new TypeToken<List<MyCourse>>() {}.getType();
+    private transient static boolean fetchingData = false;
+
 
     public String getUpdatedAt() {
         return updatedAt;
@@ -146,20 +149,13 @@ public class User {
         return "Token "+token;
     }
 
-    /* Transient variables */
-    private transient final static String TAG = User.class.getSimpleName();
-    private transient final static String NOTIFICATION = "notification";
-    private transient static final String MY_COURSES = "my_courses";
-    private transient static final String MY_COURSES_UPDATE = "my_courses_update";
-    private transient static final Type MY_COURSES_TYPE = new TypeToken<List<MyCourseModel>>() {}.getType();
-    private transient static boolean fetchingData = false;
-
     public static boolean setNotification(Context context, boolean state) {
         if (state) {
             SPHelper.saveToPrefs(context, NOTIFICATION, "on");
-            for (MyCourseModel course : getCourses(context)){
-                for (SectionTimeModel time : course.times) {
-                    scheduleNotification(context, course, time);
+            for (MyCourse course : getMySchedule(context).getCourseList()){
+                for (Timing time : course.getTimingLegacy()) {
+                    //TODO : change classes
+//                    scheduleNotification(context, course, time);
                 }
             }
             Log.i(TAG,"notifications set to ON");
@@ -175,36 +171,60 @@ public class User {
         return SPHelper.getFromPrefs(context,NOTIFICATION) != null;
     }
 
-    public static void addCourse(Context context, MyCourseModel course) {
+    public static void addCourse(Context context, MyCourse course) {
         if (course == null){
             Log.e(TAG,"Empty data passed");
+            return;
         }
-        List<MyCourseModel> myCoursesList = getCourses(context);
-        myCoursesList.add(course);
-        String coursesJson = new Gson().toJson(myCoursesList,MY_COURSES_TYPE);
-        SPHelper.saveToPrefs(context,MY_COURSES,coursesJson);
+        MySchedule mySchedule = getMySchedule(context);
+        mySchedule.getCourseList().add(course);
+        String coursesJson = new Gson().toJson(mySchedule, MySchedule.class);
+        SPHelper.saveToPrefs(context, MY_COURSES, coursesJson);
         setCoursesUpdated(context, false);
     }
 
-    public static void deleteCourse(Context context, MyCourseModel course) {
+    public static void deleteCourse(Context context, MyCourse course) {
         if (course == null){
             Log.e(TAG,"Empty data passed");
+            return;
         }
-        List<MyCourseModel> myCoursesList = getCourses(context);
-        myCoursesList.remove(course);
-        String coursesJson = new Gson().toJson(myCoursesList,MY_COURSES_TYPE);
-        SPHelper.saveToPrefs(context,MY_COURSES,coursesJson);
+        MySchedule mySchedule = getMySchedule(context);
+        mySchedule.getCourseList().remove(course);
+        String coursesJson = new Gson().toJson(mySchedule, MySchedule.class);
+        SPHelper.saveToPrefs(context, MY_COURSES, coursesJson);
     }
 
-    public static List<MyCourseModel> getCourses(Context context) {
+    public static MySchedule getMySchedule(Context context) {
         String coursesJson = SPHelper.getFromPrefs(context, MY_COURSES);
-        ArrayList<MyCourseModel> myCoursesList;
+        MySchedule mySchedule;
         if (coursesJson != null){
-            myCoursesList = new Gson().fromJson(coursesJson,MY_COURSES_TYPE);
+            // avoid exceptions from old data
+            try {
+                mySchedule = new Gson().fromJson(coursesJson, MySchedule.class);
+            } catch (Exception e){
+                mySchedule = new MySchedule();
+            }
         } else {
-            myCoursesList = new ArrayList<>();
+            mySchedule = new MySchedule();
         }
-        return myCoursesList;
+        return mySchedule;
+    }
+
+    public static void updateCourses(Context context, List<MyCourse> courseList) {
+        if (courseList == null){
+            Log.e(TAG,"Empty data passed");
+            return;
+        }
+        MySchedule mySchedule = getMySchedule(context);
+        mySchedule.setCourseList(courseList);
+        String coursesJson = new Gson().toJson(mySchedule, MySchedule.class);
+        SPHelper.saveToPrefs(context, MY_COURSES, coursesJson);
+        setCoursesUpdated(context, true);
+    }
+
+    public static void setCourses(Context context, List<MyCourse> courseList) {
+        updateCourses(context, courseList);
+        setCoursesUpdated(context, false);
     }
 
     public static boolean isCoursesUpdated(Context context) {
@@ -224,78 +244,15 @@ public class User {
         }
     }
 
-    public static void fetchCoursesData(final Context context, final Runnable callback){
-        // fetch data synchronously then rebuild schedule
-        fetchingData = true;
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                boolean hasError = false;
-                // calculate current year and semester
-                Calendar calendar = Calendar.getInstance();
-                int year = calendar.get(Calendar.YEAR);
-                int month = calendar.get(Calendar.MONTH)+1;
-                String semester;
-                if (month > 1 && month < 7){ // Second semester
-                    year -= 1;
-                    semester = "2";
-                    Log.d(TAG, "case 1");
-                }
-                else if (month > 6 && month < 10) { // Summer semester
-                    year -= 1;
-                    semester = "3";
-                    Log.d(TAG, "case 2");
-                }
-                else { // First semester (from 9 to 12)
-                    semester = "1";
-                    Log.d(TAG, "case 3");
-                }
-                // fetch data of current course
-                for (final MyCourseModel course : getCourses(context)) {
-                    try {
-                        Response<ResponseBody> response = ServiceGenerator.createService(UOBSchedule.class)
-                                .sectionsList("1",course.courseName,course.departmentCode,course.courseNumber,
-                                        "0", String.valueOf(year),semester).execute();
-                        if (response.code() == 200){
-                            String sectionsPattern = "(Sec\\. \\[ </FONT><FONT color=\"#FF0000\">" + course.sectionNumber +
-                                    "</FONT>[\\s\\S]*?<TABLE[\\s\\S]*?</TABLE>[\\s\\S]*?)";
-                            Pattern pSections =
-                                    Pattern.compile(sectionsPattern,Pattern.UNIX_LINES | Pattern.CASE_INSENSITIVE);
-                            Matcher mSections = pSections.matcher(response.body().string());
-                            if (mSections.find()){
-                                course.update(mSections.group(1));
-                                User.updateCourse(context, course);
-                            }
-                        }
-                    } catch (IOException e) {
-                        hasError = true;
-                        Log.e(TAG,"Something goes wrong");
-                        break;
-                    }
-                }
-                if (!hasError && isNotificationOn(context)){
-                    stopNotificationSchedule(context);
-                    for (MyCourseModel course : getCourses(context)){
-                        for (SectionTimeModel time : course.times){
-                            scheduleNotification(context, course, time);
-                        }
-                    }
-                }
-                setCoursesUpdated(context, !hasError);
-                fetchingData = false;
-                callback.run();
-            }
-        });
-    }
-
-    private static void updateCourse(Context context, MyCourseModel course) {
+    private static void updateCourse(Context context, MyCourse course) {
         if (course == null){
             Log.e(TAG,"Empty data passed");
+            return;
         }
-        List<MyCourseModel> myCoursesList = getCourses(context);
-        myCoursesList.remove(course);
-        myCoursesList.add(course);
-        String coursesJson = new Gson().toJson(myCoursesList,MY_COURSES_TYPE);
+        MySchedule mySchedule = getMySchedule(context);
+        mySchedule.getCourseList().remove(course);
+        mySchedule.getCourseList().add(course);
+        String coursesJson = new Gson().toJson(mySchedule, MySchedule.class);
         SPHelper.saveToPrefs(context,MY_COURSES,coursesJson);
     }
 

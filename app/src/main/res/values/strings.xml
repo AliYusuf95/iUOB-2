@@ -81,6 +81,12 @@
     <string name="h">H</string>
     <string name="summary">Summary</string>
 
+    <string name="done">Done</string>
+    <string name="undo">Undo</string>
+    <string name="erase">Erase</string>
+    <string name="save">Save</string>
+    <string name="clear_all">Clear All</string>
+
     <string name="ic_close">"\ue918"</string>
     <string name="ic_text">"\ue945"</string>
     <string name="ic_draw">""\ue944</string>

@@ -31,10 +31,8 @@ import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.app.Constants;
 import com.muqdd.iuob2.app.User;
-import com.muqdd.iuob2.models.MyCourseModel;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,8 +53,7 @@ public class AddCoursesFragment extends BaseFragment {
     @BindView(R.id.main_content) LinearLayout mainContent;
     @BindView(R.id.recycler_view) SuperRecyclerView recyclerView;
 
-    private List<MyCourseModel> coursesList;
-    private FastItemAdapter<MyCourseModel> fastAdapter;
+    private FastItemAdapter<MyCourse> fastAdapter;
     private View mView;
 
     public AddCoursesFragment() {
@@ -123,7 +120,6 @@ public class AddCoursesFragment extends BaseFragment {
     private void initiate() {
         // initialize variables
         fastAdapter = new FastItemAdapter<>();
-        coursesList = User.getCourses(getContext());
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(),
@@ -132,33 +128,33 @@ public class AddCoursesFragment extends BaseFragment {
         recyclerView.getSwipeToRefresh().setEnabled(false);
         recyclerView.setAdapter(fastAdapter);
 
-        fastAdapter.add(coursesList);
-        fastAdapter.withOnClickListener(new FastAdapter.OnClickListener<MyCourseModel>() {
+        fastAdapter.add(User.getMySchedule(getContext()).getCourseList());
+        fastAdapter.withOnClickListener(new FastAdapter.OnClickListener<MyCourse>() {
             @Override
-            public boolean onClick(View v, IAdapter<MyCourseModel> adapter,
-                                   MyCourseModel item, int position) {
+            public boolean onClick(View v, IAdapter<MyCourse> adapter,
+                                   MyCourse item, int position) {
                 return true;
             }
         });
 
-        fastAdapter.withItemEvent(new ClickEventHook<MyCourseModel>(){
+        fastAdapter.withItemEvent(new ClickEventHook<MyCourse>(){
             @Nullable
             @Override
             public View onBind(@NonNull RecyclerView.ViewHolder viewHolder) {
-                if (viewHolder instanceof MyCourseModel.ViewHolder){
-                    return ((MyCourseModel.ViewHolder) viewHolder).delete;
+                if (viewHolder instanceof MyCourse.ViewHolder){
+                    return ((MyCourse.ViewHolder) viewHolder).delete;
                 }
                 return null;
             }
 
             @Override
-            public void onClick(View v, int position, FastAdapter<MyCourseModel> fastAdapter, MyCourseModel item) {
+            public void onClick(View v, int position, FastAdapter<MyCourse> fastAdapter, MyCourse item) {
                 showDeleteDialog(item,position);
             }
         });
     }
 
-    private void showDeleteDialog(final MyCourseModel item, final int position) {
+    private void showDeleteDialog(final MyCourse item, final int position) {
         final Dialog dialog = new Dialog(getContext());
         // prepare dialog layout
         LayoutInflater inflater =
@@ -255,16 +251,16 @@ public class AddCoursesFragment extends BaseFragment {
                 if (section.length() == 1){
                     section = "0"+section;
                 }
-                MyCourseModel mCourseModel = new MyCourseModel(courseName,courseNumber,section);
+                MyCourse mCourse = new MyCourse(courseName+courseNumber, section);
                 // check if section already added
-                if (fastAdapter.getAdapterItems().contains(mCourseModel)){
+                if (fastAdapter.getAdapterItems().contains(mCourse)){
                     dialog.dismiss();
                     Snackbar.make(mainContent,"Section already exist",Snackbar.LENGTH_SHORT).show();
                     return;
                 }
                 // add section and store it
-                fastAdapter.add(mCourseModel);
-                User.addCourse(getContext(),mCourseModel);
+                fastAdapter.add(mCourse);
+                User.addCourse(getContext(),mCourse);
                 Snackbar.make(mainContent,"Course added",Snackbar.LENGTH_SHORT).show();
                 if (dialog.isShowing()) {
                     dialog.dismiss();

@@ -1,4 +1,4 @@
-package com.muqdd.iuob2.vendor.photoEditSDK;
+package com.muqdd.iuob2.utils;
 
 import android.content.Context;
 import android.database.Cursor;

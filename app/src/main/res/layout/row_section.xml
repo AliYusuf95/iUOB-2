@@ -50,18 +50,17 @@
                     android:textAppearance="?android:textAppearanceListItem" />
 
                 <TextView
-                    android:id="@+id/available_seats"
+                    android:id="@+id/status"
                     android:layout_width="0dp"
                     android:layout_gravity="center"
                     android:layout_height="match_parent"
                     android:layout_weight="0.15"
-                    tools:text="10"
+                    tools:text="Open"
                     android:maxLines="1"
                     android:gravity="end|center_vertical"
                     android:textSize="@dimen/row_primary_text"
                     android:drawablePadding="12dp"
                     android:padding="10dp"
-                    android:drawableEnd="@drawable/ic_event_seat_18dp"
                     android:textColor="@color/colorPrimaryText"
                     android:textAppearance="?android:textAppearanceListItem" />
 

@@ -3,6 +3,9 @@ package com.muqdd.iuob2.features.semester_schedule;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.view.ViewGroup;
+
+import com.muqdd.iuob2.models.CoursePrefix;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,30 +17,30 @@ import java.util.List;
 @SuppressWarnings({"unused","WeakerAccess"})
 class SemesterPagerAdapter extends FragmentStatePagerAdapter {
 
-    private final List<Fragment> fragmentList = new ArrayList<>();
+    private final List<List<CoursePrefix>> fragmentList = new ArrayList<>();
     private final List<String> fragmentTitleList = new ArrayList<>();
 
     SemesterPagerAdapter(FragmentManager fragmentManager) {
         super(fragmentManager);
     }
 
-    void addFragment(Fragment fragment, String title) {
-        fragmentList.add(fragment);
+    void addCoursePrefixFragment(List<CoursePrefix> list, String title) {
+        fragmentList.add(list);
         fragmentTitleList.add(title);
         notifyDataSetChanged();
     }
 
-    void addFragment(Fragment fragment, String title, int pos) {
+    void addCoursePrefixFragment(List<CoursePrefix> list, String title, int pos) {
         if (pos > -1 && pos <= fragmentList.size()) {
-            fragmentList.add(pos, fragment);
+            fragmentList.add(pos, list);
             fragmentTitleList.add(pos, title);
             notifyDataSetChanged();
         } else {
-            addFragment(fragment,title);
+            addCoursePrefixFragment(list, title);
         }
     }
 
-    void removeFragment(Fragment fragment){
+    void removeCoursePrefixFragment(List<CoursePrefix> fragment){
         int index = fragmentList.indexOf(fragment);
         if (index != -1){
             fragmentList.remove(index);
@@ -48,7 +51,12 @@ class SemesterPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return fragmentList.get(position);
+        if (fragmentList.get(position).size() < 0) {
+            return null;
+        }
+        int year = fragmentList.get(position).get(0).getYear();
+        int semester = fragmentList.get(position).get(0).getSemester();
+        return PrefixesFragment.newInstance(year, semester, fragmentList.get(position));
     }
 
     @Override
@@ -61,7 +69,4 @@ class SemesterPagerAdapter extends FragmentStatePagerAdapter {
         return fragmentTitleList.get(position);
     }
 
-    public Fragment getFragment(int position) {
-        return fragmentList.get(position);
-    }
 }

@@ -1,22 +1,26 @@
 package com.muqdd.iuob2.network;
 
 import com.muqdd.iuob2.app.Auth;
-import com.muqdd.iuob2.models.CalendarSemesterModel;
+import com.muqdd.iuob2.features.my_schedule.MyCourse;
+import com.muqdd.iuob2.models.Course;
+import com.muqdd.iuob2.models.CoursePrefix;
+import com.muqdd.iuob2.models.RestResponse;
+import com.muqdd.iuob2.models.Section;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.DELETE;
 import retrofit2.http.Field;
+import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
-import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
@@ -98,7 +102,34 @@ public interface iUOBApi {
 
     @GET("view-story")
     Call<List<Auth>> viewStory(
-            @Field("userId") String userId,
-            @Field("storyId") String storyId
+            @Query("userId") String userId,
+            @Query("storyId") String storyId
+    );
+
+    @GET("ucs/fetch-course-prefixes")
+    Call<RestResponse<List<String>>> coursesPrefix(
+            @Query("year") int year,
+            @Query("sem") int semester
+    );
+
+    @GET("ucs/fetch-courses")
+    Call<RestResponse<List<Course>>> courses(
+            @Query("year") int year,
+            @Query("sem") int semester,
+            @Query("codePrefix") String codePrefix
+    );
+
+    @GET("ucs/fetch-sections")
+    Call<RestResponse<List<Section>>> sections(
+            @Query("year") String year,
+            @Query("sem") String semester,
+            @Query("courseId") String courseId
+    );
+
+    @GET("ucs/fetch-sections-list")
+    Call<RestResponse<List<List<MyCourse>>>> sectionsList(
+            @Query("year") int year,
+            @Query("sem") int semester,
+            @QueryMap Map<String,String> sections
     );
 }

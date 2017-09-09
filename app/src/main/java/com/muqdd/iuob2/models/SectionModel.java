@@ -158,7 +158,7 @@ public class SectionModel extends BaseModel<SectionModel, SectionModel.ViewHolde
         protected @BindView(R.id.section_number) TextView sectionNumber;
         protected @BindView(R.id.doctor_name) TextView doctorName;
         protected @BindView(R.id.section_time_rows) LinearLayout timeRows;
-        protected @BindView(R.id.available_seats) TextView availableSeats;
+        protected @BindView(R.id.status) TextView availableSeats;
         private Context context;
 
         public ViewHolder(View view) {

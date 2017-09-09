@@ -6,17 +6,14 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.PictureCallback;
 import android.media.CamcorderProfile;
-import android.media.ExifInterface;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -25,14 +22,12 @@ import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.VideoView;
 
 import com.muqdd.iuob2.utils.Utils;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -56,9 +51,14 @@ public class CameraLayout extends RelativeLayout implements ProgressButton.Event
     private ProgressButton mButton;
     private Camera mCamera;
     private MediaRecorder mMediaRecorder;
-    private Camera.CameraInfo mCameraInfo;
 
-    private Uri videoResultFile;
+    /* Results Uri */
+    private Uri videoResult;
+    private Uri pictureResult;
+
+    /* Listeners */
+    private OnRecordListener onRecordListener;
+    private OnCaptureListener onCaptureListener;
 
     /* Flags */
     private boolean safeToTakePicture = false;
@@ -67,16 +67,16 @@ public class CameraLayout extends RelativeLayout implements ProgressButton.Event
     private PictureCallback mPicture = new PictureCallback() {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
-            File pictureFile = Utils.getOutputMediaFile(MEDIA_TYPE_IMAGE);
+            pictureResult = Utils.getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
             mCamera.startPreview();
-            if (pictureFile == null){
+            if (pictureResult == null){
                 //no path to picture, return
                 safeToTakePicture = true;
                 Log.d(TAG, "Error creating media file, check storage permissions: ");
                 return;
             }
             try {
-                FileOutputStream fos = new FileOutputStream(pictureFile);
+                FileOutputStream fos = new FileOutputStream(pictureResult.getPath());
                 Bitmap realImage = BitmapFactory.decodeByteArray(data, 0, data.length);
 
                 // change image orientation
@@ -92,7 +92,10 @@ public class CameraLayout extends RelativeLayout implements ProgressButton.Event
 //                mPreview.draw(bitmapCanvas);
 //                realImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
 
-                showImageView(realImage);
+                if (onCaptureListener != null) {
+                    onCaptureListener.onCapture(realImage, pictureResult);
+                }
+//                showImageView(realImage);
 
                 Log.d(TAG, "File saved");
             } catch (FileNotFoundException e) {
@@ -228,7 +231,10 @@ public class CameraLayout extends RelativeLayout implements ProgressButton.Event
             mCamera.lock();         // take camera access back from MediaRecorder
 
             isRecording = false;
-            showVideoView();
+            if (onRecordListener != null) {
+                onRecordListener.onRecord(videoResult);
+            }
+//            showVideoView();
         }
     }
 
@@ -246,7 +252,10 @@ public class CameraLayout extends RelativeLayout implements ProgressButton.Event
             mCamera.lock();         // take camera access back from MediaRecorder
 
             isRecording = false;
-            showVideoView();
+            if (onRecordListener != null) {
+                onRecordListener.onRecord(videoResult);
+            }
+//            showVideoView();
         }
     }
 
@@ -270,7 +279,7 @@ public class CameraLayout extends RelativeLayout implements ProgressButton.Event
             int numberOfCameras = Camera.getNumberOfCameras();
             for (int i = 0; i < numberOfCameras; i++) {
                 CameraInfo info = new CameraInfo();
-                Camera.getCameraInfo(i, mCameraInfo);
+                Camera.getCameraInfo(i, info);
                 if (info.facing == CameraInfo.CAMERA_FACING_BACK) {
                     Log.d(TAG, "Camera found");
                     cameraId = i;
@@ -301,12 +310,12 @@ public class CameraLayout extends RelativeLayout implements ProgressButton.Event
         mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
 
         // Step 4: Set output file
-        videoResultFile = Utils.getOutputMediaFileUri(MEDIA_TYPE_VIDEO);
-        if (videoResultFile != null) {
-            mMediaRecorder.setOutputFile(videoResultFile.getPath());
+        videoResult = Utils.getOutputMediaFileUri(MEDIA_TYPE_VIDEO);
+        if (videoResult != null) {
+            mMediaRecorder.setOutputFile(videoResult.getPath());
         } else {
             Log.d(TAG, "Can't create file");
-            videoResultFile = null;
+            videoResult = null;
             releaseMediaRecorder();
             return false;
         }
@@ -339,9 +348,9 @@ public class CameraLayout extends RelativeLayout implements ProgressButton.Event
     }
 
     private void showVideoView() {
-        Log.d(TAG, (videoResultFile != null)+" - "+!isRecording);
-        if (!isRecording && videoResultFile != null) {
-            mVideoView.setVideoURI(videoResultFile);
+        Log.d(TAG, (videoResult != null)+" - "+!isRecording);
+        if (!isRecording && videoResult != null) {
+            mVideoView.setVideoURI(videoResult);
             mVideoView.setMediaController(null);
             mVideoView.requestFocus();
 
@@ -391,6 +400,38 @@ public class CameraLayout extends RelativeLayout implements ProgressButton.Event
             mCamera.startPreview();
             safeToTakePicture = true;
         }
+    }
+
+    public OnRecordListener getOnRecordListener() {
+        return onRecordListener;
+    }
+
+    public void setOnRecordListener(OnRecordListener onRecordListener) {
+        this.onRecordListener = onRecordListener;
+    }
+
+    public OnCaptureListener getOnCaptureListener() {
+        return onCaptureListener;
+    }
+
+    public void setOnCaptureListener(OnCaptureListener onCaptureListener) {
+        this.onCaptureListener = onCaptureListener;
+    }
+
+    public boolean isCaptureImages() {
+        return mButton.isWithClick();
+    }
+
+    public void withCaptureImages(boolean captureImages) {
+        mButton.setWithClick(captureImages);
+    }
+
+    public boolean isRecordVideo() {
+        return mButton.isWithLongClick();
+    }
+
+    public void withRecordVideo(boolean recordVideo) {
+        mButton.setWithLongClick(recordVideo);
     }
 
     public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
@@ -454,5 +495,13 @@ public class CameraLayout extends RelativeLayout implements ProgressButton.Event
                 Log.d(TAG, "Error starting camera preview: " + e.getMessage());
             }
         }
+    }
+
+    interface OnCaptureListener {
+        void onCapture(Bitmap bitmap, Uri resultFile);
+    }
+
+    interface OnRecordListener {
+        void onRecord(Uri resultFile);
     }
 }

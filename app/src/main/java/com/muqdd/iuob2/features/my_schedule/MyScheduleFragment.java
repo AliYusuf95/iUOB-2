@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
@@ -20,17 +19,25 @@ import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.app.User;
 import com.muqdd.iuob2.features.main.Menu;
-import com.muqdd.iuob2.models.MyCourseModel;
-import com.muqdd.iuob2.models.SectionTimeModel;
+import com.muqdd.iuob2.models.RestResponse;
+import com.muqdd.iuob2.models.Timing;
+import com.muqdd.iuob2.network.ServiceGenerator;
+import com.muqdd.iuob2.network.iUOBApi;
 import com.orhanobut.logger.Logger;
 
+import java.util.Calendar;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by Ali Yusuf on 3/11/2017.
@@ -49,11 +56,11 @@ public class MyScheduleFragment extends BaseFragment {
     @BindDrawable(R.drawable.ic_notifications_off_24dp) Drawable notificationOff;
 
     private View mView;
-    private Map<SectionTimeModel, MyCourseModel> uList;
-    private Map<SectionTimeModel, MyCourseModel> mList;
-    private Map<SectionTimeModel, MyCourseModel> tList;
-    private Map<SectionTimeModel, MyCourseModel> wList;
-    private Map<SectionTimeModel, MyCourseModel> hList;
+    private Map<Timing, MyCourse> uList;
+    private Map<Timing, MyCourse> mList;
+    private Map<Timing, MyCourse> tList;
+    private Map<Timing, MyCourse> wList;
+    private Map<Timing, MyCourse> hList;
 
     public MyScheduleFragment() {
         // Required empty public constructor
@@ -139,13 +146,14 @@ public class MyScheduleFragment extends BaseFragment {
         });
 
         // section time comparator
-        Comparator<SectionTimeModel> comparator = new Comparator<SectionTimeModel>(){
+        Comparator<Timing> comparator = new Comparator<Timing>(){
             @Override
-            public int compare(SectionTimeModel t1, SectionTimeModel t2) {
+            public int compare(Timing t1, Timing t2) {
                 // compare from then to then room to sort sections
                 int f,t;
-                return (f = t1.from.compareTo(t2.from)) == 0 ?
-                        ((t = t1.room.compareTo(t2.room)) == 0 ? t1.room.compareTo(t2.room) : t ): f;
+                return (f = t1.getTimeFrom().compareTo(t2.getTimeFrom())) == 0 ?
+                        ((t = t1.getLocation().compareTo(t2.getLocation())) == 0 ?
+                                t1.getLocation().compareTo(t2.getLocation()) : t ): f;
             }
         };
 
@@ -158,23 +166,26 @@ public class MyScheduleFragment extends BaseFragment {
     }
 
     private void fetchMyScheduleData() {
-        User.fetchCoursesData(getContext(), new Runnable() {
+        MySchedule mySchedule = User.getMySchedule(getContext());
+        ServiceGenerator.createService(iUOBApi.class).sectionsList(mySchedule.getYear(),
+                mySchedule.getSemester(), mySchedule.getSectionsParam())
+                .enqueue(new Callback<RestResponse<List<List<MyCourse>>>>() {
             @Override
-            public void run() {
-                if (!User.isCoursesUpdated(getContext())) {
-                    User.setFetchingData(false);
-                    Logger.e("error accord while fetching data");
-                    runOnUi(new Runnable() {
-                        @Override
-                        public void run() {
-                            mainContent.setRefreshing(false);
-                        }
-                    });
-                } else {
-                    // update UI
+            public void onResponse(Call<RestResponse<List<List<MyCourse>>>> call, Response<RestResponse<List<List<MyCourse>>>> response) {
+                if (response.body().getStatusCode() == 200) {
+                    User.updateCourses(getContext(), MySchedule.getCoursesList(response.body().getData()));
                     Logger.d("build");
                     buildMySchedule();
+                } else {
+                    mainContent.setRefreshing(false);
+                    Logger.e("error accord while fetching data");
                 }
+            }
+
+            @Override
+            public void onFailure(Call<RestResponse<List<List<MyCourse>>>> call, Throwable t) {
+                mainContent.setRefreshing(false);
+                Logger.e("error accord while fetching data");
             }
         });
     }
@@ -186,51 +197,40 @@ public class MyScheduleFragment extends BaseFragment {
         tList.clear();
         wList.clear();
         hList.clear();
-        for (MyCourseModel course : User.getCourses(getContext())) {
-            if (course.times != null) {
-                for (SectionTimeModel time : course.times) {
-                    if (time.days.contains("U")) {
+        for (MyCourse course : User.getMySchedule(getContext()).getCourseList()) {
+            if (course.getTimingLegacy() != null) {
+                for (Timing time : course.getTimingLegacy()) {
+                    if (time.getDay().contains("U")) {
                         uList.put(time, course);
                     }
-                    if (time.days.contains("M")) {
+                    if (time.getDay().contains("M")) {
                         mList.put(time, course);
                     }
-                    if (time.days.contains("T")) {
+                    if (time.getDay().contains("T")) {
                         tList.put(time, course);
                     }
-                    if (time.days.contains("W")) {
+                    if (time.getDay().contains("W")) {
                         wList.put(time, course);
                     }
-                    if (time.days.contains("H")) {
+                    if (time.getDay().contains("H")) {
                         hList.put(time, course);
                     }
                 }
             }
         }
         // update UI
-        runOnUi(new Runnable() {
-            @Override
-            public void run() {
-                addCoursesForLayout(uLayout,uList);
-                addCoursesForLayout(mLayout,mList);
-                addCoursesForLayout(tLayout,tList);
-                addCoursesForLayout(wLayout,wList);
-                addCoursesForLayout(hLayout,hList);
+        addCoursesForLayout(uLayout,uList);
+        addCoursesForLayout(mLayout,mList);
+        addCoursesForLayout(tLayout,tList);
+        addCoursesForLayout(wLayout,wList);
+        addCoursesForLayout(hLayout,hList);
 
-                mainContent.setRefreshing(false);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        User.setFetchingData(false);
-                    }
-                },200);
-            }
-        });
+        mainContent.setRefreshing(false);
     }
 
-    private void addCoursesForLayout(LinearLayout layout, Map<SectionTimeModel, MyCourseModel> list) {
+    private void addCoursesForLayout(LinearLayout layout, Map<Timing, MyCourse> list) {
         layout.removeAllViews();
-        for (SectionTimeModel time : list.keySet()){
+        for (Timing time : list.keySet()){
             if(list.get(time) != null)
                 layout.addView(createScheduleCell(list.get(time), time));
             else {
@@ -241,13 +241,13 @@ public class MyScheduleFragment extends BaseFragment {
     }
 
     @SuppressLint("SetTextI18n")
-    private View createScheduleCell(final MyCourseModel course, SectionTimeModel time) {
+    private View createScheduleCell(final MyCourse course, Timing time) {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.cell_schedule, null, false);
-        view.findViewById(R.id.layout).setBackgroundColor(course.bgColor);
-        ((TextView)view.findViewById(R.id.course)).setText(course.getCourseTitle());
-        ((TextView)view.findViewById(R.id.time_from)).setText(time.from);
-        ((TextView)view.findViewById(R.id.time_to)).setText(time.to);
-        ((TextView)view.findViewById(R.id.room)).setText(time.room);
+        view.findViewById(R.id.layout).setBackgroundColor(course.getBgColor());
+        ((TextView)view.findViewById(R.id.course)).setText(course.getCourseId());
+        ((TextView)view.findViewById(R.id.time_from)).setText(time.getTimeFrom());
+        ((TextView)view.findViewById(R.id.time_to)).setText(time.getTimeTo());
+        ((TextView)view.findViewById(R.id.room)).setText(time.getLocation());
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -257,10 +257,11 @@ public class MyScheduleFragment extends BaseFragment {
                 LayoutInflater inflater =
                         (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 final View dialogView = inflater.inflate(R.layout.dialog_course_details, null);
-                ((TextView)dialogView.findViewById((R.id.title))).setText(course.getCourseTitle());
-                ((TextView)dialogView.findViewById((R.id.section))).setText("Section: "+course.sectionNumber);
-                ((TextView)dialogView.findViewById((R.id.doctor))).setText("Doctor: "+course.doctor);
-                ((TextView)dialogView.findViewById((R.id.final_time))).setText("Final : "+course.getFinalExam());
+                ((TextView)dialogView.findViewById((R.id.title))).setText(course.getCourseId());
+                ((TextView)dialogView.findViewById((R.id.section))).setText("Section: "+course.getSectionNo());
+                ((TextView)dialogView.findViewById((R.id.doctor))).setText("Doctor: "+course.getInstructor());
+                // TODO: Set exam date
+                ((TextView)dialogView.findViewById((R.id.final_time))).setVisibility(View.GONE);
                 dialogView.findViewById((R.id.close)).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
