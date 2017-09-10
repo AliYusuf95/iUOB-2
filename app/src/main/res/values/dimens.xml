@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="action_bar_default_height_material">56dp</dimen>
+
     <dimen name="title_text">18sp</dimen>
     <dimen name="medium_text">14sp</dimen>
     <dimen name="row_title_text">14sp</dimen>

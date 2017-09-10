@@ -143,9 +143,10 @@ public class SectionsFilterActivity extends BaseActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        if (mItemAdapter != null) {
+        // Stop saving data, try to avoid android.os.TransactionTooLargeException error
+        /*if (mItemAdapter != null) {
             outState.putString(SECTIONS_LIST, new Gson().toJson(mItemAdapter.getAdapterItems(), SECTIONS_LIST_TYPE));
-        }
+        }*/
         super.onSaveInstanceState(outState);
     }
 

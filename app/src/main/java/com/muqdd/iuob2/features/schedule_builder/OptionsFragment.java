@@ -343,69 +343,10 @@ public class OptionsFragment extends BaseFragment {
                         }
                     }
                 });
-//        ServiceGenerator.createService(UOBSchedule.class)
-//                .sectionsList("1",course.courseName,course.departmentCode,course.courseNumber,
-//                        "0", year, semester)
-//                .enqueue(new Callback<ResponseBody>() {
-//                    @Override
-//                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                        if (response.code() == 200){
-//                            try {
-//                                String responseString = response.body().string();
-//                                if (responseString.contains("The Schedule Will Be Announced Later") ||
-//                                        responseString.trim().isEmpty()){
-//                                    throw new IllegalStateException("Schedule for " + year + "\\" + semester + " is not " +
-//                                            "available. Make sure you select the right semester.");
-//                                }
-//                                // add sections list to the course
-//                                BCourse.parseSectionsData(allCourseList.get(index),responseString);
-//                                if (allCourseList.get(index).sections.size() == 0){
-//                                    throw new IllegalStateException("Course [" + allCourseList.get(index).courseName +
-//                                            allCourseList.get(index).courseNumber + "] not found.");
-//                                }
-//                            } catch (IOException e) {
-//                                if (failDialog == null && getContext() != null) {
-//                                    failDialog = infoDialog("Sorry", "Some thing goes wrong while " +
-//                                            "getting data. Please try again later.", "close");
-//                                    failDialog.show();
-//                                }
-//                                Logger.w("Something goes wrong");
-//                            } catch (IllegalStateException e){
-//                                if (failDialog == null && getContext() != null) {
-//                                    failDialog = infoDialog("Sorry", e.getMessage(), "close");
-//                                    failDialog.show();
-//                                }
-//                                Logger.w("Something goes wrong");
-//                            }
-//                            // is loading data finished
-//                            if (++dataLoadingCounter == allCourseList.size()){
-//                                dataLoadingCounter = 0;
-//                                // enable filter options
-//                                setSegmentGroupEnabled(daySegment, true);
-//                                setSegmentGroupEnabled(startSegment, true);
-//                                setSegmentGroupEnabled(finishSegment, true);
-//                                setSegmentGroupEnabled(locationSegment, true);
-//                                btnSectionFilter.setEnabled(true);
-//                                // calculate combinations
-//                                calculateCombinations();
-//                            }
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-//                        if (failDialog == null && getContext() != null) {
-//                            failDialog = t instanceof NoConnectivityException ?
-//                                    infoDialog("Error", "The Internet Connection appears to be offline.", "close") :
-//                                    infoDialog("Sorry", "Schedule for " + year + "\\" + semester + " is not " +
-//                                            "available. Make sure you select the right semester.", "close");
-//                            failDialog.show();
-//                        }
-//                    }
-//                });
     }
 
     private void calculateCombinations(){
+        checkPrimaryData(); // just to make sure and try to avoid crashes
         cCount = 0; // combinations count
         myCourseList.clear(); // clear filtered courses list
         for (BCourse course : allCourseList){
@@ -494,7 +435,7 @@ public class OptionsFragment extends BaseFragment {
             try {
                 int number = Integer.parseInt(time.getLocation().substring(0, time.getLocation().indexOf("-") - 1));
                 isSakeer = !(number > 0 && number < 38);
-            } catch (NumberFormatException e) {
+            } catch (StringIndexOutOfBoundsException | NumberFormatException e) {
                 isSakeer = !time.getLocation().startsWith("A27");
             }
             isValid = (location.equals("s") == isSakeer) && isValid;

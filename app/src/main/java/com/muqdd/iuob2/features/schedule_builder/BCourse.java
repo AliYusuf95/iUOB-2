@@ -60,6 +60,9 @@ public class BCourse extends BaseModel<BCourse, BCourse.ViewHolder> {
     }
 
     public List<BSection> getSections() {
+        if (sections == null){
+            sections = new ArrayList<>();
+        }
         return sections;
     }
 

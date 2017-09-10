@@ -44,13 +44,16 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorPrimary" />
 
-        <activity android:name=".features.main.MainActivity"/>
-        <activity android:name=".features.schedule_builder.SectionsFilterActivity"/>
+        <activity android:name=".features.main.MainActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".features.schedule_builder.SectionsFilterActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".features.stories.StoriesActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".features.splash.SplashActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
