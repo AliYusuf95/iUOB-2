@@ -10,6 +10,7 @@ import com.mikepenz.fastadapter.AbstractAdapter;
 import com.mikepenz.fastadapter.IItem;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.features.schedule_builder.BSection;
+import com.orhanobut.logger.Logger;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 
 import java.util.List;
@@ -24,7 +25,6 @@ public class StickyHeaderAdapter extends AbstractAdapter implements StickyRecycl
     @Override
     public long getHeaderId(int position) {
         IItem item = getItem(position);
-
         if (item instanceof BSection) {
             return (long) ((BSection) item).getHeaderId();
         }

@@ -7,6 +7,8 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.muqdd.iuob2.BuildConfig;
 import com.muqdd.iuob2.R;
+import com.orhanobut.logger.AndroidLogAdapter;
+import com.orhanobut.logger.Logger;
 
 /**
  * Created by Ali Yusuf on 3/10/2017.
@@ -22,6 +24,7 @@ public class iUobApplication extends Application {
         super.onCreate();
 
         if (BuildConfig.DEBUG) {
+            Logger.addLogAdapter(new AndroidLogAdapter());
             // disable Firebase crashes
             Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                 @Override

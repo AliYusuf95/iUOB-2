@@ -21,6 +21,7 @@ import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseActivity;
 import com.muqdd.iuob2.app.Constants;
 import com.muqdd.iuob2.app.adapters.StickyHeaderAdapter;
+import com.muqdd.iuob2.utils.SPHelper;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 
 import java.lang.reflect.Type;
@@ -63,8 +64,8 @@ public class SectionsFilterActivity extends BaseActivity {
             getSupportActionBar().setTitle(R.string.activity_sections_filter);
         }
 
-        if (getIntent().hasExtra(Constants.INTENT_SECTIONS_LIST)){
-            String json = getIntent().getStringExtra(Constants.INTENT_SECTIONS_LIST);
+        String json = SPHelper.getFromPrefs(this, Constants.SB_SECTIONS_LIST);
+        if (json != null && !json.equals("")){
             mCourseList = new Gson().fromJson(json, COURSES_LIST_TYPE);
         }
         if (mCourseList == null || mCourseList.size() == 0) {
@@ -117,10 +118,10 @@ public class SectionsFilterActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.done:
-                Intent intent = new Intent();
+                // save sections data in shared preference
                 BSection.putSectionsIntoCoursesList(mCourseList, mItemAdapter.getAdapterItems());
-                intent.putExtra(Constants.INTENT_SECTIONS_LIST, new Gson().toJson(mCourseList, COURSES_LIST_TYPE));
-                setResult(Activity.RESULT_OK, intent);
+                SPHelper.saveToPrefs(this , Constants.SB_SECTIONS_LIST, new Gson().toJson(mCourseList, COURSES_LIST_TYPE));
+                setResult(Activity.RESULT_OK);
                 finish();
                 break;
             case R.id.select_all:

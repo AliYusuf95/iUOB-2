@@ -18,6 +18,7 @@ android {
         applicationId "com.muqdd.iuob2"
         minSdkVersion 21
         compileSdkVersion 26
+        targetSdkVersion 26
         versionCode 7
         versionName "1.4.1"
         renderscriptSupportModeEnabled true
@@ -34,6 +35,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileSdkVersion 26
 }
 
 dependencies {

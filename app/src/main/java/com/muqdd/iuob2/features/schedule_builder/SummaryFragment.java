@@ -36,9 +36,7 @@ import butterknife.ButterKnife;
 public class SummaryFragment extends BaseFragment {
 
     private final static String COURSES_LIST = "COURSES_LIST";
-    private final static String SCHEDULES_LIST = "SCHEDULES_LIST";
     private final static Type COURSES_LIST_TYPE = new TypeToken<List<BCourse>>() {}.getType();
-    private final static Type SCHEDULES_LIST_TYPE = new TypeToken<List<List<BSection>>>() {}.getType();
 
     @BindView(R.id.main_content) LinearLayout mainContent;
     @BindView(R.id.progress_bar) ProgressBar progressBar;

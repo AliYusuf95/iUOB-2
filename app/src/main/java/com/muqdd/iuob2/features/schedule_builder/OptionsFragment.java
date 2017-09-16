@@ -24,11 +24,13 @@ import com.google.gson.reflect.TypeToken;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.app.Constants;
+import com.muqdd.iuob2.models.FinalExam;
 import com.muqdd.iuob2.models.RestResponse;
 import com.muqdd.iuob2.models.Timing;
 import com.muqdd.iuob2.network.ConnectivityInterceptor.NoConnectivityException;
 import com.muqdd.iuob2.network.IUOBApi;
 import com.muqdd.iuob2.network.ServiceGenerator;
+import com.muqdd.iuob2.utils.SPHelper;
 import com.orhanobut.logger.Logger;
 
 import java.lang.reflect.Type;
@@ -102,14 +104,19 @@ public class OptionsFragment extends BaseFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == SECTIONS_FILTER && resultCode == Activity.RESULT_OK){
-            if (data.hasExtra(Constants.INTENT_SECTIONS_LIST)){
-                String json = data.getStringExtra(Constants.INTENT_SECTIONS_LIST);
-                allCourseList = new Gson().fromJson(json, COURSES_LIST_TYPE);
-                sectionFilter = true;
-                imgSectionFilter.setVisibility(View.VISIBLE);
-                calculateCombinations();
+        if (requestCode == SECTIONS_FILTER){
+            if (resultCode == Activity.RESULT_OK){
+                // get data from shared preference
+                String json = SPHelper.getFromPrefs(getContext(), Constants.SB_SECTIONS_LIST);
+                if (json != null && !json.equals("")){
+                    allCourseList = new Gson().fromJson(json, COURSES_LIST_TYPE);
+                    sectionFilter = true;
+                    imgSectionFilter.setVisibility(View.VISIBLE);
+                    calculateCombinations();
+                }
             }
+            // clear shared preference
+            SPHelper.deleteFromPrefs(getContext(), Constants.SB_SECTIONS_LIST);
         }
     }
 
@@ -349,7 +356,26 @@ public class OptionsFragment extends BaseFragment {
         checkPrimaryData(); // just to make sure and try to avoid crashes
         cCount = 0; // combinations count
         myCourseList.clear(); // clear filtered courses list
+        Logger.d("calculateCombinations");
         for (BCourse course : allCourseList){
+            // check final clash
+            for (BCourse tempCourse : allCourseList) {
+                // check if the courses have sections
+                if (course.getSections() == null || course.getSections().size() < 1 ||
+                        tempCourse.getSections() == null || tempCourse.getSections().size() < 1 )
+                    continue;
+                // check in there is clash in exam day
+                FinalExam examA = course.getSections().get(0).getExam();
+                FinalExam examB = tempCourse.getSections().get(0).getExam();
+                if (!course.equals(tempCourse) && examA != null && examB != null && examA.hasClash(examB)){
+                    if (failDialog == null && getContext() != null) {
+                        failDialog = infoDialog("Final exam clash", "There is a clash in the final exam" +
+                                "between "+course.getId()+" and "+tempCourse.getId(), "close");
+                        failDialog.show();
+                        break;
+                    }
+                }
+            }
             int sCount = 0; // available sections count
             List<BSection> validSections = new ArrayList<>(); // valid section list
             for (BSection section : course.getSections()){
@@ -504,8 +530,9 @@ public class OptionsFragment extends BaseFragment {
 
     @OnClick(R.id.section_filter)
     protected void startSectionFilter() {
+        // save sections data in shared preference
+        SPHelper.saveToPrefs(getContext(), Constants.SB_SECTIONS_LIST, new Gson().toJson(allCourseList, COURSES_LIST_TYPE));
         Intent intent = new Intent(getActivity(), SectionsFilterActivity.class);
-        intent.putExtra(Constants.INTENT_SECTIONS_LIST, new Gson().toJson(allCourseList, COURSES_LIST_TYPE));
         startActivityForResult(intent, SECTIONS_FILTER);
     }
 }

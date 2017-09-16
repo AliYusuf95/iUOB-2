@@ -14,6 +14,7 @@ import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseModel;
 import com.muqdd.iuob2.models.FinalExam;
 import com.muqdd.iuob2.models.Timing;
+import com.orhanobut.logger.Logger;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -82,7 +83,7 @@ public class BSection extends BaseModel<BSection, BSection.ViewHolder> {
     }
 
     public int getHeaderId() {
-        return (courseId).hashCode();
+        return ((courseId).hashCode() & 0xfffffff);
     }
 
     public void setId(String id) {

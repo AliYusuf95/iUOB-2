@@ -226,7 +226,6 @@ public class TimeTableFragment extends BaseFragment {
             if(list.get(time) != null)
                 layout.addView(createScheduleCell(list.get(time), time));
             else {
-                Logger.i("null");
                 Logger.i(time.toString());
             }
         }
