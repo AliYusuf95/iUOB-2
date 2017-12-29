@@ -8,11 +8,10 @@
 .externalNativeBuild
 /app/google-services.json
 gradle.properties
-app/app-release.apk
 app/libs/
 keystore.jks
 /screanshots/
-/.idea/
+/.idea
 /keystore.properties
 /pepk.jar
 /private_key.pky

@@ -8,7 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.muqdd.iuob2.BuildConfig;
 import com.muqdd.iuob2.app.Auth;
-import com.muqdd.iuob2.app.User;
+import com.muqdd.iuob2.models.User;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -23,7 +23,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 @SuppressWarnings("WeakerAccess")
 public class ServiceGenerator {
 
-    public static final String API_BASE_URL = "https://iuob.net/";
+    public static final String API_BASE_URL = !BuildConfig.DEBUG ? "http://10.0.2.2:8080" : "https://iuob.net/";
 
     private static ConnectivityManager connectivityManager;
 

@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.muqdd.iuob2.R;
-import com.muqdd.iuob2.features.stories.StoriesActivity;
+import com.muqdd.iuob2.features.stories.CaptureActivity;
 
 import java.util.ArrayList;
 
@@ -25,13 +25,13 @@ import java.util.ArrayList;
 public class ImageFragment extends Fragment implements ImageAdapter.OnImageClickListener {
 
     private ArrayList<Bitmap> stickerBitmaps;
-    private StoriesActivity photoEditorActivity;
+    private CaptureActivity photoEditorActivity;
     private RecyclerView imageRecyclerView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        photoEditorActivity = (StoriesActivity) getActivity();
+        photoEditorActivity = (CaptureActivity) getActivity();
 
         TypedArray images = getResources().obtainTypedArray(R.array.photo_editor_photos);
         stickerBitmaps = new ArrayList<>();

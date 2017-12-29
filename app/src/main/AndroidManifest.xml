@@ -24,33 +24,6 @@
         android:fullBackupContent="@xml/backup_scheme"
         android:theme="@style/AppTheme">
 
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
-        <!--The API key for Google Maps-based APIs.-->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
-
-        <meta-data
-            android:name="com.google.android.gms.analytics.globalConfigResource"
-            android:resource="@xml/global_tracker"/>
-
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/ic_stat_logo_white" />
-
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_color"
-            android:resource="@color/colorPrimary" />
-
-        <activity android:name=".features.main.MainActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".features.schedule_builder.SectionsFilterActivity"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name=".features.stories.StoriesActivity"
-            android:screenOrientation="portrait"/>
         <activity
             android:name=".features.splash.SplashActivity"
             android:screenOrientation="portrait"
@@ -68,6 +41,43 @@
                     android:pathPrefix="/" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".features.main.MainActivity"
+            android:screenOrientation="portrait" />
+
+        <activity android:name=".features.schedule_builder.SectionsFilterActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".features.stories.CaptureActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".features.stories.StatusStoriesActivity"
+            android:screenOrientation="portrait" />
+
+        <!-- Meta Data -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            tools:replace="android:value"
+            android:value="@integer/google_play_services_version" />
+        <!--The API key for Google Maps-based APIs.-->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            tools:replace="android:value"
+            android:value="@string/google_maps_key" />
+
+        <meta-data
+            android:name="com.google.android.gms.analytics.globalConfigResource"
+            android:resource="@xml/global_tracker"/>
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_logo_white" />
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorPrimary" />
 
         <!-- FCM Services -->
         <service android:name=".notification.RegistrationIntentService" android:exported="false"/>

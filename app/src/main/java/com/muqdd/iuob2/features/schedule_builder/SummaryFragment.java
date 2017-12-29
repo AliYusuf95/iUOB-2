@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -62,7 +63,7 @@ public class SummaryFragment extends BaseFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater,container,savedInstanceState);
         if (mView == null) {
             // Inflate the layout for this fragment
@@ -104,7 +105,6 @@ public class SummaryFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
         toolbar.setTitle(title);
-        params.setScrollFlags(0); // stop hiding toolbar
         checkPrimaryData();
         if (nextMenuItem != null && mSchedulesList != null) {
             nextMenuItem.setEnabled(mSchedulesList.size() > 0);

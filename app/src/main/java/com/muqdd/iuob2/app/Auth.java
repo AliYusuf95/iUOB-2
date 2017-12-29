@@ -3,9 +3,9 @@ package com.muqdd.iuob2.app;
 import android.content.Context;
 import android.util.Log;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import com.muqdd.iuob2.models.User;
 import com.muqdd.iuob2.utils.SPHelper;
+import com.muqdd.iuob2.utils.TextUtils;
 
 /**
  * Created by Ali Yusuf on 9/3/2017.
@@ -18,10 +18,6 @@ public class Auth {
     private transient static final String FCM_TOKEN = "FCM_TOKEN";
     private transient static final String FCM_TOKEN_SENT = "FCM_TOKEN_SENT";
     private transient static final String LOGGED_IN_USER = "LOGGED_IN_USER";
-    @SerializedName("user")
-    @Expose
-    private User user;
-
     /**
      * Adds/Replace login data from {@link User} object into SharedPreferences.
      *
@@ -37,13 +33,12 @@ public class Auth {
         }
 
         // Check login data
-        if (user.getEmail() == null || "".equals(user.getEmail()) ||
-                user.getToken() == null || "".equals(user.getToken())) {
+        if (!TextUtils.hasText(user.getEmail()) || !TextUtils.hasText(user.getToken())) {
             Log.e(TAG, "Auth#login(): Error: attempted to login with empty data.");
             return false;
         }
 
-        SPHelper.saveToPrefs(context, LOGGED_IN_USER, user.getId());
+        SPHelper.saveToPrefs(context, LOGGED_IN_USER, user.toString());
 
         Log.i(TAG, "Auth#login(): Group of services with email (" + user.getEmail() + ") has been saved.");
         return true;
@@ -58,6 +53,16 @@ public class Auth {
     public static boolean isLoggedIn(Context context) {
         User user = getUserData(context);
         return user != null && isValidUser(user);
+    }
+
+    /**
+     * Remove login data from SharedPreferences.
+     *
+     * @param context The application context
+     * @return true if the deletion was successful; false otherwise.
+     */
+    public static boolean logout(Context context) {
+        return SPHelper.deleteFromPrefs(context, LOGGED_IN_USER);
     }
 
     /**

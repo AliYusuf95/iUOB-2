@@ -8,6 +8,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.List;
+
 class MultiTouchListener implements OnTouchListener {
 
     private static final int INVALID_POINTER_ID = -1;
@@ -25,16 +27,18 @@ class MultiTouchListener implements OnTouchListener {
     private int[] stickerViewLocation = new int[2];
     private Rect stickerRect = new Rect();
     private View deleteView;
+    private List<View> toolsViews;
     private View photoEditImageView;
     private RelativeLayout parentView;
 
     private OnMultiTouchListener onMultiTouchListener;
     private OnPhotoEditorSDKListener onPhotoEditorSDKListener;
 
-    MultiTouchListener(View deleteView, RelativeLayout parentView,
+    MultiTouchListener(View deleteView, List<View> toolsViews, RelativeLayout parentView,
                        View photoEditImageView, OnPhotoEditorSDKListener onPhotoEditorSDKListener) {
         mScaleGestureDetector = new ScaleGestureDetector(new ScaleGestureListener());
         this.deleteView = deleteView;
+        this.toolsViews = toolsViews;
         this.parentView = parentView;
         this.photoEditImageView = photoEditImageView;
         this.onPhotoEditorSDKListener = onPhotoEditorSDKListener;
@@ -114,6 +118,9 @@ class MultiTouchListener implements OnTouchListener {
                 mPrevRawY = event.getRawY();
                 mActivePointerId = event.getPointerId(0);
                 deleteView.setVisibility(View.VISIBLE);
+                for (View toolsView : toolsViews) {
+                    toolsView.setVisibility(View.GONE);
+                }
                 view.bringToFront();
                 firePhotoEditorSDKListener(view, true);
                 break;
@@ -147,6 +154,9 @@ class MultiTouchListener implements OnTouchListener {
                     view.animate().translationX(0).translationY(0);
                 }
                 deleteView.setVisibility(View.GONE);
+                for (View toolsView : toolsViews) {
+                    toolsView.setVisibility(View.VISIBLE);
+                }
                 firePhotoEditorSDKListener(view, false);
                 float mCurrentCancelX = event.getRawX();
                 float mCurrentCancelY = event.getRawY();

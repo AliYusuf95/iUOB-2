@@ -62,7 +62,7 @@ public class SchedulesFragment extends BaseFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater,container,savedInstanceState);
         if (mView == null) {
             // Inflate the layout for this fragment
@@ -77,8 +77,6 @@ public class SchedulesFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
         toolbar.setTitle(title);
-        // stop hiding toolbar
-        params.setScrollFlags(0);
         // check primary data
         checkPrimaryData();
     }

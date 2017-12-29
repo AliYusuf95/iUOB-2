@@ -1,6 +1,7 @@
 package com.muqdd.iuob2.features.semester_schedule;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.MenuItemCompat;
@@ -20,6 +21,7 @@ import com.muqdd.iuob2.models.CoursePrefix;
 import com.muqdd.iuob2.models.RestResponse;
 import com.muqdd.iuob2.network.IUOBApi;
 import com.muqdd.iuob2.network.ServiceGenerator;
+import com.muqdd.iuob2.network.UOBSchedule;
 import com.orhanobut.logger.Logger;
 
 import java.util.Calendar;
@@ -60,7 +62,7 @@ public class SemestersHolderFragment extends BaseFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater,container,savedInstanceState);
         if (mView == null) {
             // Inflate the layout for this fragment
@@ -135,33 +137,34 @@ public class SemestersHolderFragment extends BaseFragment {
         // Second semester
         if (month > 3 && month < 7){
             getSemesterCourses(0, year-1, 2);
-//            getSemesterCourses(1, year-1, 3);
-//            getSemesterCourses(2, year, 1);
+            getSemesterCourses(1, year-1, 3);
+            getSemesterCourses(2, year, 1);
             Logger.d("case 1");
         }
         // Summer semester
         else if (month > 6 && month < 9) {
             getSemesterCourses(0, year-1, 3);
-//            getSemesterCourses(1, year, 1);
-//            getSemesterCourses(2, year, 2);
+            getSemesterCourses(1, year, 1);
+            getSemesterCourses(2, year, 2);
             Logger.d("case 2");
         }
         // First semester (from 9 to 12)
         else {
             getSemesterCourses(0, year, 1);
-//            getSemesterCourses(1, year, 2);
-//            getSemesterCourses(2, year, 3);
+            getSemesterCourses(1, year, 2);
+            getSemesterCourses(2, year, 3);
             Logger.d("case 3");
         }
     }
 
     public void getSemesterCourses(final int pos, final int year, final int semester) {
-        ServiceGenerator.createService(IUOBApi.class)
+        ServiceGenerator.createService(UOBSchedule.class)
                 .coursesPrefix(year, semester).enqueue(new Callback<RestResponse<List<String>>>() {
             @Override
-            public void onResponse(Call<RestResponse<List<String>>> call, Response<RestResponse<List<String>>> response) {
-                if (response.body().getStatusCode() == 200){
-                    List<CoursePrefix> list = CoursePrefix.createList(response.body().getData(), year, semester);
+            public void onResponse(@NonNull Call<RestResponse<List<String>>> call, @NonNull Response<RestResponse<List<String>>> response) {
+                RestResponse<List<String>> restResponse = response.body();
+                if (restResponse != null && restResponse.getStatusCode() == 200){
+                    List<CoursePrefix> list = CoursePrefix.createList(restResponse.getData(), year, semester);
                     if (list.size() > 0) {
                         progressBar.setVisibility(View.GONE);
                         pagerAdapter.addCoursePrefixFragment(list, year+"/"+semester, pos);
@@ -170,7 +173,7 @@ public class SemestersHolderFragment extends BaseFragment {
             }
 
             @Override
-            public void onFailure(Call<RestResponse<List<String>>> call, Throwable t) {
+            public void onFailure(@NonNull Call<RestResponse<List<String>>> call, @NonNull Throwable t) {
 
             }
         });

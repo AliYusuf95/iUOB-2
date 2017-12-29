@@ -1,10 +1,18 @@
 package com.muqdd.iuob2.models;
 
+import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.orhanobut.logger.Logger;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Ali Yusuf on 9/3/2017.
@@ -12,6 +20,17 @@ import java.util.List;
  */
 
 public class Story {
+
+    @SerializedName("_id")
+    @Expose
+    private String id;
+    @SerializedName("updatedAt")
+    @Expose
+    private String updatedAt;
+    @SerializedName("createdAt")
+    @Expose
+    private String createdAt;
+    private Date createdAtDate;
     @SerializedName("url")
     @Expose
     private String url;
@@ -32,19 +51,84 @@ public class Story {
     private Integer size;
     @SerializedName("views")
     @Expose
-    private Integer views;
-    @SerializedName("mediaDuration")
-    @Expose
-    private Integer mediaDuration;
-    @SerializedName("location")
-    @Expose
-    private List<Integer> location = new ArrayList<>();
+    private int views;
     @SerializedName("createdBy")
     @Expose
-    private String createdBy;
+    private User createdBy;
+    @SerializedName("location")
+    @Expose
+    private List<Double> location = null;
     @SerializedName("watchedBy")
     @Expose
-    private List<String> watchedBy = new ArrayList<>();
+    private List<User> watchedBy = null;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public String getCreatedAtDuration() {
+        int seconds = calculateCreatedAtDuration();
+        String out ="";
+        int hr = seconds/(60*60);
+        seconds = seconds%(60*60);
+        int min = seconds/(60);
+        seconds = seconds%(60);
+
+        boolean mtrue = false;
+        if(min > 0){
+            mtrue = true;
+            out =  min + " min" +(min == 1 ? " ":"s ");
+        }
+        if(seconds > 0){
+            if(mtrue)
+                out += "and ";
+            out +=  seconds + " s";
+        }
+        if(hr>0) {
+            out =  hr + " hour" +(hr == 1 ? " ":"s ");
+        }
+        return out;
+    }
+
+    private int calculateCreatedAtDuration() {
+        int diff = 0;
+        if (createdAtDate == null) {
+            SimpleDateFormat format =
+                    new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+            try {
+                format.setTimeZone(TimeZone.getTimeZone("UTC"));
+                createdAtDate = format.parse(createdAt);
+                long diffInMillies = Math.abs(createdAtDate.getTime() - new Date().getTime());
+                diff = (int) TimeUnit.SECONDS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+            } catch (ParseException e) {
+                createdAtDate = new Date();
+            }
+        } else {
+            long diffInMillies = Math.abs(createdAtDate.getTime() - new Date().getTime());
+            diff = (int) TimeUnit.SECONDS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+        }
+        return diff;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
 
     public String getUrl() {
         return url;
@@ -86,7 +170,7 @@ public class Story {
         this.title = title;
     }
 
-    public Integer getSize() {
+    public int getSize() {
         return size;
     }
 
@@ -94,43 +178,48 @@ public class Story {
         this.size = size;
     }
 
-    public Integer getViews() {
+    public int getViews() {
         return views;
+    }
+
+    public String getViewsFormat() {
+        return String.format(Locale.getDefault(), "# Views: %s", views);
     }
 
     public void setViews(Integer views) {
         this.views = views;
     }
 
-    public Integer getMediaDuration() {
-        return mediaDuration;
-    }
-
-    public void setMediaDuration(Integer mediaDuration) {
-        this.mediaDuration = mediaDuration;
-    }
-
-    public List<Integer> getLocation() {
-        return location;
-    }
-
-    public void setLocation(List<Integer> location) {
-        this.location = location;
-    }
-
-    public String getCreatedBy() {
+    public User getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(String createdBy) {
+    public void setCreatedBy(User createdBy) {
         this.createdBy = createdBy;
     }
 
-    public List<String> getWatchedBy() {
+    public List<Double> getLocation() {
+        return location;
+    }
+
+    public void setLocation(List<Double> location) {
+        this.location = location;
+    }
+
+    public List<User> getWatchedBy() {
         return watchedBy;
     }
 
-    public void setWatchedBy(List<String> watchedBy) {
+    public void setWatchedBy(List<User> watchedBy) {
         this.watchedBy = watchedBy;
+    }
+
+    @Override
+    public String toString() {
+        return new Gson().toJson(this, Story.class);
+    }
+
+    public static Story fromJson(String json) {
+        return json == null ? null : new Gson().fromJson(json, Story.class);
     }
 }

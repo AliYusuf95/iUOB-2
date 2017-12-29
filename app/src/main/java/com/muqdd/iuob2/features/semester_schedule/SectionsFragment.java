@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -27,6 +28,7 @@ import com.muqdd.iuob2.models.RestResponse;
 import com.muqdd.iuob2.models.Section;
 import com.muqdd.iuob2.network.ServiceGenerator;
 import com.muqdd.iuob2.network.IUOBApi;
+import com.muqdd.iuob2.network.UOBSchedule;
 import com.orhanobut.logger.Logger;
 
 import java.util.List;
@@ -73,10 +75,12 @@ public class SectionsFragment extends BaseFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater,container,savedInstanceState);
         // Inflate the layout for this fragment
-        course = new Gson().fromJson(getArguments().getString(COURSE), Course.class);
+        if (getArguments() != null) {
+            course = new Gson().fromJson(getArguments().getString(COURSE), Course.class);
+        }
         View view = inflater.inflate(R.layout.fragment_list, container, false);
         ButterKnife.bind(this, view);
         // Setup variables and layouts
@@ -89,10 +93,8 @@ public class SectionsFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        // set fragment course
+        // set fragment title
         toolbar.setTitle(title);
-        // stop hiding toolbar
-        params.setScrollFlags(0);
     }
 
     private void initiate() {
@@ -105,33 +107,29 @@ public class SectionsFragment extends BaseFragment {
                 R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryLight);
 
         // refresh request
-        recyclerView.getSwipeToRefresh().setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                getSectionsList();
-            }
-        });
-        fastAdapter.withOnLongClickListener(new FastAdapter.OnLongClickListener<Section>() {
-            @Override
-            public boolean onLongClick(View v, IAdapter<Section> adapter, Section item, int position) {
-                Logger.d(item.toString());
-                ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText("iUOB2", item.toString());
+        recyclerView.getSwipeToRefresh().setOnRefreshListener(this::getSectionsList);
+        fastAdapter.withOnLongClickListener((v, adapter, item, position) -> {
+            Logger.d(item.toString());
+            if (getActivity() == null) return false;
+            ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText("iUOB2", item.toString());
+            if (clipboard != null) {
                 clipboard.setPrimaryClip(clip);
-                Snackbar.make(mainContent,"Section details copied",Snackbar.LENGTH_LONG).show();
-                return false;
             }
+            Snackbar.make(mainContent,"Section details copied",Snackbar.LENGTH_LONG).show();
+            return false;
         });
     }
 
     public void getSectionsList() {
-        ServiceGenerator.createService(IUOBApi.class)
+        ServiceGenerator.createService(UOBSchedule.class)
                 .sections(course.getYear(), course.getSemester(), course.getCode())
                 .enqueue(new Callback<RestResponse<List<Section>>>() {
                     @Override
-                    public void onResponse(Call<RestResponse<List<Section>>> call, final Response<RestResponse<List<Section>>> response) {
-                        if (response.body().getStatusCode() == 200) {
-                            fastAdapter.set(response.body().getData());
+                    public void onResponse(@NonNull Call<RestResponse<List<Section>>> call, @NonNull final Response<RestResponse<List<Section>>> response) {
+                        RestResponse<List<Section>> restResponse = response.body();
+                        if (restResponse != null && restResponse.getStatusCode() == 200) {
+                            fastAdapter.set(restResponse.getData());
                             if (recyclerView.getAdapter() == null) {
                                 recyclerView.setAdapter(fastAdapter);
                             }
@@ -140,7 +138,7 @@ public class SectionsFragment extends BaseFragment {
                     }
 
                     @Override
-                    public void onFailure(Call<RestResponse<List<Section>>> call, Throwable t) {}
+                    public void onFailure(@NonNull Call<RestResponse<List<Section>>> call, @NonNull Throwable t) {}
                 });
     }
 
@@ -153,7 +151,7 @@ public class SectionsFragment extends BaseFragment {
         // create new view
         finalView =
                 LayoutInflater.from(getContext()).inflate(R.layout.row_finalexam_time,null,false);
-        String color = Integer.toHexString(ContextCompat.getColor(getActivity(),R.color.colorAccent) & 0x00ffffff);
+        String color = Integer.toHexString(ContextCompat.getColor(getContext(), R.color.colorAccent) & 0x00ffffff);
         String finalExam = course.getExam().toString();
         finalExam = finalExam.equals("") ? getString(R.string.row_finalexam_time_no_exam) : finalExam;
         String text = String.format(Locale.getDefault(), "<font color=\"#%s\">%s</font> %s",

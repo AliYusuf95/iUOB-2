@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,8 +29,8 @@ import com.muqdd.iuob2.models.FinalExam;
 import com.muqdd.iuob2.models.RestResponse;
 import com.muqdd.iuob2.models.Timing;
 import com.muqdd.iuob2.network.ConnectivityInterceptor.NoConnectivityException;
-import com.muqdd.iuob2.network.IUOBApi;
 import com.muqdd.iuob2.network.ServiceGenerator;
+import com.muqdd.iuob2.network.UOBSchedule;
 import com.muqdd.iuob2.utils.SPHelper;
 import com.orhanobut.logger.Logger;
 
@@ -76,7 +77,6 @@ public class OptionsFragment extends BaseFragment {
     private View mView;
     private List<BCourse> allCourseList; // all courses data
     private List<BCourse> myCourseList; // filtered courses data
-    private Dialog failDialog;
 //    private int dataLoadingCounter; // check if all courses data loaded
     private int cCount; // combinations count
     private MenuItem nextMenuItem;
@@ -121,7 +121,7 @@ public class OptionsFragment extends BaseFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater,container,savedInstanceState);
         if (mView == null) {
             // Inflate the layout for this fragment
@@ -163,8 +163,6 @@ public class OptionsFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
         toolbar.setTitle(title);
-        // stop hiding toolbar
-        params.setScrollFlags(0);
         // check primary data
         checkPrimaryData();
     }
@@ -305,24 +303,22 @@ public class OptionsFragment extends BaseFragment {
     }
 
     private void getCourseData(final int year, final int semester){
-        ServiceGenerator.createService(IUOBApi.class)
+        ServiceGenerator.createService(UOBSchedule.class)
                 .coursesSectionsList(year, semester, BCourse.getCoursesIds(allCourseList))
                 .enqueue(new Callback<RestResponse<List<BCourse>>>() {
                     @Override
-                    public void onResponse(Call<RestResponse<List<BCourse>>> call, Response<RestResponse<List<BCourse>>> response) {
+                    public void onResponse(@NonNull Call<RestResponse<List<BCourse>>> call, @NonNull Response<RestResponse<List<BCourse>>> response) {
                         if (response.body().getStatusCode() != 200) {
-                            if (failDialog == null && getContext() != null) {
-                                failDialog = infoDialog("Sorry", "Some thing goes wrong while " +
-                                        "getting data. Please try again later.", "close");
-                                failDialog.show();
+                            if (getContext() != null) {
+                                infoDialog("Sorry", "Some thing goes wrong while " +
+                                        "getting data. Please try again later.", "close").show();
                             }
                             Logger.w("Something goes wrong");
                         } else {
                             if (response.body().getData().size() < 0) {
-                                if (failDialog == null && getContext() != null) {
-                                    failDialog = infoDialog("Sorry", "Some thing goes wrong while " +
-                                            "getting data. Please try again later.", "close");
-                                    failDialog.show();
+                                if (getContext() != null) {
+                                    infoDialog("Sorry", "Some thing goes wrong while " +
+                                            "getting data. Please try again later.", "close").show();
                                 }
                                 Logger.w("Something goes wrong");
                             } else {
@@ -340,13 +336,12 @@ public class OptionsFragment extends BaseFragment {
                     }
 
                     @Override
-                    public void onFailure(Call<RestResponse<List<BCourse>>> call, Throwable t) {
-                        if (failDialog == null && getContext() != null) {
-                            failDialog = t instanceof NoConnectivityException ?
+                    public void onFailure(@NonNull Call<RestResponse<List<BCourse>>> call, @NonNull Throwable t) {
+                        if (getContext() != null) {
+                            Dialog dialog = t instanceof NoConnectivityException ?
                                     infoDialog("Error", "The Internet Connection appears to be offline.", "close") :
-                                    infoDialog("Sorry", "Schedule for " + year + "\\" + semester + " is not " +
-                                            "available. Make sure you select the right semester.", "close");
-                            failDialog.show();
+                                    infoDialog("Sorry", "Cannot perform the request please try again later.", "close");
+                            dialog.show();
                         }
                     }
                 });
@@ -356,7 +351,7 @@ public class OptionsFragment extends BaseFragment {
         checkPrimaryData(); // just to make sure and try to avoid crashes
         cCount = 0; // combinations count
         myCourseList.clear(); // clear filtered courses list
-        Logger.d("calculateCombinations");
+        Dialog dialog = null;
         for (BCourse course : allCourseList){
             // check final clash
             for (BCourse tempCourse : allCourseList) {
@@ -368,10 +363,10 @@ public class OptionsFragment extends BaseFragment {
                 FinalExam examA = course.getSections().get(0).getExam();
                 FinalExam examB = tempCourse.getSections().get(0).getExam();
                 if (!course.equals(tempCourse) && examA != null && examB != null && examA.hasClash(examB)){
-                    if (failDialog == null && getContext() != null) {
-                        failDialog = infoDialog("Final exam clash", "There is a clash in the final exam" +
+                    if ((dialog == null || !dialog.isShowing()) && getContext() != null) {
+                        dialog = infoDialog("Final exam clash", "There is a clash in the final exam" +
                                 "between "+course.getId()+" and "+tempCourse.getId(), "close");
-                        failDialog.show();
+                        dialog.show();
                         break;
                     }
                 }

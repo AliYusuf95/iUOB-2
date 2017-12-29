@@ -13,7 +13,7 @@ android {
             storePassword keystoreProperties['storePassword']
         }
     }
-    buildToolsVersion "26.0.1"
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "com.muqdd.iuob2"
         minSdkVersion 21
@@ -21,67 +21,96 @@ android {
         targetSdkVersion 26
         versionCode 7
         versionName "1.4.1"
+        renderscriptTargetApi 21
         renderscriptSupportModeEnabled true
         resValue "string", "google_maps_key", (project.findProperty("GOOGLE_MAPS_API_KEY") ?: "")
     }
     buildTypes {
         release {
+//            shrinkResources true
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
         }
         debug {
-            minifyEnabled false
+//            shrinkResources false
+//            minifyEnabled true
+//            useProguard false
+            ext.enableCrashlytics = false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    compileSdkVersion 26
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+// dependencies versions
+ext {
+    versions = [
+            supportLib: '27.0.2',
+            firebaseLib: '11.6.2'
+    ]
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     // Edit photo SDK
-    compile project(path: ':photoeditorsdk')
+    implementation project(':photoeditorsdk')
     // Android
-    compile 'com.android.support:appcompat-v7:26.0.1'
-    compile 'com.android.support:cardview-v7:26.0.1'
-    compile 'com.android.support:design:26.0.1'
+    implementation "com.android.support:appcompat-v7:${versions.supportLib}"
+    implementation "com.android.support:cardview-v7:${versions.supportLib}"
+    implementation "com.android.support:design:${versions.supportLib}"
     // Google Play Services
-    compile 'com.google.android.gms:play-services-maps:11.0.4'
-    compile 'com.google.android.gms:play-services-analytics:11.0.4'
+    implementation "com.google.android.gms:play-services-maps:${versions.firebaseLib}"
+    implementation "com.google.android.gms:play-services-location:${versions.firebaseLib}"
+    implementation "com.google.android.gms:play-services-analytics:${versions.firebaseLib}"
     // Firebase
-    compile 'com.google.firebase:firebase-core:11.0.4'
-    compile 'com.google.firebase:firebase-messaging:11.0.4'
-    compile 'com.google.firebase:firebase-crash:11.0.4'
+    implementation "com.google.firebase:firebase-core:${versions.firebaseLib}"
+    implementation "com.google.firebase:firebase-messaging:${versions.firebaseLib}"
+    implementation "com.google.firebase:firebase-crash:${versions.firebaseLib}"
     // Retrofit
-    compile 'com.squareup.retrofit2:retrofit:2.2.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.2.0'
-    compile 'com.squareup.okhttp3:logging-interceptor:3.9.0'
+    implementation "com.squareup.retrofit2:retrofit:2.3.0"
+    implementation "com.squareup.retrofit2:converter-gson:2.3.0"
+    implementation "com.squareup.okhttp3:logging-interceptor:3.9.0"
     // MaterialDrawer
-    compile('com.mikepenz:materialdrawer:5.9.5@aar') {
+    implementation("com.mikepenz:materialdrawer:5.9.5@aar") {
         transitive = true
     }
     // Butter Knife
-    compile 'com.jakewharton:butterknife:8.8.1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    implementation "com.jakewharton:butterknife:8.8.1"
+    annotationProcessor "com.jakewharton:butterknife-compiler:8.8.1"
     // Logger
-    compile 'com.orhanobut:logger:2.1.1'
+    implementation "com.orhanobut:logger:2.1.1"
     // Super RecyclerView
-    compile 'com.malinskiy:superrecyclerview:1.1.4'
+    implementation "com.malinskiy:superrecyclerview:1.1.4"
     // FastAdapter
-    compile 'com.mikepenz:fastadapter-commons:2.6.3@aar'
-    compile 'com.mikepenz.thirdparty:stickyheadersrecyclerview:0.4.4-SNAPSHOT@aar'
+    implementation "com.mikepenz:fastadapter-commons:2.6.3@aar"
+    implementation "com.mikepenz.thirdparty:stickyheadersrecyclerview:0.4.4-SNAPSHOT@aar"
     // RoundedImageView
-    compile 'com.makeramen:roundedimageview:2.3.0'
+    implementation "com.makeramen:roundedimageview:2.3.0"
     // Material sheet fab
-    compile 'com.gordonwong:material-sheet-fab:1.2.1'
+    implementation "com.gordonwong:material-sheet-fab:1.2.1"
     // Timeline View
-    compile 'com.github.vipulasri:timelineview:1.0.5'
+    implementation "com.github.vipulasri:timelineview:1.0.5"
     // AutoFit TextView
-    compile 'me.grantland:autofittextview:0.2.1'
+    implementation "me.grantland:autofittextview:0.2.1"
     // Segmented Controls
-    compile 'info.hoang8f:android-segmented:1.0.6'
+    implementation "info.hoang8f:android-segmented:1.0.6"
     // View Pager Indicator
-    compile 'fr.avianey.com.viewpagerindicator:library:2.4.1@aar'
+    implementation "fr.avianey.com.viewpagerindicator:library:2.4.1@aar"
+    // Material spinner
+    implementation ("com.github.ganfra:material-spinner:2.0.0") {
+        exclude group: "com.android.support", module: "appcompat-v7"
+    }
+    // Camera button
+    implementation 'com.dewarder:camerabutton-rxjava2:1.0.0'
+    // Glide
+    implementation 'com.github.bumptech.glide:glide:3.9.0-SNAPSHOT'
+    // StatusStories
+    compile 'com.github.RahulJanagouda:StatusStories:1.0.1'
+    // SwipeBack
+    compile 'com.github.liuguangqiang.swipeback:library:1.0.2@aar'
 }
-apply plugin: 'com.google.gms.google-services'
+apply plugin: "com.google.gms.google-services"

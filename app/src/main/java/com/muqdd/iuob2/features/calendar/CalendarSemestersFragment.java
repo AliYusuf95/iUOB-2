@@ -1,6 +1,7 @@
 package com.muqdd.iuob2.features.calendar;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -54,7 +55,7 @@ public class CalendarSemestersFragment extends BaseFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater,container,savedInstanceState);
         if (mView == null) {
             // Inflate the layout for this fragment
@@ -67,16 +68,9 @@ public class CalendarSemestersFragment extends BaseFragment {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         toolbar.setTitle(title);
-        // stop hiding toolbar
-        params.setScrollFlags(0);
     }
 
     private void initiate() {
@@ -104,7 +98,7 @@ public class CalendarSemestersFragment extends BaseFragment {
 
     private void getCalendarFromNet(){
         ServiceGenerator.createService(UOBSchedule.class)
-                .semesterCalendar().enqueue(new Callback<List<CalendarSemester>>() {
+                .semesterCalendar("").enqueue(new Callback<List<CalendarSemester>>() {
             @Override
             public void onResponse(Call<List<CalendarSemester>> call,
                                    Response<List<CalendarSemester>> response) {

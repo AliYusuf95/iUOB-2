@@ -17,14 +17,17 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseActivity;
-import com.muqdd.iuob2.app.User;
+import com.muqdd.iuob2.features.account.LoginFragment;
+import com.muqdd.iuob2.models.User;
 import com.muqdd.iuob2.features.about.AboutFragment;
+import com.muqdd.iuob2.features.account.AccountFragment;
 import com.muqdd.iuob2.features.calendar.CalendarSemestersFragment;
 import com.muqdd.iuob2.features.links.LinksFragment;
 import com.muqdd.iuob2.features.map.MapFragment;
 import com.muqdd.iuob2.features.my_schedule.MyScheduleFragment;
 import com.muqdd.iuob2.features.schedule_builder.ScheduleBuilderFragment;
 import com.muqdd.iuob2.features.semester_schedule.SemestersHolderFragment;
+import com.muqdd.iuob2.features.stories.StoriesFragment;
 import com.orhanobut.logger.Logger;
 
 import butterknife.BindView;
@@ -36,11 +39,13 @@ public class MainActivity extends BaseActivity {
     protected @BindView(R.id.main_content) CoordinatorLayout mainContent;
 
     private FragmentManager fragmentManager;
+    private PrimaryDrawerItem stories;
     private PrimaryDrawerItem semesterSchedule;
     private PrimaryDrawerItem calendarSchedule;
     private PrimaryDrawerItem mySchedule;
     private PrimaryDrawerItem scheduleBuilder;
     private PrimaryDrawerItem map;
+    private PrimaryDrawerItem account;
     private PrimaryDrawerItem links;
     private PrimaryDrawerItem about;
     private IDrawerItem lastSelectedItem;
@@ -75,24 +80,21 @@ public class MainActivity extends BaseActivity {
         fragmentManager = getSupportFragmentManager();
 
         // if there is change in fragment stack change drawer icon.
-        fragmentManager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
-            @Override
-            public void onBackStackChanged() {
-                if (fragmentManager.getBackStackEntryCount() > 0) {
-                    // show arrow icon
-                    drawerMenu.getActionBarDrawerToggle().setDrawerIndicatorEnabled(false);
-                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                    // disable swipe to open menu
-                    drawerMenu.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-                } else {
-                    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-                    drawerMenu.getActionBarDrawerToggle().setDrawerIndicatorEnabled(true);
-                    // enable swipe to open menu
-                    drawerMenu.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-                }
-                // reset drawerMenu selection on orientation changed
-                setDrawerMenuSelection();
+        fragmentManager.addOnBackStackChangedListener(() -> {
+            if (fragmentManager.getBackStackEntryCount() > 0) {
+                // show arrow icon
+                drawerMenu.getActionBarDrawerToggle().setDrawerIndicatorEnabled(false);
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                // disable swipe to open menu
+                drawerMenu.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            } else {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                drawerMenu.getActionBarDrawerToggle().setDrawerIndicatorEnabled(true);
+                // enable swipe to open menu
+                drawerMenu.getDrawerLayout().setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
             }
+            // reset drawerMenu selection on orientation changed
+            setDrawerMenuSelection();
         });
 
         // if it is not change orientation call append default fragment
@@ -105,6 +107,14 @@ public class MainActivity extends BaseActivity {
     }
 
     private void initDrawerMenu(Bundle savedInstanceState) {
+
+        stories = new PrimaryDrawerItem()
+                .withTag(Menu.STORIES)
+                .withName(Menu.STORIES.toString())
+                .withIcon(R.drawable.ic_send_24dp)
+                .withIconColorRes(R.color.colorPrimaryDark)
+                .withIconTintingEnabled(true)
+                .withSelectedTextColorRes(R.color.colorPrimaryDark);
 
         semesterSchedule = new PrimaryDrawerItem()
                 .withTag(Menu.SEMESTER_SCHEDULE)
@@ -136,6 +146,15 @@ public class MainActivity extends BaseActivity {
                 .withIcon(R.drawable.map)
                 .withSelectedTextColorRes(R.color.colorPrimaryDark);
 
+        account = new PrimaryDrawerItem()
+                .withTag(Menu.ACCOUNT)
+                .withName(Menu.ACCOUNT.toString())
+                .withIcon(R.drawable.ic_person)
+                .withIconColorRes(R.color.blue_color_picker)
+                .withIconTintingEnabled(true)
+                .withSelectedTextColorRes(R.color.colorPrimaryDark)
+                .withSelectedIconColorRes(R.color.blue_color_picker);
+
         links = new PrimaryDrawerItem()
                 .withTag(Menu.LINKS)
                 .withName(Menu.LINKS.toString())
@@ -156,66 +175,68 @@ public class MainActivity extends BaseActivity {
                 .withActionBarDrawerToggleAnimated(true) // to animate hamburger icon
                 .withTranslucentStatusBar(false) // for embedded drawer
                 .addDrawerItems(
+                        stories,
                         semesterSchedule,
                         // calendarSchedule,
                         //new DividerDrawerItem(), // just test divider
                         mySchedule,
                         scheduleBuilder,
                         map,
+                        account,
                         links,
                         about
                 )
                 .withSavedInstance(savedInstanceState)
                 .withCloseOnClick(true)
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        if (User.isFetchingData() && lastSelectedItem != null && drawerItem != lastSelectedItem){
-                            drawerMenu.setSelection(lastSelectedItem);
-                            drawerMenu.closeDrawer();
-                            Snackbar.make(mainContent,"Please wait fetching data",Snackbar.LENGTH_SHORT).show();
-                            Logger.d(drawerItem.getTag());
-                            Logger.d(lastSelectedItem.getTag());
-                        } else {
-                            lastSelectedItem = drawerItem;
-                            switch ((Menu) drawerItem.getTag()) {
-                                case SEMESTER_SCHEDULE:
-                                    replaceFragment(SemestersHolderFragment.newInstance());
-                                    break;
-                                case CALENDAR:
-                                    replaceFragment(CalendarSemestersFragment.newInstance());
-                                    break;
-                                case MY_SCHEDULE:
-                                    replaceFragment(MyScheduleFragment.newInstance());
-                                    break;
-                                case SCHEDULE_BUILDER:
-                                    replaceFragment(ScheduleBuilderFragment.newInstance());
-                                    break;
-                                case MAP:
-                                    replaceFragment(MapFragment.newInstance());
-                                    break;
-                                case LINKS:
-                                    replaceFragment(LinksFragment.newInstance());
-                                    break;
-                                case ABOUT:
-                                    replaceFragment(AboutFragment.newInstance());
-                                    break;
-                                default:
-                                    Logger.w("not handled select");
-                                    break;
-                            }
+                .withOnDrawerItemClickListener((view, position, drawerItem) -> {
+                    if (User.isFetchingData() && lastSelectedItem != null && drawerItem != lastSelectedItem){
+                        drawerMenu.setSelection(lastSelectedItem);
+                        drawerMenu.closeDrawer();
+                        Snackbar.make(mainContent,"Please wait fetching data",Snackbar.LENGTH_SHORT).show();
+                        Logger.d(drawerItem.getTag());
+                        Logger.d(lastSelectedItem.getTag());
+                    } else {
+                        lastSelectedItem = drawerItem;
+                        switch ((Menu) drawerItem.getTag()) {
+                            case STORIES:
+                                replaceFragment(StoriesFragment.newInstance());
+                                break;
+                            case SEMESTER_SCHEDULE:
+                                replaceFragment(SemestersHolderFragment.newInstance());
+                                break;
+                            case CALENDAR:
+                                replaceFragment(CalendarSemestersFragment.newInstance());
+                                break;
+                            case MY_SCHEDULE:
+                                replaceFragment(MyScheduleFragment.newInstance());
+                                break;
+                            case SCHEDULE_BUILDER:
+                                replaceFragment(ScheduleBuilderFragment.newInstance());
+                                break;
+                            case MAP:
+                                replaceFragment(MapFragment.newInstance());
+                                break;
+                            case ACCOUNT:
+                                replaceFragment(AccountFragment.newInstance());
+                                break;
+                            case LINKS:
+                                replaceFragment(LinksFragment.newInstance());
+                                break;
+                            case ABOUT:
+                                replaceFragment(AboutFragment.newInstance());
+                                break;
+                            default:
+                                Logger.w("not handled select");
+                                break;
                         }
-                        return false;
                     }
+                    return false;
                 })
-                .withOnDrawerNavigationListener(new Drawer.OnDrawerNavigationListener() {
-                    @Override
-                    public boolean onNavigationClickListener(View clickedView) {
-                        //this method is only called if the Arrow icon is shown.
-                        //if the back arrow is shown.
-                        onBackPressed();
-                        return true;
-                    }
+                .withOnDrawerNavigationListener(clickedView -> {
+                    //this method is only called if the Arrow icon is shown.
+                    //if the back arrow is shown.
+                    onBackPressed();
+                    return true;
                 })
                 .withOnDrawerListener(new Drawer.OnDrawerListener() {
                     @Override
@@ -223,7 +244,9 @@ public class MainActivity extends BaseActivity {
                         if (getCurrentFocus() != null) {
                             InputMethodManager inputMethodManager =
                                     (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-                            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                            if (inputMethodManager != null) {
+                                inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                            }
                         }
                     }
 
@@ -259,31 +282,43 @@ public class MainActivity extends BaseActivity {
     /**
      * Set drawerMenu selection based on current fragment
      */
-    private void setDrawerMenuSelection(){
-        Fragment mFragment = fragmentManager.findFragmentById(R.id.frameLayout);
-        if(mFragment != null){
-            if (mFragment instanceof SemestersHolderFragment){
-                drawerMenu.setSelection(semesterSchedule);
+    private void setDrawerMenuSelection(Fragment mFragment, boolean fireOnClick){
+        if(mFragment != null && drawerMenu != null){
+            if (mFragment instanceof StoriesFragment){
+                drawerMenu.setSelection(stories, fireOnClick);
+            }
+            else if (mFragment instanceof SemestersHolderFragment){
+                drawerMenu.setSelection(semesterSchedule, fireOnClick);
             }
 //            if (mFragment instanceof CalendarSemestersFragment){
 //                drawerMenu.setSelection(calendarSchedule);
 //            }
-            if (mFragment instanceof MyScheduleFragment){
-                drawerMenu.setSelection(mySchedule);
+            else if (mFragment instanceof MyScheduleFragment){
+                drawerMenu.setSelection(mySchedule, fireOnClick);
             }
-            if (mFragment instanceof ScheduleBuilderFragment){
-                drawerMenu.setSelection(scheduleBuilder);
+            else if (mFragment instanceof ScheduleBuilderFragment){
+                drawerMenu.setSelection(scheduleBuilder, fireOnClick);
             }
-            if (mFragment instanceof MapFragment){
-                drawerMenu.setSelection(map);
+            else if (mFragment instanceof MapFragment){
+                drawerMenu.setSelection(map, fireOnClick);
             }
-            if (mFragment instanceof LinksFragment){
-                drawerMenu.setSelection(links);
+            else if (mFragment instanceof AccountFragment || mFragment instanceof LoginFragment){
+                if (!account.isSelected()){
+                    drawerMenu.setSelection(account, fireOnClick);
+                }
             }
-            if (mFragment instanceof AboutFragment){
-                drawerMenu.setSelection(about);
+            else if (mFragment instanceof LinksFragment){
+                drawerMenu.setSelection(links, fireOnClick);
+            }
+            else if (mFragment instanceof AboutFragment){
+                drawerMenu.setSelection(about, fireOnClick);
             }
         }
+    }
+
+    private void setDrawerMenuSelection(){
+        Fragment mFragment = fragmentManager.findFragmentById(R.id.frameLayout);
+        setDrawerMenuSelection(mFragment, true);
     }
 
     @Override
@@ -295,6 +330,7 @@ public class MainActivity extends BaseActivity {
                     .commit();
             fragmentManager.executePendingTransactions();
         }
+        setDrawerMenuSelection(fragment, false);
     }
 
     @Override

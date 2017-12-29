@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
@@ -17,12 +18,12 @@ import android.widget.TextView;
 
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
-import com.muqdd.iuob2.app.User;
+import com.muqdd.iuob2.models.User;
 import com.muqdd.iuob2.features.main.Menu;
 import com.muqdd.iuob2.models.RestResponse;
 import com.muqdd.iuob2.models.Timing;
 import com.muqdd.iuob2.network.ServiceGenerator;
-import com.muqdd.iuob2.network.IUOBApi;
+import com.muqdd.iuob2.network.UOBSchedule;
 import com.orhanobut.logger.Logger;
 
 import java.util.Comparator;
@@ -73,7 +74,7 @@ public class MyScheduleFragment extends BaseFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater,container,savedInstanceState);
         if (mView == null) {
             // Inflate the layout for this fragment
@@ -120,8 +121,6 @@ public class MyScheduleFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
         toolbar.setTitle(title);
-        // stop hiding toolbar
-        params.setScrollFlags(0);
         // build schedule
         mainContent.setRefreshing(true);
         if (User.isCoursesUpdated(getContext())) {
@@ -165,7 +164,7 @@ public class MyScheduleFragment extends BaseFragment {
 
     private void fetchMyScheduleData() {
         MySchedule mySchedule = User.getMySchedule(getContext());
-        ServiceGenerator.createService(IUOBApi.class).sectionsList(mySchedule.getYear(),
+        ServiceGenerator.createService(UOBSchedule.class).sectionsList(mySchedule.getYear(),
                 mySchedule.getSemester(), mySchedule.getSectionsParam())
                 .enqueue(new Callback<RestResponse<List<List<MyCourse>>>>() {
             @Override

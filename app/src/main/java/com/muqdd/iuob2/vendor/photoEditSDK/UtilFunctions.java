@@ -164,16 +164,4 @@ public class UtilFunctions {
         }
         return encodedImage;
     }
-
-    public static void hideKeyboardFrom(Activity activity) {
-        if (activity.getCurrentFocus() != null) {
-            InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
-        }
-    }
-
-    public static void showKeyboardAt(Activity activity) {
-        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-    }
 }

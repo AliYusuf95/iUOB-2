@@ -144,7 +144,8 @@
                     android:padding="15dp"
                     android:text="@string/ic_images"
                     android:textColor="#FFFFFF"
-                    android:textSize="20sp" />
+                    android:textSize="20sp"
+                    tools:ignore="RelativeOverlap" />
 
             </RelativeLayout>
 

@@ -1,6 +1,9 @@
 package com.muqdd.iuob2.app;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,6 +16,18 @@ public class Constants {
     private static Map<String, String> debCodeMap;
 
     public final static String SB_SECTIONS_LIST = "SB_SECTIONS_LIST";
+
+    public final static List<String> collegesNameList = Arrays.asList("Arts", "Science", "Information Technology",
+            "Business Administration", "Applied Studies", "Physical Education and Physiotherapy",
+            "Engineering", "Bahrain Teachers College", "Health Sciences", "Law");
+
+//            {"College of Arts", "College of Business Administration",
+//            "College of Engineering", "College of Science", "College of Education", "French Studies Center",
+//            "College of Information Technology", "College of Applied Studies", "College of Law",
+//            "Bahrain Teachers College", "Physical Education and Physiotherapy", "College of Health Sciences",
+//            "English Language Center", "Sharia'a", "Science  Research", "College of Physical Education",
+//            "Confucius Institute", "Reserved", "Language Centers", "Confucius Institute", "Languages Institute",
+//            "Unit for Teaching Excellence and Leadership"};
 
     public final static String[] coursesNameList = {"ACC","ACCA","ACCM","AH","ALH","AMST","ARAB","ARABA",
             "ARABM","ARCG","ART","BAA","BIOLS","BIONU","BIS","CEA","CEG","CENG","CGS","CHE","CHEMY",

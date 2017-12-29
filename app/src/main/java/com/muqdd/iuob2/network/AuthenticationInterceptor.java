@@ -1,6 +1,9 @@
 package com.muqdd.iuob2.network;
 
+import android.support.annotation.NonNull;
+
 import java.io.IOException;
+import java.util.Objects;
 
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
@@ -29,7 +32,7 @@ public class AuthenticationInterceptor implements Interceptor {
     }
 
     @Override
-    public Response intercept(Chain chain) throws IOException {
+    public Response intercept(@NonNull Chain chain) throws IOException {
         Request original = chain.request();
         Request.Builder requestBuilder = original.newBuilder();
 
@@ -40,5 +43,21 @@ public class AuthenticationInterceptor implements Interceptor {
 
         Request request = requestBuilder.build();
         return chain.proceed(request);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(authName, authValue);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof AuthenticationInterceptor)) {
+            return false;
+        } else {
+            AuthenticationInterceptor ai = (AuthenticationInterceptor) obj;
+            return authName != null && authValue != null && authName.equals(ai.authName) &&
+                    authValue.equals(ai.authValue);
+        }
     }
 }

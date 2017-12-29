@@ -13,6 +13,8 @@ public enum Menu {
     SCHEDULE_BUILDER ("Schedule Builder"),
     MAP ("UOB Map"),
     ACCOUNT ("Account"),
+    SIGN_UP ("Sign up"),
+    LOGIN ("Login"),
     LINKS ("Useful Links"),
     ABOUT ("About");
 

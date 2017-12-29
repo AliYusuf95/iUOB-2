@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
@@ -60,7 +61,7 @@ public class ScheduleDetailsFragment extends BaseFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater,container,savedInstanceState);
         if (mView == null) {
             // Inflate the layout for this fragment
@@ -110,8 +111,6 @@ public class ScheduleDetailsFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
         toolbar.setTitle(title);
-        // stop hiding toolbar
-        params.setScrollFlags(0);
         // check primary data
         checkPrimaryData();
     }

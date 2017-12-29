@@ -31,8 +31,9 @@
     <string name="row_finalexam_time_no_exam">No Exam</string>
     <string name="search_title">Search</string>
     <string name="dialog_btn_delete">Delete</string>
-    <string name="dialog_delete_course_title">Are you sure?</string>
+    <string name="dialog_delete_title">Are you sure?</string>
     <string name="dialog_delete_course_sub_title">This course will be deleted from your schedule</string>
+    <string name="dialog_delete_story_sub_title">Deleting your story will remove it from UOB Live</string>
     <string name="menu_next">Next</string>
     <string name="fragment_schedule_builder_options">Options</string>
     <string name="activity_sections_filter">Sections Filter</string>
@@ -80,7 +81,9 @@
     <string name="w">W</string>
     <string name="h">H</string>
     <string name="summary">Summary</string>
+    <string name="email">Email</string>
 
+    <!-- Photo Edit SDK -->
     <string name="done">Done</string>
     <string name="undo">Undo</string>
     <string name="erase">Erase</string>
@@ -95,6 +98,26 @@
     <string name="ic_clear_all">"\ue947"</string>
     <string name="ic_continue">"\ue948"</string>
     <string name="ic_delete">"\ue92c"</string>
+    <string name="name">Name</string>
+    <string name="student_id">Student ID</string>
+    <string name="student_id_hint">e.g. 201444285</string>
+    <string name="password">Password</string>
+    <string name="optionals">Optionals</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="login">Login</string>
+    <string name="lbl_to_signup">Don\'t have an account? Signup</string>
+    <string name="signup">Signup</string>
+    <string name="lbl_to_login">Have an account? Login</string>
+    <string name="lbl_signup_bottom_sentence">Create an account so you can add stories and access other features.</string>
+    <string name="gender">Gender</string>
+    <string name="college">College</string>
+    <string name="required">Required</string>
+    <string name="birthday">Birthday</string>
+    <string name="update_info">Update Info</string>
+    <string name="logout">Logout</string>
+    <string name="iuob_stories">iUOB Stories</string>
+    <string name="my_stories">My Stories</string>
 
     <!-- for cameraFilter_spinner; match with CameraCaptureActivity constants -->
     <string-array name="cameraFilterNames">

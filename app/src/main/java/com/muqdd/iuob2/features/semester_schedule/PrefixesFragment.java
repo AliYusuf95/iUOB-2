@@ -1,6 +1,7 @@
 package com.muqdd.iuob2.features.semester_schedule;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
@@ -23,6 +24,7 @@ import com.muqdd.iuob2.models.CoursePrefix;
 import com.muqdd.iuob2.models.RestResponse;
 import com.muqdd.iuob2.network.ServiceGenerator;
 import com.muqdd.iuob2.network.IUOBApi;
+import com.muqdd.iuob2.network.UOBSchedule;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -70,12 +72,7 @@ public class PrefixesFragment extends BaseFragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater,container,savedInstanceState);
         if (mView == null) {
             // Inflate the layout for this fragment
@@ -95,6 +92,7 @@ public class PrefixesFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
+        setToolbarScrollFlag();
     }
 
     private void initiate() {
@@ -154,7 +152,7 @@ public class PrefixesFragment extends BaseFragment {
     }
 
     public void getPrefixes() {
-        ServiceGenerator.createService(IUOBApi.class)
+        ServiceGenerator.createService(UOBSchedule.class)
                 .coursesPrefix(year, semester).enqueue(new Callback<RestResponse<List<String>>>() {
             @Override
             public void onResponse(Call<RestResponse<List<String>>> call, final Response<RestResponse<List<String>>> response) {

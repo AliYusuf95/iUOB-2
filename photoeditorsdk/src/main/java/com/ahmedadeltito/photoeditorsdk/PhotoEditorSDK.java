@@ -3,6 +3,7 @@ package com.ahmedadeltito.photoeditorsdk;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.annotation.ColorInt;
 import android.util.Log;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -31,6 +33,7 @@ public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
     private View deleteView;
     private BrushDrawingView brushDrawingView;
     private List<View> addedViews;
+    private List<View> toolsViews;
     private OnPhotoEditorSDKListener onPhotoEditorSDKListener;
     private View addTextRootView;
 
@@ -39,6 +42,7 @@ public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
         this.parentView = photoEditorSDKBuilder.parentView;
         this.imageView = photoEditorSDKBuilder.childView;
         this.deleteView = photoEditorSDKBuilder.deleteView;
+        this.toolsViews = photoEditorSDKBuilder.toolsViews;
         this.brushDrawingView = photoEditorSDKBuilder.brushDrawingView;
         addedViews = new ArrayList<>();
     }
@@ -50,7 +54,7 @@ public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
         imageView.setImageBitmap(desiredImage);
         imageView.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT));
-        MultiTouchListener multiTouchListener = new MultiTouchListener(deleteView,
+        MultiTouchListener multiTouchListener = new MultiTouchListener(deleteView, toolsViews,
                 parentView, this.imageView, onPhotoEditorSDKListener);
         multiTouchListener.setOnMultiTouchListener(this);
         imageRootView.setOnTouchListener(multiTouchListener);
@@ -70,7 +74,7 @@ public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
         addTextView.setGravity(Gravity.CENTER);
         addTextView.setText(text);
         addTextView.setTextColor(colorCodeTextView);
-        MultiTouchListener multiTouchListener = new MultiTouchListener(deleteView,
+        MultiTouchListener multiTouchListener = new MultiTouchListener(deleteView, toolsViews,
                 parentView, this.imageView, onPhotoEditorSDKListener);
         multiTouchListener.setOnMultiTouchListener(this);
         addTextRootView.setOnTouchListener(multiTouchListener);
@@ -90,7 +94,7 @@ public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
         emojiTextView.setTypeface(emojiFont);
         emojiTextView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         emojiTextView.setText(convertEmoji(emojiName));
-        MultiTouchListener multiTouchListener = new MultiTouchListener(deleteView,
+        MultiTouchListener multiTouchListener = new MultiTouchListener(deleteView, toolsViews,
                 parentView, this.imageView, onPhotoEditorSDKListener);
         multiTouchListener.setOnMultiTouchListener(this);
         emojiRootView.setOnTouchListener(multiTouchListener);
@@ -223,7 +227,7 @@ public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
     }
 
     private String convertEmoji(String emoji) {
-        String returnedEmoji = "";
+        String returnedEmoji;
         try {
             int convertEmojiToInt = Integer.parseInt(emoji.substring(2), 16);
             returnedEmoji = getEmojiByUnicode(convertEmojiToInt);
@@ -262,6 +266,7 @@ public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
         private View childView;
         private View deleteView;
         private BrushDrawingView brushDrawingView;
+        private List<View> toolsViews;
 
         public PhotoEditorSDKBuilder(Context context) {
             this.context = context;
@@ -284,6 +289,14 @@ public class PhotoEditorSDK implements MultiTouchListener.OnMultiTouchListener {
 
         public PhotoEditorSDKBuilder brushDrawingView(BrushDrawingView brushDrawingView) {
             this.brushDrawingView = brushDrawingView;
+            return this;
+        }
+
+        public PhotoEditorSDKBuilder toolsViews(View... views) {
+            toolsViews = new ArrayList<>();
+            if (views != null) {
+                toolsViews.addAll(Arrays.asList(views));
+            }
             return this;
         }
 

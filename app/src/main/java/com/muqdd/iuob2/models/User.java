@@ -1,4 +1,4 @@
-package com.muqdd.iuob2.app;
+package com.muqdd.iuob2.models;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -12,7 +12,6 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.muqdd.iuob2.features.my_schedule.MyCourse;
 import com.muqdd.iuob2.features.my_schedule.MySchedule;
-import com.muqdd.iuob2.models.Timing;
 import com.muqdd.iuob2.notification.AlarmNotificationReceiver;
 import com.muqdd.iuob2.utils.SPHelper;
 import com.orhanobut.logger.Logger;
@@ -51,6 +50,12 @@ public class User {
     @SerializedName("dateOfBirth")
     @Expose
     private String dateOfBirth;
+    @SerializedName("gender")
+    @Expose
+    private String gender;
+    @SerializedName("college")
+    @Expose
+    private String college;
     @SerializedName("lastLogin")
     @Expose
     private String lastLogin;
@@ -118,6 +123,14 @@ public class User {
         this.dateOfBirth = dateOfBirth;
     }
 
+    public String getCollege() {
+        return college;
+    }
+
+    public void setCollege(String college) {
+        this.college = college;
+    }
+
     public String getLastLogin() {
         return lastLogin;
     }
@@ -132,6 +145,14 @@ public class User {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public String getToken() {
@@ -372,6 +393,11 @@ public class User {
         AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY * 7, pendingIntent);
+    }
+
+    @Override
+    public String toString() {
+        return new Gson().toJson(this, User.class);
     }
 
     public static User fromJson(String json) {

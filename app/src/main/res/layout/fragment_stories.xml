@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.muqdd.iuob2.views.MultiTouchDetectLayout
+        android:id="@+id/multi_touch_layout"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/layout_iuob_stories"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/iuob_stories"
+                android:textColor="@color/colorAccent"
+                android:padding="8dp"
+                android:background="@color/lightGray"/>
+
+            <include layout="@layout/row_story" />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/my_stories"
+            android:textColor="@color/colorAccent"
+            android:padding="8dp"
+            android:background="@color/lightGray"/>
+
+        <com.malinskiy.superrecyclerview.SuperRecyclerView
+            android:id="@+id/rv_my_stories"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:mainLayoutId="@layout/layout_recyclerview_verticalscroll"
+            app:recyclerClipToPadding="false"
+            app:scrollbarStyle="insideInset"
+            app:recyclerPaddingTop="2dp"
+            app:recyclerPaddingBottom="8dp"
+            />
+
+    </com.muqdd.iuob2.views.MultiTouchDetectLayout>
+
+</android.support.v4.widget.SwipeRefreshLayout>

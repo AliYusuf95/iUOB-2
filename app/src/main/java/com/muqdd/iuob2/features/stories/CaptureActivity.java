@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.annotation.ColorRes;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -60,10 +59,11 @@ import butterknife.ButterKnife;
  * iUOB-2
  */
 
-public class StoriesActivity extends BaseActivity implements View.OnClickListener, OnPhotoEditorSDKListener,
+public class CaptureActivity extends BaseActivity implements View.OnClickListener, OnPhotoEditorSDKListener,
         CameraLayout.OnCaptureListener, CameraLayout.OnRecordListener {
 
-    private static final String TAG = StoriesActivity.class.getSimpleName();
+    private static final String TAG = CaptureActivity.class.getSimpleName();
+    public static final String RESULT_PATH = "RESULT_PATH";
 
     /** Activity required permissions */
     private List<String> requiredPermissions = Arrays.asList(
@@ -128,11 +128,14 @@ public class StoriesActivity extends BaseActivity implements View.OnClickListene
                 if (hasAllPermissions()) {
                     Log.d(TAG, "All permission granted");
                     setContentView(renewCameraLayout());
+                } else {
+                    requestPermissions();
                 }
             }
 
             @Override
             public void onDenied(String permission) {
+                requiredPermissions.remove(permission);
                 Log.d(TAG, "Permission request has been denied: "+permission);
             }
         };
@@ -155,7 +158,7 @@ public class StoriesActivity extends BaseActivity implements View.OnClickListene
     }
 
     private CameraLayout renewCameraLayout() {
-        mCameraLayout = new CameraLayout(StoriesActivity.this);
+        mCameraLayout = new CameraLayout(CaptureActivity.this);
         mCameraLayout.withRecordVideo(false);
         mCameraLayout.setOnCaptureListener(this);
         mCameraLayout.setOnRecordListener(this);
@@ -213,6 +216,7 @@ public class StoriesActivity extends BaseActivity implements View.OnClickListene
                 .childView(photoEditImageView) // add the desired image view
                 .deleteView(deleteRelativeLayout) // add the deleted view that will appear during the movement of the views
                 .brushDrawingView(brushDrawingView) // add the brush drawing view that is responsible for drawing on the image view
+                .toolsViews(topShadowRelativeLayout, bottomShadowRelativeLayout)
                 .buildPhotoEditorSDK(); // build photo editor sdk
         photoEditorSDK.setOnPhotoEditorSDKListener(this);
 
@@ -312,7 +316,11 @@ public class StoriesActivity extends BaseActivity implements View.OnClickListene
     private void openAddTextPopupWindow(String text, int colorCode) {
         colorCodeTextView = colorCode;
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View addTextPopupWindowRootView = inflater.inflate(R.layout.add_text_popup_window, null);
+        View addTextPopupWindowRootView;
+        if (inflater == null) {
+            return;
+        }
+        addTextPopupWindowRootView = inflater.inflate(R.layout.add_text_popup_window, null);
         final EditText addTextEditText = addTextPopupWindowRootView.findViewById(R.id.add_text_edit_text);
         TextView addTextDoneTextView = addTextPopupWindowRootView.findViewById(R.id.add_text_done_tv);
         RecyclerView addTextColorPickerRecyclerView = addTextPopupWindowRootView.findViewById(R.id.add_text_color_picker_recycler_view);
@@ -321,12 +329,9 @@ public class StoriesActivity extends BaseActivity implements View.OnClickListene
         addTextColorPickerRecyclerView.setHasFixedSize(true);
         addTextEditText.setTextColor(colorCode);
         ColorPickerAdapter colorPickerAdapter = new ColorPickerAdapter(this, colorPickerColors);
-        colorPickerAdapter.setOnColorPickerClickListener(new ColorPickerAdapter.OnColorPickerClickListener() {
-            @Override
-            public void onColorPickerClickListener(int colorCode) {
-                addTextEditText.setTextColor(colorCode);
-                colorCodeTextView = colorCode;
-            }
+        colorPickerAdapter.setOnColorPickerClickListener(colorCode1 -> {
+            addTextEditText.setTextColor(colorCode1);
+            colorCodeTextView = colorCode1;
         });
         addTextColorPickerRecyclerView.setAdapter(colorPickerAdapter);
         if (stringIsNotEmpty(text)) {
@@ -347,19 +352,21 @@ public class StoriesActivity extends BaseActivity implements View.OnClickListene
         pop.setBackgroundDrawable(null);
         if(!isFinishing()) {
             pop.showAtLocation(addTextPopupWindowRootView, Gravity.TOP, 0, 0);
+
         }
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-        addTextDoneTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                addText(addTextEditText.getText().toString(), colorCodeTextView);
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                if (pop != null && pop.isShowing() && !isFinishing()) {
-                    pop.dismiss();
-                    pop = null;
-                }
+        if (imm != null) {
+            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+        }
+        addTextDoneTextView.setOnClickListener(view -> {
+            addText(addTextEditText.getText().toString(), colorCodeTextView);
+            InputMethodManager imm1 = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm1 != null) {
+                imm1.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
+            if (pop != null && pop.isShowing() && !isFinishing()) {
+                pop.dismiss();
+                pop = null;
             }
         });
     }
@@ -382,12 +389,7 @@ public class StoriesActivity extends BaseActivity implements View.OnClickListene
             drawingViewColorPickerRecyclerView.setLayoutManager(layoutManager);
             drawingViewColorPickerRecyclerView.setHasFixedSize(true);
             ColorPickerAdapter colorPickerAdapter = new ColorPickerAdapter(this, colorPickerColors);
-            colorPickerAdapter.setOnColorPickerClickListener(new ColorPickerAdapter.OnColorPickerClickListener() {
-                @Override
-                public void onColorPickerClickListener(int colorCode) {
-                    photoEditorSDK.setBrushColor(colorCode);
-                }
-            });
+            colorPickerAdapter.setOnColorPickerClickListener(colorCode -> photoEditorSDK.setBrushColor(colorCode));
             drawingViewColorPickerRecyclerView.setAdapter(colorPickerAdapter);
         } else {
             updateView(View.VISIBLE);
@@ -408,7 +410,7 @@ public class StoriesActivity extends BaseActivity implements View.OnClickListene
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String imageName = "IMG_" + timeStamp + ".jpg";
         Intent returnIntent = new Intent();
-        returnIntent.putExtra("imagePath", photoEditorSDK.saveImage("iUOB", imageName));
+        returnIntent.putExtra(RESULT_PATH, photoEditorSDK.saveImage("iUOB", imageName));
         setResult(Activity.RESULT_OK, returnIntent);
         finish();
     }
