@@ -19,15 +19,15 @@ android {
         minSdkVersion 21
         compileSdkVersion 26
         targetSdkVersion 26
-        versionCode 7
-        versionName "1.4.1"
+        versionCode 8
+        versionName "1.5.0"
         renderscriptTargetApi 21
         renderscriptSupportModeEnabled true
         resValue "string", "google_maps_key", (project.findProperty("GOOGLE_MAPS_API_KEY") ?: "")
     }
     buildTypes {
         release {
-//            shrinkResources true
+            shrinkResources true
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
@@ -110,7 +110,5 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:3.9.0-SNAPSHOT'
     // StatusStories
     compile 'com.github.RahulJanagouda:StatusStories:1.0.1'
-    // SwipeBack
-    compile 'com.github.liuguangqiang.swipeback:library:1.0.2@aar'
 }
 apply plugin: "com.google.gms.google-services"

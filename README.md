@@ -26,8 +26,8 @@ You can follow me on Twitter [@aliyusuf\_95](https://twitter.com/aliyusuf_95).
 - [x] Map
 - [x] Useful Links
 - [x] Schedule Builder
-- [ ] Year Calendar
-- [ ] iUob Stories 
+- [x] Year Calendar
+- [x] iUob Stories `Only photos`
 - [ ] UOB Auto
 
 
