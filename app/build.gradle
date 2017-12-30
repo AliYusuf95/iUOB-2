@@ -19,16 +19,16 @@ android {
         minSdkVersion 21
         compileSdkVersion 26
         targetSdkVersion 26
-        versionCode 8
-        versionName "1.5.0"
+        versionCode 9
+        versionName "1.5.1"
         renderscriptTargetApi 21
         renderscriptSupportModeEnabled true
         resValue "string", "google_maps_key", (project.findProperty("GOOGLE_MAPS_API_KEY") ?: "")
     }
     buildTypes {
         release {
-            shrinkResources true
-            minifyEnabled true
+//            shrinkResources true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
         }
