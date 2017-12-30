@@ -98,7 +98,7 @@ public class CalendarSemestersFragment extends BaseFragment {
 
     private void getCalendarFromNet(){
         ServiceGenerator.createService(UOBSchedule.class)
-                .semesterCalendar("").enqueue(new Callback<List<CalendarSemester>>() {
+                .semesterCalendar("uobmo/uobmo.calendar").enqueue(new Callback<List<CalendarSemester>>() {
             @Override
             public void onResponse(Call<List<CalendarSemester>> call,
                                    Response<List<CalendarSemester>> response) {

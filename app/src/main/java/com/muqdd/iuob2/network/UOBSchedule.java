@@ -60,6 +60,6 @@ public interface UOBSchedule {
             @Query("coursesId[]") List<String> coursesId
     );
 
-    @GET("uobmo/uobmo.calendar")
+    @GET
     Call<List<CalendarSemester>> semesterCalendar(@Url String url);
 }

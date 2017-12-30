@@ -22,6 +22,13 @@
 -dontwarn javax.annotation.**
 -dontwarn com.viewpagerindicator.LinePageIndicator
 
+-keep public class * implements com.bumptech.glide.module.GlideModule
+-keep public class * extends com.bumptech.glide.GeneratedAppGlideModule
+-keep public enum com.bumptech.glide.load.resource.bitmap.ImageHeaderParser$** {
+    **[] $VALUES;
+    public *;
+}
+
 # Uncomment this to preserve the line sectionNumber information for
 # debugging stack traces.
 #-keepattributes SourceFile,LineNumberTable
