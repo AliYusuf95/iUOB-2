@@ -333,7 +333,7 @@ public class StoriesFragment extends BaseFragment {
     }
 
     private void uploadImage(String filePath) {
-        if (filePath.equals("")) {
+        if (filePath.equals("") || userLocation == null) {
             infoDialog("Sorry","Some thing goes wrong pleas try again later.",
                     "Cancel"
             ).show();

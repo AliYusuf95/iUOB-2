@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
+import com.google.firebase.FirebaseApp;
 import com.muqdd.iuob2.BuildConfig;
 import com.muqdd.iuob2.R;
 import com.orhanobut.logger.AndroidLogAdapter;
@@ -22,6 +23,8 @@ public class iUobApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        FirebaseApp.initializeApp(this);
 
         if (BuildConfig.DEBUG) {
             Logger.addLogAdapter(new AndroidLogAdapter());

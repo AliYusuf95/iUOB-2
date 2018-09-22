@@ -335,6 +335,7 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void displayFragment(Fragment fragment){
+        if (isFinishing()) return;
         Fragment currentFragment = fragmentManager.findFragmentById(R.id.frameLayout);
         if (currentFragment == null || !fragment.getClass().toString().equals(currentFragment.getTag())) {
             fragmentManager.beginTransaction()

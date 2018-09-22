@@ -214,9 +214,15 @@ public class SignupFragment extends BaseFragment {
                                 response.errorBody().string(),
                                 new TypeToken<List<ApiResponse>>() {}.getType()
                         );
-                        infoDialog("Oops!", apiResponses.get(0).getMsg(), "Close").show();
+                        Dialog dialog = infoDialog("Oops!", apiResponses.get(0).getMsg(), "Close");
+                        if (dialog != null) {
+                            dialog.show();
+                        }
                     } catch (Exception e){
-                        infoDialog("Oops!", "Cant perform the request please try again later", "Cancel").show();
+                        Dialog dialog = infoDialog("Oops!", "Cant perform the request please try again later", "Cancel");
+                        if (dialog != null) {
+                            dialog.show();
+                        }
                     }
                 }
             }
@@ -226,8 +232,9 @@ public class SignupFragment extends BaseFragment {
                 Dialog dialog = t instanceof ConnectivityInterceptor.NoConnectivityException ?
                         infoDialog("Error", "The Internet Connection appears to be offline.", "close") :
                         infoDialog("Sorry", "Cant perform the request please try again later.", "close");
-                dialog.show();
-                infoDialog("Oops!", "", "Cancel");
+                if (dialog != null) {
+                    dialog.show();
+                }
             }
         });
     }

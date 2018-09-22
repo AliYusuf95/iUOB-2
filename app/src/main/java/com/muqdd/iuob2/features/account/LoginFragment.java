@@ -113,7 +113,7 @@ public class LoginFragment extends BaseFragment {
                         if (response.isSuccessful() && !isEmptyResponse()){
                             Auth.login(getContext(), response.body().getUser());
                             replaceFragment(AccountFragment.newInstance());
-                        } else {
+                        } else if (getContext() != null){
                             try {
                                 ApiResponse apiResponses = new Gson().fromJson(
                                         response.errorBody().string(),

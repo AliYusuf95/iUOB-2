@@ -169,7 +169,7 @@ public class MyScheduleFragment extends BaseFragment {
                 .enqueue(new Callback<RestResponse<List<List<MyCourse>>>>() {
             @Override
             public void onResponse(Call<RestResponse<List<List<MyCourse>>>> call, Response<RestResponse<List<List<MyCourse>>>> response) {
-                if (response.body().getStatusCode() == 200) {
+                if (response.body() != null && response.body().getStatusCode() == 200) {
                     User.updateCourses(getContext(), MySchedule.getCoursesList(response.body().getData()));
                     Logger.d("build");
                     buildMySchedule();

@@ -272,21 +272,26 @@ public class CameraLayout extends RelativeLayout implements ProgressButton.Event
     }
 
     private Camera getCameraInstance(){
-        Camera c = Camera.open(); // attempt to get a Camera instance
-        if (c == null){
-            int cameraId = -1;
-            // Search for the front facing camera
-            int numberOfCameras = Camera.getNumberOfCameras();
-            for (int i = 0; i < numberOfCameras; i++) {
-                CameraInfo info = new CameraInfo();
-                Camera.getCameraInfo(i, info);
-                if (info.facing == CameraInfo.CAMERA_FACING_BACK) {
-                    Log.d(TAG, "Camera found");
-                    cameraId = i;
-                    break;
+        Camera c = null;
+        try {
+            c = Camera.open(); // attempt to get a Camera instance
+            if (c == null){
+                int cameraId = -1;
+                // Search for the front facing camera
+                int numberOfCameras = Camera.getNumberOfCameras();
+                for (int i = 0; i < numberOfCameras; i++) {
+                    CameraInfo info = new CameraInfo();
+                    Camera.getCameraInfo(i, info);
+                    if (info.facing == CameraInfo.CAMERA_FACING_BACK) {
+                        Log.d(TAG, "Camera found");
+                        cameraId = i;
+                        break;
+                    }
                 }
+                c = Camera.open(cameraId);
             }
-            c = Camera.open(cameraId);
+        } catch (Exception ignored) {
+
         }
         return c; // returns null if camera is unavailable
     }

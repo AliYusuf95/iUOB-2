@@ -215,8 +215,10 @@ public class AccountFragment extends BaseFragment {
                     public void onResponse(Response<ApiResponse> response) {
                         if (response.isSuccessful() && !isEmptyResponse()) {
                             User user = response.body().getUser();
-                            Auth.login(getContext(), user);
-                            setData(user);
+                            if (user != null) {
+                                Auth.login(getContext(), user);
+                                setData(user);
+                            }
                         }
                     }
 
@@ -228,6 +230,7 @@ public class AccountFragment extends BaseFragment {
     }
 
     private void setData(User user) {
+        if (getActivity() == null || user == null) return;
         txtName.setText(user.getName());
         txtEmail.setText(user.getEmail());
         txtSid.setText(user.getStudentID());
@@ -301,6 +304,7 @@ public class AccountFragment extends BaseFragment {
                 .updateUserProfile(options).enqueue(new AuthCallBack<Auth>() {
             @Override
             public void onResponse(Response<Auth> response) {
+                if (getContext() == null) return;
                 if (response.isSuccessful() && !isEmptyResponse()) {
                     infoDialog("Success", "Profile updated successfully! OMG", "Close").show();
                 } else {

@@ -1,5 +1,6 @@
 package com.muqdd.iuob2.features.semester_schedule;
 
+import android.annotation.SuppressLint;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -8,7 +9,9 @@ import android.view.ViewGroup;
 import com.muqdd.iuob2.models.CoursePrefix;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Ali Yusuf on 3/11/2017.
@@ -24,7 +27,7 @@ class SemesterPagerAdapter extends FragmentStatePagerAdapter {
         super(fragmentManager);
     }
 
-    void addCoursePrefixFragment(List<CoursePrefix> list, String title) {
+    private void addCoursePrefixFragment(List<CoursePrefix> list, String title) {
         fragmentList.add(list);
         fragmentTitleList.add(title);
         notifyDataSetChanged();

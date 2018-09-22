@@ -33,6 +33,7 @@ import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.app.Constants;
 import com.muqdd.iuob2.features.main.Menu;
+import com.orhanobut.logger.Logger;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -198,16 +199,20 @@ public class ScheduleBuilderFragment extends BaseFragment {
             }
         });
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
-                android.R.layout.simple_dropdown_item_1line, Constants.coursesList);
-        txtCourse.setAdapter(adapter);
+        if (getContext() != null) {
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
+                    android.R.layout.simple_dropdown_item_1line, Constants.coursesList);
+            txtCourse.setAdapter(adapter);
+        }
         // validate input
         txtCourse.setValidator(new AutoCompleteTextView.Validator() {
             @Override
             public boolean isValid(CharSequence charSequence) {
                 Matcher m = pCourse.matcher(charSequence.toString().toUpperCase().trim());
+                Logger.d(charSequence.toString().toUpperCase().trim());
                 if (!m.find()) {return false;}
                 String courseName = m.group(1);
+                Logger.d(courseName);
                 return Arrays.binarySearch(Constants.coursesNameList, courseName) > 0;
             }
 
@@ -217,30 +222,19 @@ public class ScheduleBuilderFragment extends BaseFragment {
                 return "";
             }
         });
-        txtCourse.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    addCourse();
-                    return true;
-                }
-                return false;
-            }
-        });
-        txtCourse.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean hasFocus) {
-                if (view.getId() == R.id.course && !hasFocus) {
-                    ((AutoCompleteTextView)view).performValidation();
-                }
-            }
-        });
-        txtCourse.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        txtCourse.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
                 addCourse();
+                return true;
+            }
+            return false;
+        });
+        txtCourse.setOnFocusChangeListener((view, hasFocus) -> {
+            if (view.getId() == R.id.course && !hasFocus) {
+                ((AutoCompleteTextView)view).performValidation();
             }
         });
+        txtCourse.setOnItemClickListener((adapterView, view, i, l) -> addCourse());
     }
 
     private void refreshNextMenuItem(){

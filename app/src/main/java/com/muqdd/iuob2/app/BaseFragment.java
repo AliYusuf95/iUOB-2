@@ -78,7 +78,8 @@ public class BaseFragment extends Fragment {
 
     @SuppressWarnings("ConstantConditions")
     protected Dialog infoDialog(String title, String message, String cancel){
-        final Dialog dialog = new Dialog(getActivity());
+        if (getContext() == null) return null;
+        final Dialog dialog = new Dialog(getContext());
         // prepare dialog layout
         LayoutInflater inflater =
                 (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
