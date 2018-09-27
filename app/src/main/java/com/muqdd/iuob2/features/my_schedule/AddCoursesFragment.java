@@ -163,6 +163,7 @@ public class AddCoursesFragment extends BaseFragment {
         });
         // init delete button
         dialogView.findViewById(R.id.delete).setOnClickListener(view -> {
+            if (fastAdapter.getAdapterItems().size() <= position || position < 0) return;
             User.deleteCourse(getContext(),item);
             ((FastItemAdapter)fastAdapter).remove(position);
             Snackbar.make(mainContent,"Course deleted",Snackbar.LENGTH_SHORT).show();
