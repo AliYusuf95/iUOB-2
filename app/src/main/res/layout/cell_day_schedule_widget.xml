@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    tools:layout_height="wrap_content"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:gravity="center"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:padding="2dp">
+
+    <TextView
+        android:id="@+id/course"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textColor="@color/semi_black"
+        android:textSize="@dimen/row_secondary_text"
+        android:textStyle="bold"
+        tools:text="📚"/>
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textColor="@color/semi_black"
+        android:textSize="@dimen/row_secondary_text"
+        android:textStyle="bold"
+        tools:text="🕗"/>
+
+    <TextView
+        android:id="@+id/room"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textColor="@color/semi_black"
+        android:textSize="@dimen/row_secondary_text"
+        android:textStyle="bold"
+        tools:text="🏢" />
+
+</LinearLayout>

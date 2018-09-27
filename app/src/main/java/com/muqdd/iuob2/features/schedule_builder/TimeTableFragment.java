@@ -78,7 +78,7 @@ public class TimeTableFragment extends BaseFragment {
         super.onCreateView(inflater,container,savedInstanceState);
         if (mView == null) {
             // Inflate the layout for this fragment
-            mView = inflater.inflate(R.layout.fragment_time_table, container, false);
+            mView = inflater.inflate(R.layout.fragment_my_schedule, container, false);
             ButterKnife.bind(this, mView);
             initiate();
         }

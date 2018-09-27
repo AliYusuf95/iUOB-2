@@ -4,7 +4,9 @@
     package="com.muqdd.iuob2">
 
     <!-- Required features -->
-    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
     <!-- Required permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -17,41 +19,41 @@
     <application
         android:name=".app.iUobApplication"
         android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_scheme"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="false"
-        tools:replace="android:supportsRtl"
-        android:fullBackupContent="@xml/backup_scheme"
-        android:theme="@style/AppTheme">
-
+        android:theme="@style/AppTheme"
+        tools:replace="android:supportsRtl">
         <activity
             android:name=".features.splash.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.BROWSABLE" />
                 <!-- Accepts URIs that begin with "http://iuob.net/” -->
-                <data android:scheme="http"
+                <data
                     android:host="iuob.net"
-                    android:pathPrefix="/" />
+                    android:pathPrefix="/"
+                    android:scheme="http" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".features.main.MainActivity"
+        <activity
+            android:name=".features.main.MainActivity"
             android:screenOrientation="portrait" />
-
-        <activity android:name=".features.schedule_builder.SectionsFilterActivity"
+        <activity
+            android:name=".features.schedule_builder.SectionsFilterActivity"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".features.stories.CaptureActivity"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".features.stories.StatusStoriesActivity"
             android:screenOrientation="portrait" />
@@ -59,34 +61,37 @@
         <!-- Meta Data -->
         <meta-data
             android:name="com.google.android.gms.version"
-            tools:replace="android:value"
-            android:value="@integer/google_play_services_version" />
-        <!--The API key for Google Maps-based APIs.-->
+            android:value="@integer/google_play_services_version"
+            tools:replace="android:value" />
+        <!-- The API key for Google Maps-based APIs. -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            tools:replace="android:value"
-            android:value="@string/google_maps_key" />
-
+            android:value="@string/google_maps_key"
+            tools:replace="android:value" />
         <meta-data
             android:name="com.google.android.gms.analytics.globalConfigResource"
-            android:resource="@xml/global_tracker"/>
-
+            android:resource="@xml/global_tracker" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_stat_logo_white" />
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorPrimary" />
 
         <!-- FCM Services -->
-        <service android:name=".notification.RegistrationIntentService" android:exported="false"/>
-        <service android:name=".notification.MyInstanceIDListenerService" android:exported="false">
+        <service
+            android:name=".notification.RegistrationIntentService"
+            android:exported="false" />
+        <service
+            android:name=".notification.MyInstanceIDListenerService"
+            android:exported="false">
             <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
-        <service android:name=".notification.FCMMessageHandler" android:exported="false" >
+        <service
+            android:name=".notification.FCMMessageHandler"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
@@ -95,5 +100,29 @@
         <!-- App Alarm -->
         <receiver android:name=".notification.AlarmNotificationReceiver" />
 
+        <!-- Widgets -->
+        <receiver
+            android:label="Full Schedule"
+            android:name=".features.widgets.FullScheduleWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/full_schedule_widget_info" />
+        </receiver>
+        <receiver
+            android:label="Day Schedule"
+            android:name=".features.widgets.DayScheduleWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/day_schedule_widget_info" />
+        </receiver>
     </application>
+
 </manifest>

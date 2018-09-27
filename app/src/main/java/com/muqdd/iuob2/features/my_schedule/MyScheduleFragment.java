@@ -2,7 +2,10 @@ package com.muqdd.iuob2.features.my_schedule;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,6 +21,7 @@ import android.widget.TextView;
 
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
+import com.muqdd.iuob2.features.widgets.FullScheduleWidget;
 import com.muqdd.iuob2.models.User;
 import com.muqdd.iuob2.features.main.Menu;
 import com.muqdd.iuob2.models.RestResponse;
@@ -78,7 +82,7 @@ public class MyScheduleFragment extends BaseFragment {
         super.onCreateView(inflater,container,savedInstanceState);
         if (mView == null) {
             // Inflate the layout for this fragment
-            mView = inflater.inflate(R.layout.fragment_time_table, container, false);
+            mView = inflater.inflate(R.layout.fragment_my_schedule, container, false);
             ButterKnife.bind(this, mView);
             initiate();
         }
@@ -135,12 +139,7 @@ public class MyScheduleFragment extends BaseFragment {
         //mainContent.setRefreshing(true);
         mainContent.setColorSchemeResources(
                 R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryLight);
-        mainContent.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                fetchMyScheduleData();
-            }
-        });
+        mainContent.setOnRefreshListener(this::fetchMyScheduleData);
 
         // section time comparator
         Comparator<Timing> comparator = new Comparator<Timing>(){
@@ -221,6 +220,15 @@ public class MyScheduleFragment extends BaseFragment {
         addCoursesForLayout(tLayout,tList);
         addCoursesForLayout(wLayout,wList);
         addCoursesForLayout(hLayout,hList);
+
+        if (getActivity() != null) {
+            Intent intent = new Intent(getActivity(), FullScheduleWidget.class);
+            intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+            int ids[] = AppWidgetManager.getInstance(getActivity().getApplication())
+                    .getAppWidgetIds(new ComponentName(getActivity().getApplication(), FullScheduleWidget.class));
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+            getActivity().sendBroadcast(intent);
+        }
 
         mainContent.setRefreshing(false);
     }
