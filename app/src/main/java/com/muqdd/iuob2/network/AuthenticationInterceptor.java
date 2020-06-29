@@ -1,6 +1,6 @@
 package com.muqdd.iuob2.network;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import java.io.IOException;
 import java.util.Objects;

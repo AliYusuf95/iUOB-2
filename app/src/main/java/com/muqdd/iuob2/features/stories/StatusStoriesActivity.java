@@ -3,7 +3,6 @@ package com.muqdd.iuob2.features.stories;
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -25,6 +24,8 @@ import com.rahuljanagouda.statusstories.glideProgressBar.LoggingListener;
 import com.rahuljanagouda.statusstories.glideProgressBar.ProgressTarget;
 
 import java.util.Locale;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * Created by Ali Yusuf on 12/29/2017.

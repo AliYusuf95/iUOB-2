@@ -6,7 +6,7 @@ package com.muqdd.iuob2.app;
  */
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.muqdd.iuob2.features.account.LoginFragment;
 

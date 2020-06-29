@@ -1,6 +1,6 @@
 package com.muqdd.iuob2.utils;
 
-import android.support.annotation.StringDef;
+import androidx.annotation.StringDef;
 import android.widget.TextView;
 
 import java.lang.annotation.Retention;

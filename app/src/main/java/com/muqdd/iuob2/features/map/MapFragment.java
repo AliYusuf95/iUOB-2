@@ -2,7 +2,7 @@ package com.muqdd.iuob2.features.map;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;

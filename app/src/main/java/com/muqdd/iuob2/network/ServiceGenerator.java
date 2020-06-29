@@ -2,7 +2,7 @@ package com.muqdd.iuob2.network;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

@@ -11,9 +11,10 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatButton;
+
 import android.util.AttributeSet;
-import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;

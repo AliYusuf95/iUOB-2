@@ -1,11 +1,7 @@
 package com.muqdd.iuob2.features.semester_schedule;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
+import androidx.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +25,10 @@ import com.muqdd.iuob2.network.UOBSchedule;
 import java.lang.reflect.Type;
 import java.util.List;
 
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Call;
@@ -117,12 +117,7 @@ public class PrefixesFragment extends BaseFragment {
                 R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryLight);
 
         // refresh request
-        recyclerView.getSwipeToRefresh().setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                getPrefixes();
-            }
-        });
+        recyclerView.getSwipeToRefresh().setOnRefreshListener(this::getPrefixes);
 
         // On item click
         fastAdapter.withOnClickListener(new FastAdapter.OnClickListener<CoursePrefix>() {
@@ -137,14 +132,9 @@ public class PrefixesFragment extends BaseFragment {
 
         // Register to search view listener
         Fragment parent = getParentFragment();
-        if (parent != null && parent instanceof SemestersHolderFragment){
+        if (parent instanceof SemestersHolderFragment){
             ((SemestersHolderFragment) parent)
-                    .addSearchTextListeners(title, new SemestersHolderFragment.SearchTextListener() {
-                        @Override
-                        public void onTextChange(String s) {
-                            fastAdapter.filter(s);
-                        }
-                    });
+                    .addSearchTextListeners(title, s -> fastAdapter.filter(s));
         }
 
         fastAdapter.set(mPrefixesList);
@@ -156,7 +146,7 @@ public class PrefixesFragment extends BaseFragment {
                 .coursesPrefix(year, semester).enqueue(new Callback<RestResponse<List<String>>>() {
             @Override
             public void onResponse(Call<RestResponse<List<String>>> call, final Response<RestResponse<List<String>>> response) {
-                if (response.body().getStatusCode() == 200) {
+                if (response.body() != null && response.body().getStatusCode() == 200) {
                     mPrefixesList = CoursePrefix.createList(response.body().getData(), year, semester);
                     if (mPrefixesList.size() > 0) {
                         fastAdapter.set(mPrefixesList);

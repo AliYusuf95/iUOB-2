@@ -7,9 +7,8 @@
 /captures
 .externalNativeBuild
 /app/google-services.json
-gradle.properties
 app/libs/
-keystore.jks
+/app/keystore.jks
 /screanshots/
 /.idea
 /keystore.properties

@@ -12,11 +12,11 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.renderscript.Allocation;
-import android.renderscript.Element;
-import android.renderscript.RSRuntimeException;
-import android.renderscript.RenderScript;
-import android.renderscript.ScriptIntrinsicBlur;
+import androidx.renderscript.Allocation;
+import androidx.renderscript.Element;
+import androidx.renderscript.RSRuntimeException;
+import androidx.renderscript.RenderScript;
+import androidx.renderscript.ScriptIntrinsicBlur;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
@@ -342,7 +342,7 @@ public class RealtimeBlurView extends View {
 
     static {
         try {
-            RealtimeBlurView.class.getClassLoader().loadClass("android.support.v8.renderscript.RenderScript");
+            RealtimeBlurView.class.getClassLoader().loadClass("androidx.renderscript.RenderScript");
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("RenderScript support not enabled. Add \"android { defaultConfig { renderscriptSupportModeEnabled true }}\" in your build.gradle");
         }

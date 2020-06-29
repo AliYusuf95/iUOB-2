@@ -2,15 +2,10 @@ package com.muqdd.iuob2.features.main;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
@@ -30,13 +25,20 @@ import com.muqdd.iuob2.features.semester_schedule.SemestersHolderFragment;
 import com.muqdd.iuob2.features.stories.StoriesFragment;
 import com.orhanobut.logger.Logger;
 
+import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends BaseActivity {
 
-    protected @BindView(R.id.toolbar) Toolbar toolbar;
-    protected @BindView(R.id.main_content) CoordinatorLayout mainContent;
+    protected @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    protected @BindView(R.id.main_content)
+    CoordinatorLayout mainContent;
 
     private FragmentManager fragmentManager;
     private PrimaryDrawerItem stories;
@@ -192,7 +194,7 @@ public class MainActivity extends BaseActivity {
                     if (User.isFetchingData() && lastSelectedItem != null && drawerItem != lastSelectedItem){
                         drawerMenu.setSelection(lastSelectedItem);
                         drawerMenu.closeDrawer();
-                        Snackbar.make(mainContent,"Please wait fetching data",Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(mainContent,"Please wait fetching data", Snackbar.LENGTH_SHORT).show();
                         Logger.d(drawerItem.getTag());
                         Logger.d(lastSelectedItem.getTag());
                     } else {

@@ -8,9 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v4.widget.SwipeRefreshLayout;
+import androidx.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.features.widgets.FullScheduleWidget;
@@ -35,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -49,7 +49,8 @@ import retrofit2.Response;
 @SuppressWarnings("FieldCanBeLocal")
 public class MyScheduleFragment extends BaseFragment {
 
-    @BindView(R.id.main_content) SwipeRefreshLayout mainContent;
+    @BindView(R.id.main_content)
+    SwipeRefreshLayout mainContent;
     @BindView(R.id.u_layout) LinearLayout uLayout;
     @BindView(R.id.m_layout) LinearLayout mLayout;
     @BindView(R.id.t_layout) LinearLayout tLayout;

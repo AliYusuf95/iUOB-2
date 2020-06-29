@@ -1,7 +1,7 @@
 package com.muqdd.iuob2.views;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.support.design.widget.FloatingActionButton;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.Animation;
@@ -9,6 +9,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.view.animation.ScaleAnimation;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.gordonwong.materialsheetfab.AnimatedFab;
 import com.muqdd.iuob2.R;
 
@@ -47,6 +48,7 @@ public class Fab extends FloatingActionButton implements AnimatedFab {
      * @param translationX translation X value
      * @param translationY translation Y value
      */
+    @SuppressLint("RestrictedApi")
     @Override
     public void show(float translationX, float translationY) {
         // Set FAB's translation
@@ -79,6 +81,7 @@ public class Fab extends FloatingActionButton implements AnimatedFab {
     /**
      * Hides the FAB.
      */
+    @SuppressLint("RestrictedApi")
     @Override
     public void hide() {
         // Only use scale animation if FAB is visible

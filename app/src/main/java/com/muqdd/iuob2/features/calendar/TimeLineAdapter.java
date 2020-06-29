@@ -1,6 +1,6 @@
 package com.muqdd.iuob2.features.calendar;
 
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 

@@ -7,8 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
+import androidx.annotation.NonNull;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
@@ -101,7 +101,7 @@ public class ScheduleDetailsFragment extends BaseFragment {
                 ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("iUOB2", summaryText);
                 clipboard.setPrimaryClip(clip);
-                Snackbar.make(mainContent,"Schedule details copied",Snackbar.LENGTH_LONG).show();
+                Snackbar.make(mainContent,"Schedule details copied", Snackbar.LENGTH_LONG).show();
             default:
                 return super.onOptionsItemSelected(item);
         }

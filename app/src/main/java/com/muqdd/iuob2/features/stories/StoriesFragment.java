@@ -8,13 +8,12 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -29,6 +28,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
+import com.google.android.material.snackbar.Snackbar;
 import com.malinskiy.superrecyclerview.SuperRecyclerView;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
@@ -139,24 +139,25 @@ public class StoriesFragment extends BaseFragment {
         // handle item selection
         switch (item.getItemId()) {
             case R.id.add:
-                getBaseActivity().getLastLocation(location -> {
-                    if (location == null && userLocation == null) {
-                        infoDialog("Sorry","We can't locate your location please open the map to checkout.",
-                                "Cancel"
-                        ).show();
-                        return;
-                    } else if (location != null){
-                        userLocation = location;
-                    }
-                    float sakheerResult, isaTownResult;
-                    sakheerResult = SAKHEER_LOCATION.distanceTo(userLocation);
-                    isaTownResult = ISA_TOWN_LOCATION.distanceTo(userLocation);
-                    if (enableStories || sakheerResult <= SAKHEER_RADIUS || isaTownResult <= ISA_TOWN_RADIUS) {
-                        startActivityForResult(new Intent(getActivity(), CaptureActivity.class), STORY_REQUEST);
-                        return;
-                    }
-                    infoDialog("Error", "You must in Sakheer/Isa Town Campus to post stories", "Close").show();
-                });
+                startActivityForResult(new Intent(getActivity(), CaptureActivity.class), STORY_REQUEST);
+//                getBaseActivity().getLastLocation(location -> {
+//                    if (location == null && userLocation == null) {
+//                        infoDialog("Sorry","We can't locate your location please open the map to checkout.",
+//                                "Cancel"
+//                        ).show();
+//                        return;
+//                    } else if (location != null){
+//                        userLocation = location;
+//                    }
+//                    float sakheerResult, isaTownResult;
+//                    sakheerResult = SAKHEER_LOCATION.distanceTo(userLocation);
+//                    isaTownResult = ISA_TOWN_LOCATION.distanceTo(userLocation);
+//                    if (enableStories || sakheerResult <= SAKHEER_RADIUS || isaTownResult <= ISA_TOWN_RADIUS) {
+//                        startActivityForResult(new Intent(getActivity(), CaptureActivity.class), STORY_REQUEST);
+//                        return;
+//                    }
+//                    infoDialog("Error", "You must in Sakheer/Isa Town Campus to post stories", "Close").show();
+//                });
         }
         return super.onOptionsItemSelected(item);
     }
@@ -231,7 +232,7 @@ public class StoriesFragment extends BaseFragment {
         iuobStoriesImg.setBackground(null);
         iuobStoriesImg.setColorFilter(null);
         iuobStoriesImg.setImageTintList(null);
-        Glide.with(this)
+        Glide.with(getContext())
                 .load(R.drawable.ic_logo)
                 .asBitmap()
                 .placeholder(R.drawable.ic_send_48dp)

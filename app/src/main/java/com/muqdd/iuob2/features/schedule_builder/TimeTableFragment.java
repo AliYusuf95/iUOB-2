@@ -6,9 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
+import androidx.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import androidx.core.content.ContextCompat;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -44,7 +44,8 @@ public class TimeTableFragment extends BaseFragment {
     private final static String SCHEDULE = "SCHEDULE";
     private static final int MENU_DETAILS = Menu.FIRST;
 
-    @BindView(R.id.main_content) SwipeRefreshLayout mainContent;
+    @BindView(R.id.main_content)
+    SwipeRefreshLayout mainContent;
     @BindView(R.id.u_layout) LinearLayout uLayout;
     @BindView(R.id.m_layout) LinearLayout mLayout;
     @BindView(R.id.t_layout) LinearLayout tLayout;

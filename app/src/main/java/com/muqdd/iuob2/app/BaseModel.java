@@ -1,10 +1,10 @@
 package com.muqdd.iuob2.app;
 
-import android.support.v7.widget.RecyclerView;
-
 import com.mikepenz.fastadapter.IClickable;
 import com.mikepenz.fastadapter.IItem;
 import com.mikepenz.fastadapter.items.AbstractItem;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created by Ali Yusuf on 3/24/2017.

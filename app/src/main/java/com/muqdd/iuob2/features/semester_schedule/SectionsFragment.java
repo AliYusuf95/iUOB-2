@@ -4,11 +4,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
+import androidx.annotation.NonNull;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,10 +12,9 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.malinskiy.superrecyclerview.SuperRecyclerView;
-import com.mikepenz.fastadapter.FastAdapter;
-import com.mikepenz.fastadapter.IAdapter;
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
@@ -34,6 +29,8 @@ import com.orhanobut.logger.Logger;
 import java.util.List;
 import java.util.Locale;
 
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Call;
@@ -116,7 +113,7 @@ public class SectionsFragment extends BaseFragment {
             if (clipboard != null) {
                 clipboard.setPrimaryClip(clip);
             }
-            Snackbar.make(mainContent,"Section details copied",Snackbar.LENGTH_LONG).show();
+            Snackbar.make(mainContent,"Section details copied", Snackbar.LENGTH_LONG).show();
             return false;
         });
     }

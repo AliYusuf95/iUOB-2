@@ -1,12 +1,8 @@
 package com.muqdd.iuob2.features.semester_schedule;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v7.widget.SearchView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -14,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import com.google.android.material.tabs.TabLayout;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.features.main.Menu;
@@ -29,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import androidx.appcompat.widget.SearchView;
+import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Call;
@@ -42,7 +41,8 @@ import retrofit2.Response;
 
 public class SemestersHolderFragment extends BaseFragment {
 
-    protected @BindView(R.id.viewPager) ViewPager viewPager;
+    protected @BindView(R.id.viewPager)
+    ViewPager viewPager;
     protected @BindView(R.id.progress_bar) ProgressBar progressBar;
 
     private SemesterPagerAdapter pagerAdapter;

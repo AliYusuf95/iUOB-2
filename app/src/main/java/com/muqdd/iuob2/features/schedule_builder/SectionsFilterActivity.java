@@ -3,12 +3,13 @@ package com.muqdd.iuob2.features.schedule_builder;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+
+import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -36,8 +37,10 @@ public class SectionsFilterActivity extends BaseActivity {
     private final static Type COURSES_LIST_TYPE = new TypeToken<List<BCourse>>() {}.getType();
     private final static Type SECTIONS_LIST_TYPE = new TypeToken<List<BSection>>() {}.getType();
 
-    @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.main_content) CoordinatorLayout mainContent;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.main_content)
+    CoordinatorLayout mainContent;
     @BindView(R.id.recycler_view) SuperRecyclerView recyclerView;
 
     private List<BCourse> mCourseList; // filtered courses data

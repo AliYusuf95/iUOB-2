@@ -1,7 +1,6 @@
 package com.muqdd.iuob2.features.my_schedule;
 
 import android.graphics.Color;
-import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -19,6 +18,7 @@ import com.orhanobut.logger.Logger;
 import java.util.List;
 import java.util.Objects;
 
+import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
