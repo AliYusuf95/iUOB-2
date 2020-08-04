@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.Auth;
 import com.muqdd.iuob2.app.AuthCallBack;

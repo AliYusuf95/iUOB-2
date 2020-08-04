@@ -26,6 +26,7 @@
             tools:text="Days: UTHMW"
             android:textSize="@dimen/row_primary_text"
             android:textColor="@color/colorPrimaryDark"
+            tools:drawableStart="@drawable/ic_science_20db"
             android:textAppearance="?android:textAppearanceListItem" />
 
 

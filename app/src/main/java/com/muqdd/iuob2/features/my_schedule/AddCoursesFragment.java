@@ -243,6 +243,10 @@ public class AddCoursesFragment extends BaseFragment {
                 section = "0"+section;
             }
             MyCourse mCourse = new MyCourse(courseName+courseNumber, section);
+            Bundle bundle = new Bundle();
+            bundle.putString("course_id", mCourse.getCourseId());
+            bundle.putString("section_number", mCourse.getSectionNo());
+            mFirebaseAnalytics.logEvent("add_my_course", bundle);
             // check if section already added
             if (fastAdapter.getAdapterItems().contains(mCourse)){
                 dialog.dismiss();

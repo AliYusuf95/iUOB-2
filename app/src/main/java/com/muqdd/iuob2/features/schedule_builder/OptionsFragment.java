@@ -4,9 +4,12 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
+
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -61,18 +64,28 @@ public class OptionsFragment extends BaseFragment {
 
     private final static String COURSES_LIST = "COURSES_LIST";
     private final static String SEMESTER = "SEMESTER";
-    private final static Type COURSES_LIST_TYPE = new TypeToken<List<BCourse>>() {}.getType();
+    private final static Type COURSES_LIST_TYPE = new TypeToken<List<BCourse>>() {
+    }.getType();
     private static final int SECTIONS_FILTER = 1;
 
-    @BindView(R.id.main_content) LinearLayout mainContent;
-    @BindView(R.id.combinations) TextView combinations;
-    @BindView(R.id.alert) TextView alertText;
-    @BindView(R.id.days) SegmentedGroup daySegment;
-    @BindView(R.id.start) SegmentedGroup startSegment;
-    @BindView(R.id.finish) SegmentedGroup finishSegment;
-    @BindView(R.id.location) SegmentedGroup locationSegment;
-    @BindView(R.id.section_filter) Button btnSectionFilter;
-    @BindView(R.id.section_filter_status) ImageView imgSectionFilter;
+    @BindView(R.id.main_content)
+    LinearLayout mainContent;
+    @BindView(R.id.combinations)
+    TextView combinations;
+    @BindView(R.id.alert)
+    TextView alertText;
+    @BindView(R.id.days)
+    SegmentedGroup daySegment;
+    @BindView(R.id.start)
+    SegmentedGroup startSegment;
+    @BindView(R.id.finish)
+    SegmentedGroup finishSegment;
+    @BindView(R.id.location)
+    SegmentedGroup locationSegment;
+    @BindView(R.id.section_filter)
+    Button btnSectionFilter;
+    @BindView(R.id.section_filter_status)
+    ImageView imgSectionFilter;
 
     private View mView;
     private List<BCourse> allCourseList; // all courses data
@@ -86,6 +99,7 @@ public class OptionsFragment extends BaseFragment {
     private String start;
     private String finish;
     private String location;
+    private Dialog mClashDialog;
 
     public OptionsFragment() {
         // Required empty public constructor
@@ -170,13 +184,8 @@ public class OptionsFragment extends BaseFragment {
     private void checkPrimaryData() {
         if (allCourseList == null && getContext() != null){
             allCourseList = new ArrayList<>();
-            Dialog dialog = infoDialog("Sorry","Some thing goes wrong pleas try again later.", "Cancel");
-            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                @Override
-                public void onDismiss(DialogInterface dialogInterface) {
-                    getActivity().onBackPressed();
-                }
-            });
+            Dialog dialog = infoDialog("Sorry", "Some thing goes wrong pleas try again later.", "Cancel");
+            dialog.setOnDismissListener(dialogInterface -> getActivity().onBackPressed());
             dialog.show();
         }
     }
@@ -287,9 +296,28 @@ public class OptionsFragment extends BaseFragment {
         });
 
         int semester = getArguments().getInt(SEMESTER);
-        int year = Calendar.getInstance().get(Calendar.YEAR);
-        if (2 == semester || 3 == semester)
-            year -= 1;
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH)+1;
+        // Second semester
+        if (month > 3 && month < 7){
+            year -=1;
+            Logger.d("case 1");
+        }
+        // Summer semester
+        else if (month > 6 && month < 9) {
+            if (semester != 1) {
+                year -=1;
+            }
+            Logger.d("case 2");
+        }
+        // First semester (from 9 to 12)
+        else {
+            if (semester == 3) {
+                year -=1;
+            }
+            Logger.d("case 3");
+        }
 
         // disable filter options
         setSegmentGroupEnabled(daySegment, false);
@@ -347,84 +375,93 @@ public class OptionsFragment extends BaseFragment {
                 });
     }
 
-    private void calculateCombinations(){
+    private void calculateCombinations() {
         checkPrimaryData(); // just to make sure and try to avoid crashes
         cCount = 0; // combinations count
         myCourseList.clear(); // clear filtered courses list
-        Dialog dialog = null;
-        for (BCourse course : allCourseList){
-            // check final clash
-            for (BCourse tempCourse : allCourseList) {
-                // check if the courses have sections
-                if (course.getSections() == null || course.getSections().size() < 1 ||
-                        tempCourse.getSections() == null || tempCourse.getSections().size() < 1 )
-                    continue;
-                // check in there is clash in exam day
-                FinalExam examA = course.getSections().get(0).getExam();
-                FinalExam examB = tempCourse.getSections().get(0).getExam();
-                if (!course.equals(tempCourse) && examA != null && examB != null && examA.hasClash(examB)){
-                    if ((dialog == null || !dialog.isShowing()) && getContext() != null) {
-                        dialog = infoDialog("Final exam clash", "There is a clash in the final exam" +
-                                "between "+course.getId()+" and "+tempCourse.getId(), "close");
-                        dialog.show();
-                        break;
+        mClashDialog = null;
+        AsyncTask.execute(() -> {
+            for (BCourse course : allCourseList) {
+                // check final clash
+                for (BCourse tempCourse : allCourseList) {
+                    // check if the courses have sections
+                    if (course.getSections() == null || course.getSections().size() < 1 ||
+                            tempCourse.getSections() == null || tempCourse.getSections().size() < 1)
+                        continue;
+                    // check in there is clash in exam day
+                    FinalExam examA = course.getSections().get(0).getExam();
+                    FinalExam examB = tempCourse.getSections().get(0).getExam();
+                    if (!course.equals(tempCourse) && examA != null && examB != null && examA.hasClash(examB)) {
+                        if ((mClashDialog == null || !mClashDialog.isShowing()) && getContext() != null) {
+                            mClashDialog = infoDialog("Final exam clash", "There is a clash in the final exam" +
+                                    "between " + course.getId() + " and " + tempCourse.getId(), "close");
+                            runOnUi(() -> mClashDialog.show());
+                            break;
+                        }
                     }
                 }
-            }
-            int sCount = 0; // available sections count
-            List<BSection> validSections = new ArrayList<>(); // valid section list
-            for (BSection section : course.getSections()){
-                // check if selection required or not; from [section filter]
-                boolean isValidSection = !sectionFilter || section.isSelected();
-                for (Timing time: section.getTimingLegacy()){
-                    isValidSection = isValidTime(time) && isValidSection;
+                int sCount = 0; // available sections count
+                List<BSection> validSections = new ArrayList<>(); // valid section list
+                for (BSection section : course.getSections()) {
+                    // check if selection required or not; from [section filter]
+                    boolean isValidSection = !sectionFilter || section.isSelected();
+                    for (Timing time : section.getTimingLegacy()) {
+                        isValidSection = isValidTime(time) && isValidSection;
+                    }
+                    // add to section count if the section is valid
+                    sCount += isValidSection ? 1 : 0;
+                    // set section validity
+                    section.withSetSelected(isValidSection);
+                    if (isValidSection) {
+                        // add the section in the list
+                        validSections.add(section);
+                    }
                 }
-                // add to section count if the section is valid
-                sCount += isValidSection ? 1:0;
-                // set section validity
-                section.withSetSelected(isValidSection);
-                if (isValidSection) {
-                    // add the section in the list
-                    validSections.add(section);
+                // no section available for this course; then stop counting
+                if (sCount == 0) {
+                    // reset cCount
+                    cCount = 0;
+                    break;
                 }
-            }
-            // no section available for this course; then stop counting
-            if (sCount == 0) {
-                // reset cCount
-                cCount = 0;
-                break;
-            }
-            // init cCount if needed
-            cCount = cCount == 0 ? 1 : cCount;
+                // init cCount if needed
+                cCount = cCount == 0 ? 1 : cCount;
 
-            BCourse tempCourse = new BCourse(course);
-            tempCourse.setSections(validSections); // set valid sections
-            myCourseList.add(tempCourse); // add course to filtered list
-            // multiply cCount with sCount if available
-            cCount *= sCount > 0 ? sCount : 1;
-        }
-        if (cCount < 1){
-            // clear filtered courses list if combinations count = 0
-            myCourseList.clear();
-            alertText.setVisibility(View.INVISIBLE);
-            if (nextMenuItem != null) {
-                nextMenuItem.setEnabled(false);
+                BCourse tempCourse = new BCourse(course);
+                tempCourse.setSections(validSections); // set valid sections
+                myCourseList.add(tempCourse); // add course to filtered list
+                // multiply cCount with sCount if available
+                cCount *= sCount > 0 ? sCount : 1;
             }
-        } else if (cCount > 20000) {
-            alertText.setVisibility(View.VISIBLE);
-            if (nextMenuItem != null) {
-                nextMenuItem.setEnabled(false);
-            }
-        } else {
-            alertText.setVisibility(View.INVISIBLE);
-            if (nextMenuItem != null) {
-                nextMenuItem.setEnabled(true);
-            }
-        }
-        combinations.setText(String.valueOf(cCount));
+
+            runOnUi(() -> {
+                if (cCount < 1) {
+                    // clear filtered courses list if combinations count = 0
+                    myCourseList.clear();
+                    alertText.setVisibility(View.INVISIBLE);
+                    if (nextMenuItem != null) {
+                        nextMenuItem.setEnabled(false);
+                    }
+                } else if (cCount > 20000) {
+                    alertText.setVisibility(View.VISIBLE);
+                    if (nextMenuItem != null) {
+                        nextMenuItem.setEnabled(false);
+                    }
+                } else {
+                    alertText.setVisibility(View.INVISIBLE);
+                    if (nextMenuItem != null) {
+                        nextMenuItem.setEnabled(true);
+                    }
+                }
+                Bundle bundle = new Bundle();
+                bundle.putLong("combinations_count", cCount);
+                bundle.putLong("curses_count", allCourseList.size());
+                mFirebaseAnalytics.logEvent("schedule_combinations", bundle);
+                combinations.setText(String.valueOf(cCount));
+            });
+        });
     }
 
-    private boolean isValidTime(Timing time){
+    private boolean isValidTime(Timing time) {
         DateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
         boolean isValid = true;
 
@@ -474,7 +511,7 @@ public class OptionsFragment extends BaseFragment {
         availableDays = availableDays.toUpperCase();
         days = days.toUpperCase();
         boolean found = true;
-        for (char c : days.toCharArray()){
+        for (char c : days.toCharArray()) {
             found = availableDays.indexOf(c) > -1 && found;
         }
         return found;
@@ -486,14 +523,14 @@ public class OptionsFragment extends BaseFragment {
             return;
         segmentedGroup.setTintColor(ContextCompat.getColor(getContext(),
                 enabled ? R.color.colorPrimaryDark : R.color.colorPrimaryLight));
-        for(int i = 0; i < segmentedGroup.getChildCount(); i++){
+        for (int i = 0; i < segmentedGroup.getChildCount(); i++) {
             segmentedGroup.getChildAt(i).setEnabled(enabled);
         }
     }
 
     private void removeSectionFilter() {
-        if (sectionFilter && getContext() != null){
-            infoDialog("Reset","[Section Filter] has been reset. Please reselect your options again.","close").show();
+        if (sectionFilter && getContext() != null) {
+            infoDialog("Reset", "[Section Filter] has been reset. Please reselect your options again.", "close").show();
             sectionFilter = false;
             imgSectionFilter.setVisibility(View.INVISIBLE);
         }
@@ -501,26 +538,26 @@ public class OptionsFragment extends BaseFragment {
 
     @OnClick(R.id.probability_info)
     protected void showProbabilityInfo() {
-        if (getContext() == null){
+        if (getContext() == null) {
             return;
         }
-        infoDialog("Info","Number of possible combinations is the sectionNumber of MAXIMUM possible " +
+        infoDialog("Info", "Number of possible combinations is the sectionNumber of MAXIMUM possible " +
                 "combinations for the courses you entered. It should be less than 20000 in order to " +
                 "continue to the next step which will show you the TRUE sectionNumber of combinations. " +
                 "You can minimize the sectionNumber of possible combinations by selecting different " +
-                "options below.","Close")
-        .show();
+                "options below.", "Close")
+                .show();
     }
 
     @OnClick(R.id.filter_info)
     protected void showFilterInfo() {
-        if (getContext() == null){
+        if (getContext() == null) {
             return;
         }
-        infoDialog("Info","Use [Section Filter] for extra options. You can choose what section you" +
+        infoDialog("Info", "Use [Section Filter] for extra options. You can choose what section you" +
                 "want to be included individually. Please use [Section Filter] after selecting the " +
-                "Working Days/Times/Location.","Close")
-        .show();
+                "Working Days/Times/Location.", "Close")
+                .show();
     }
 
     @OnClick(R.id.section_filter)

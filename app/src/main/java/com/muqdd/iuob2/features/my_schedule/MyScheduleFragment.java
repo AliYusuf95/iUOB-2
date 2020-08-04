@@ -254,34 +254,32 @@ public class MyScheduleFragment extends BaseFragment {
         ((TextView)view.findViewById(R.id.time_from)).setText(time.getTimeFrom());
         ((TextView)view.findViewById(R.id.time_to)).setText(time.getTimeTo());
         ((TextView)view.findViewById(R.id.room)).setText(time.getLocation());
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final Dialog dialog = new Dialog(getContext());
+        view.setOnClickListener(view1 -> {
+            Bundle bundle = new Bundle();
+            bundle.putString("course_id", course.getCourseId());
+            bundle.putString("section_number", course.getSectionNo());
+            mFirebaseAnalytics.logEvent("view_my_course", bundle);
+            final Dialog dialog = new Dialog(getBaseActivity());
 
-                // prepare dialog layout
-                LayoutInflater inflater =
-                        (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                final View dialogView = inflater.inflate(R.layout.dialog_course_details, null);
-                ((TextView)dialogView.findViewById((R.id.title))).setText(course.getCourseId());
-                ((TextView)dialogView.findViewById((R.id.section))).setText("Section: "+course.getSectionNo());
-                ((TextView)dialogView.findViewById((R.id.doctor))).setText("Doctor: "+course.getInstructor());
-                if (course.getExam() != null) {
-                    ((TextView) dialogView.findViewById((R.id.final_time))).setText("Final : " + course.getExam().toString());
-                } else {
-                    dialogView.findViewById((R.id.final_time)).setVisibility(View.GONE);
-                }
-                dialogView.findViewById((R.id.close)).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if (dialog.isShowing())
-                            dialog.dismiss();
-                    }
-                });
-                // show dialog
-                dialog.setContentView(dialogView);
-                dialog.show();
+            // prepare dialog layout
+            LayoutInflater inflater =
+                    (LayoutInflater)getBaseActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            final View dialogView = inflater.inflate(R.layout.dialog_course_details, null);
+            ((TextView)dialogView.findViewById((R.id.title))).setText(course.getCourseId());
+            ((TextView)dialogView.findViewById((R.id.section))).setText("Section: "+course.getSectionNo());
+            ((TextView)dialogView.findViewById((R.id.doctor))).setText("Doctor: "+course.getInstructor());
+            if (course.getExam() != null) {
+                ((TextView) dialogView.findViewById((R.id.final_time))).setText("Final : " + course.getExam().toString());
+            } else {
+                dialogView.findViewById((R.id.final_time)).setVisibility(View.GONE);
             }
+            dialogView.findViewById((R.id.close)).setOnClickListener(view11 -> {
+                if (dialog.isShowing())
+                    dialog.dismiss();
+            });
+            // show dialog
+            dialog.setContentView(dialogView);
+            dialog.show();
         });
         return view;
     }

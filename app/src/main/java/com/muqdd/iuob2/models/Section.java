@@ -222,9 +222,13 @@ public class Section extends BaseModel<Section, Section.ViewHolder> {
             line.setBackgroundColor(ContextCompat.getColor(context, R.color.divider));
             // row layout
             View row = LayoutInflater.from(context).inflate(R.layout.row_section_time, null, false);
+            TextView dateView = ((TextView) row.findViewById(R.id.days));
+            dateView.setText(sectionTime.getDay());
+            if (sectionTime.getType() != null &&  sectionTime.getType().toUpperCase().equals("LAB")) {
+                dateView.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_science_20db, 0, 0, 0);
+            }
             ((TextView) row.findViewById(R.id.time)).setText(sectionTime.getDuration());
             ((TextView) row.findViewById(R.id.room)).setText(sectionTime.getLocation());
-            ((TextView) row.findViewById(R.id.days)).setText(sectionTime.getDay());
             // add to the card
             timeRows.addView(line);
             timeRows.addView(row);

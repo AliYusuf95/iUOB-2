@@ -10,6 +10,8 @@ import com.muqdd.iuob2.BuildConfig;
 import com.muqdd.iuob2.app.Auth;
 import com.muqdd.iuob2.models.User;
 
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import okhttp3.logging.HttpLoggingInterceptor.Level;
@@ -31,7 +33,11 @@ public class ServiceGenerator {
             new HttpLoggingInterceptor().setLevel(BuildConfig.DEBUG ? Level.BODY : Level.NONE);
 
     private static OkHttpClient.Builder httpClient =
-            new OkHttpClient.Builder().addInterceptor(logging);
+            new OkHttpClient.Builder()
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .connectTimeout(60, TimeUnit.SECONDS)
+                    .writeTimeout(60, TimeUnit.SECONDS)
+                    .addInterceptor(logging);
 
     public static Gson gson = new GsonBuilder()
             .excludeFieldsWithoutExposeAnnotation()

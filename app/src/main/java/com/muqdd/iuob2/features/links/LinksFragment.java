@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.malinskiy.superrecyclerview.SuperRecyclerView;
 import com.mikepenz.fastadapter.FastAdapter;
 import com.mikepenz.fastadapter.IAdapter;
@@ -97,14 +98,14 @@ public class LinksFragment extends BaseFragment {
         recyclerView.setAdapter(fastAdapter);
 
         // open link on click
-        fastAdapter.withOnClickListener(new FastAdapter.OnClickListener<Link>() {
-            @Override
-            public boolean onClick(View v, IAdapter<Link> adapter, Link item, int position) {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(item.url));
-                startActivity(i);
-                return false;
-            }
+        fastAdapter.withOnClickListener((v, adapter, item, position) -> {
+            Bundle bundle = new Bundle();
+            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, item.title);
+            mFirebaseAnalytics.logEvent("link_item", bundle);
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(item.url));
+            startActivity(i);
+            return false;
         });
         // copy link on hold
         // TODO: need to fix click/long click behavior

@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.muqdd.iuob2.R;
@@ -102,6 +103,7 @@ public class LoginFragment extends BaseFragment {
         if (!TextUtils.isEmailValid(txtEmail, true) || !TextUtils.hasText(txtPassword)) {
             return;
         }
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, new Bundle());
         btnLogin.setEnabled(false);
         Utils.hideKeyboardFrom(getBaseActivity());
         String email = txtEmail.getText().toString().trim();

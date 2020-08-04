@@ -14,6 +14,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.muqdd.iuob2.R;
@@ -184,6 +185,7 @@ public class SignupFragment extends BaseFragment {
                 !TextUtils.hasText(txtSid) || !TextUtils.hasText(txtPassword)) {
             return;
         }
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SIGN_UP, new Bundle());
         String name = txtName.getText().toString().trim();
         String email = txtEmail.getText().toString().trim();
         String password = txtPassword.getText().toString().trim();

@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.muqdd.iuob2.BuildConfig;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseFragment;
@@ -69,32 +70,32 @@ public class AboutFragment extends BaseFragment {
         // initialize variables
         txtTitle.setText(getString(R.string.app_name)+" Version "+ BuildConfig.VERSION_NAME);
         txtGihub.setText(R.string.about_github);
-        txtGihub.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openLink("https://github.com/AliYusuf95/iUOB-2");
-            }
+        txtGihub.setOnClickListener(view -> {
+            Bundle bundle = new Bundle();
+            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Github");
+            mFirebaseAnalytics.logEvent("about_item", bundle);
+            openLink("https://github.com/AliYusuf95/iUOB-2");
         });
         txtEmail.setText(R.string.about_email);
-        txtEmail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sendEmail(getString(R.string.about_email));
-            }
+        txtEmail.setOnClickListener(view -> {
+            Bundle bundle = new Bundle();
+            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Email");
+            mFirebaseAnalytics.logEvent("about_item", bundle);
+            sendEmail(getString(R.string.about_email));
         });
         txtTwitter.setText(R.string.about_twitter);
-        txtTwitter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openTwitterAccount("aliyusuf_95");
-            }
+        txtTwitter.setOnClickListener(view -> {
+            Bundle bundle = new Bundle();
+            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Twitter");
+            mFirebaseAnalytics.logEvent("about_item", bundle);
+            openTwitterAccount("aliyusuf_95");
         });
         txtWebsite.setText(R.string.about_website);
-        txtWebsite.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openLink("http://iuob.net");
-            }
+        txtWebsite.setOnClickListener(view -> {
+            Bundle bundle = new Bundle();
+            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Website");
+            mFirebaseAnalytics.logEvent("about_item", bundle);
+            openLink("http://iuob.net");
         });
     }
 

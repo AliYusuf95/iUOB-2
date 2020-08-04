@@ -5,7 +5,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
@@ -63,6 +67,13 @@ public class MainActivity extends BaseActivity {
 
         // send tracker
         sendAnalyticTracker(R.string.app_name);
+
+
+        MobileAds.initialize(this, initializationStatus -> { });
+        AdView mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
     }
 
     @Override
@@ -231,6 +242,9 @@ public class MainActivity extends BaseActivity {
                                 Logger.w("not handled select");
                                 break;
                         }
+                        Bundle bundle = new Bundle();
+                        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, drawerItem.getTag().toString());
+                        mFirebaseAnalytics.logEvent("app_menu_item", bundle);
                     }
                     return false;
                 })

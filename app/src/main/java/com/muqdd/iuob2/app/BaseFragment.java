@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseActivity.OnBackPressedListener;
 
@@ -31,6 +32,7 @@ public class BaseFragment extends Fragment {
     protected Toolbar toolbar;
     protected TabLayout tabLayout;
     protected AppBarLayout.LayoutParams params;
+    protected FirebaseAnalytics mFirebaseAnalytics;
 
     public BaseFragment() {
         // Required empty public constructor
@@ -70,6 +72,8 @@ public class BaseFragment extends Fragment {
         // remove scroll flags from toolbar
         params.setScrollFlags(0);
         setHasOptionsMenu(false);
+        // Obtain the FirebaseAnalytics instance.
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(getBaseActivity());
         return null;
     }
 

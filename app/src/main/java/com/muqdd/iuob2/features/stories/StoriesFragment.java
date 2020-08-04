@@ -52,6 +52,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -334,7 +335,7 @@ public class StoriesFragment extends BaseFragment {
     }
 
     private void uploadImage(String filePath) {
-        if (filePath.equals("") || userLocation == null) {
+        if (filePath.equals("")) {
             infoDialog("Sorry","Some thing goes wrong pleas try again later.",
                     "Cancel"
             ).show();
@@ -343,13 +344,23 @@ public class StoriesFragment extends BaseFragment {
         File file = new File(filePath);
         User user = Auth.getUserData(getContext());
 
-        RequestBody image = RequestBody.create(MediaType.parse("image/png"), file);
+        MultipartBody.Part image = MultipartBody.Part.createFormData(
+                "image",
+                file.getName(),
+                RequestBody.create(MediaType.parse("image/png"), file)
+        );
         RequestBody createdBy = RequestBody.create(MediaType.parse("text/plain"),
                 user.getId());
         RequestBody type = RequestBody.create(MediaType.parse("text/plain"), "photo");
         RequestBody duration = RequestBody.create(MediaType.parse("text/plain"), "5");
-        RequestBody lat = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(userLocation.getLatitude()));
-        RequestBody lng = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(userLocation.getLongitude()));
+        double _lat = -1;
+        double _lng = -1;
+        if (userLocation != null) {
+            _lat = userLocation.getLatitude();
+            _lng = userLocation.getLongitude();
+        }
+        RequestBody lat = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(_lat));
+        RequestBody lng = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(_lng));
         iuobApi.storyUpload(createdBy, type, duration, lat, lng, image).enqueue(new Callback<ApiResponse>() {
             @Override
             public void onResponse(@NonNull Call<ApiResponse> call, @NonNull Response<ApiResponse> response) {

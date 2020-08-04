@@ -138,21 +138,21 @@ public class SemestersHolderFragment extends BaseFragment {
         if (month > 3 && month < 7){
             getSemesterCourses(0, year-1, 2);
             getSemesterCourses(1, year-1, 3);
-            getSemesterCourses(2, year, 1);
+            getSemesterCourses(2, year-1, 1);
             Logger.d("case 1");
         }
         // Summer semester
         else if (month > 6 && month < 9) {
             getSemesterCourses(0, year-1, 3);
             getSemesterCourses(1, year, 1);
-            getSemesterCourses(2, year, 2);
+            getSemesterCourses(2, year-1, 2);
             Logger.d("case 2");
         }
         // First semester (from 9 to 12)
         else {
             getSemesterCourses(0, year, 1);
             getSemesterCourses(1, year, 2);
-            getSemesterCourses(2, year, 3);
+            getSemesterCourses(2, year-1, 3);
             Logger.d("case 3");
         }
     }

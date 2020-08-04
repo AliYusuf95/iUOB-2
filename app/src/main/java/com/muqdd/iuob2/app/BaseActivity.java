@@ -18,8 +18,6 @@ import android.widget.Toast;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -28,9 +26,11 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.mikepenz.materialdrawer.Drawer;
 import com.muqdd.iuob2.BuildConfig;
+import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.network.ServiceGenerator;
 import com.orhanobut.logger.Logger;
 
@@ -68,6 +68,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                 Toast.makeText(BaseActivity.this, errorMessage, Toast.LENGTH_LONG).show();
         }
     };
+    protected FirebaseAnalytics mFirebaseAnalytics;
 
     @SuppressLint("UseSparseArrays")
     @Override
@@ -88,6 +89,8 @@ public abstract class BaseActivity extends AppCompatActivity {
                 });
         permissionsRequests = new HashMap<>();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        // Obtain the FirebaseAnalytics instance.
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     public void sendAnalyticTracker(@StringRes int screenName) {

@@ -15,10 +15,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.gordonwong.materialsheetfab.MaterialSheetFab;
 import com.muqdd.iuob2.R;
-import com.muqdd.iuob2.app.BaseActivity;
 import com.muqdd.iuob2.app.BaseFragment;
 import com.muqdd.iuob2.features.main.Menu;
 import com.muqdd.iuob2.views.Fab;
@@ -90,11 +91,16 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // handle item selection
+        Bundle bundle = new Bundle();
         switch (item.getItemId()) {
             case R.id.sakheer:
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Sakheer");
+                mFirebaseAnalytics.logEvent("map_location", bundle);
                 moveMapCamera(sakheerLocation, 15);
                 return true;
             case R.id.isa_town:
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Isa Town");
+                mFirebaseAnalytics.logEvent("map_location", bundle);
                 moveMapCamera(isaTownLocation, 16);
                 return true;
             default:
@@ -135,19 +141,18 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
             }
         }
 
+        mMap.setOnMarkerClickListener(marker -> {
+            Bundle bundle = new Bundle();
+            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, marker.getTitle());
+            mFirebaseAnalytics.logEvent("map_marker", bundle);
+            return false;
+        });
+
         // Add pins in background for better performance
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                addLocation();
-                runOnUi(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (Location location: locations){
-                            mMap.addMarker(location.getMarker());
-                        }
-                    }
-                });
+        AsyncTask.execute(() -> {
+            addLocations();
+            for (final Location location: locations) {
+                runOnUi(() -> mMap.addMarker(location.getMarker()));
             }
         });
     }
@@ -181,19 +186,18 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
         // initialize map
         mapFragment = ((SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map));
-        mapFragment.getMapAsync(this);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }
         // Create material sheet FAB
         materialSheetFab = new MaterialSheetFab<>(fab, sheetView, overlay, sheetColor, fabColor);
 
-        setOnBackPressedListener(new BaseActivity.OnBackPressedListener() {
-            @Override
-            public boolean onBack() {
-                if (materialSheetFab.isSheetVisible()) {
-                    materialSheetFab.hideSheet();
-                    return true;
-                }
-                return false;
+        setOnBackPressedListener(() -> {
+            if (materialSheetFab.isSheetVisible()) {
+                materialSheetFab.hideSheet();
+                return true;
             }
+            return false;
         });
     }
 
@@ -201,7 +205,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location,zoom));
     }
 
-    private void addLocation(){
+    private void addLocations(){
         // Add all fucking locations to the list
         locations.add(new Location("S40","IT College","Sakheer","Red","26.047918","50.509989"));
         locations.add(new Location("CS Department","Computer Science","Sakheer","Red","26.047903","50.510153"));
@@ -274,7 +278,7 @@ public class MapFragment extends BaseFragment implements OnMapReadyCallback {
         locations.add(new Location("31","Building 31","Sakheer","Red","26.166811","50.545884"));
     }
 
-    private class Location {
+    private final static class Location {
         String title;
         String description;
         String location;
