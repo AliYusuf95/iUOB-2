@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -19,6 +20,7 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseActivity.OnBackPressedListener;
+import com.orhanobut.logger.Logger;
 
 /**
  * Created by Ali Yusuf on 3/11/2017.
@@ -27,6 +29,7 @@ import com.muqdd.iuob2.app.BaseActivity.OnBackPressedListener;
 @SuppressWarnings("unused")
 public class BaseFragment extends Fragment {
     protected static final String TITLE = "TITLE";
+    private static boolean isAdShowed = true;
 
     protected String title;
     protected Toolbar toolbar;
@@ -50,7 +53,7 @@ public class BaseFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         // check in the parent activity is BaseActivity or not
-        if (!(getActivity() instanceof BaseActivity)){
+        if (!(getActivity() instanceof BaseActivity)) {
             throw new IllegalStateException("Parent activity must be BaseActivity");
         }
     }
@@ -77,21 +80,30 @@ public class BaseFragment extends Fragment {
         return null;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (!isAdShowed && getActivity() != null) {
+            getBaseActivity().showInterstitial();
+            isAdShowed = true;
+        }
+    }
+
     protected final BaseActivity getBaseActivity() {
         return (BaseActivity) getActivity();
     }
 
     @SuppressWarnings("ConstantConditions")
-    protected Dialog infoDialog(String title, String message, String cancel){
+    protected Dialog infoDialog(String title, String message, String cancel) {
         if (getContext() == null) return null;
         final Dialog dialog = new Dialog(getContext());
         // prepare dialog layout
         LayoutInflater inflater =
-                (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View dialogView = inflater.inflate(R.layout.dialog_info, null);
         // set text
-        ((TextView)dialogView.findViewById(R.id.title)).setText(title);
-        ((TextView)dialogView.findViewById(R.id.message)).setText(message);
+        ((TextView) dialogView.findViewById(R.id.title)).setText(title);
+        ((TextView) dialogView.findViewById(R.id.message)).setText(message);
         // init cancel button
         Button cancelBtn = dialogView.findViewById(R.id.cancel);
         cancelBtn.setText(cancel);
@@ -109,21 +121,33 @@ public class BaseFragment extends Fragment {
                 AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS);
     }
 
+    protected final void showAdOnClose() {
+        isAdShowed = false;
+    }
+
     protected final void setOnBackPressedListener(@NonNull OnBackPressedListener listener) {
         getBaseActivity().setOnBackPressedListener(listener);
     }
 
     protected final void replaceFragment(@NonNull final Fragment fragment) {
         // Run in handler to avoid fragment manager transactions error
-        new Handler().post(() -> getBaseActivity().replaceFragment(fragment));
+        new Handler().post(() -> {
+            if (getActivity() != null) {
+                getBaseActivity().replaceFragment(fragment);
+            }
+        });
     }
 
     protected final void displayFragment(@NonNull final Fragment fragment) {
         // Run in handler to avoid fragment manager transactions error
-        new Handler().post(() -> getBaseActivity().displayFragment(fragment));
+        new Handler().post(() -> {
+            if (getActivity() != null) {
+                getBaseActivity().displayFragment(fragment);
+            }
+        });
     }
 
-    protected final void runOnUi(@NonNull Runnable runnable){
+    protected final void runOnUi(@NonNull Runnable runnable) {
         if (getActivity() != null && !getActivity().isFinishing()) {
             getActivity().runOnUiThread(runnable);
         }

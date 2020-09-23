@@ -1,8 +1,10 @@
 package com.muqdd.iuob2.app;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.util.Log;
 
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.google.firebase.FirebaseApp;
@@ -18,13 +20,18 @@ import com.orhanobut.logger.Logger;
 
 public class iUobApplication extends Application {
     private Tracker mTracker;
-
+    @SuppressLint("StaticFieldLeak")
+    @SuppressWarnings("FieldCanBeLocal")
+    private static AppOpenManager appOpenManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         FirebaseApp.initializeApp(this);
+
+        MobileAds.initialize(this, initializationStatus -> {});
+        appOpenManager = new AppOpenManager(this);
 
         if (BuildConfig.DEBUG) {
             Logger.addLogAdapter(new AndroidLogAdapter());

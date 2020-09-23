@@ -80,6 +80,7 @@ public class AddCoursesFragment extends BaseFragment {
             initiate();
         }
         setHasOptionsMenu(true);
+        showAdOnClose();
         return mView;
     }
 
@@ -227,11 +228,11 @@ public class AddCoursesFragment extends BaseFragment {
                 return;
             }
             // course name not in the list
-            if (!Arrays.asList(Constants.coursesNameList).contains(courseName)){
-                dialog.dismiss();
-                Snackbar.make(mainContent,"Wrong course input",Snackbar.LENGTH_SHORT).show();
-                return;
-            }
+//            if (!Arrays.asList(Constants.coursesNameList).contains(courseName)){
+//                dialog.dismiss();
+//                Snackbar.make(mainContent,"Wrong course input",Snackbar.LENGTH_SHORT).show();
+//                return;
+//            }
             // section sectionNumber up to 99
             if (section.length() > 2){
                 dialog.dismiss();

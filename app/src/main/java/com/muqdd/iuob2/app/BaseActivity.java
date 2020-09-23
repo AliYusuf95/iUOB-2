@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -13,8 +14,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -69,6 +77,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     };
     protected FirebaseAnalytics mFirebaseAnalytics;
+    private InterstitialAd interstitialAd;
 
     @SuppressLint("UseSparseArrays")
     @Override
@@ -91,6 +100,31 @@ public abstract class BaseActivity extends AppCompatActivity {
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         // Obtain the FirebaseAnalytics instance.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        // Initialize the Mobile Ads SDK.
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+
+        // Create the InterstitialAd and set the adUnitId.
+        interstitialAd = new InterstitialAd(this);
+        interstitialAd.setAdUnitId(getString(R.string.google_admob_add_course_unit_id));
+        AdRequest adRequest = new AdRequest.Builder().build();
+        interstitialAd.loadAd(adRequest);
+        interstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                interstitialAd.loadAd(new AdRequest.Builder().build());
+            }
+        });
+    }
+
+    final public void showInterstitial() {
+        // Show the ad if it's ready.
+        if (interstitialAd != null && interstitialAd.isLoaded()) {
+            interstitialAd.show();
+        }
     }
 
     public void sendAnalyticTracker(@StringRes int screenName) {
@@ -119,7 +153,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected boolean isPermissionGranted(String permission) {
         return ContextCompat.checkSelfPermission(this, permission) ==
-                PackageManager.PERMISSION_GRANTED ;
+                PackageManager.PERMISSION_GRANTED;
     }
 
     protected void requestPermission(String permission, @Nullable PermissionCallback callBack) {
@@ -180,7 +214,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
-    public interface OnBackPressedListener{
+    public interface OnBackPressedListener {
         /**
          * @return return true to prevent default onBackPressed; false otherwise
          */

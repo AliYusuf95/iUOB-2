@@ -28,7 +28,7 @@ public class Constants {
 //            "Confucius Institute", "Reserved", "Language Centers", "Confucius Institute", "Languages Institute",
 //            "Unit for Teaching Excellence and Leadership"};
 
-    public final static String[] coursesNameList = {"ACC","ACCA","ACCM","AH","ALH","AMST","ARAB","ARABA",
+    public final static String[] coursesNameList = {"ACC","ACA","ACCA","ACCM","AH","ALH","AMST","ARAB","ARABA",
             "ARABM","ARCG","ART","BAA","BIOLS","BIONU","BIS","CEA","CEG","CENG","CGS","CHE","CHEMY",
             "CHENG","CHL","COM","CSA","CSC","DH","ECON","ECONA","ECONM","EDAR","EDEG","EDPS","EDTC",
             "EDU","EEDA","EEG","EENG","ELE","ENG","ENGG","ENGL",/*"ENGL.",*/"ENGLA","ENGLM","ENGLR","ENGLU",
