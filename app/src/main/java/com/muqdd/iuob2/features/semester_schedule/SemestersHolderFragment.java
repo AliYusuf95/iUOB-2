@@ -117,6 +117,17 @@ public class SemestersHolderFragment extends BaseFragment {
         toolbar.setTitle(title);
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mView != null) {
+            ViewGroup parent = (ViewGroup) mView.getParent();
+            if (parent != null) {
+                parent.removeAllViews();
+            }
+        }
+    }
+
     private void initiate() {
         searchTextListeners = new HashMap<>();
         pagerAdapter = new SemesterPagerAdapter(getChildFragmentManager());

@@ -94,6 +94,17 @@ public class CoursesFragment extends BaseFragment {
         toolbar.setTitle(title);
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mView != null) {
+            ViewGroup parent = (ViewGroup) mView.getParent();
+            if (parent != null) {
+                parent.removeAllViews();
+            }
+        }
+    }
+
     private void initiate() {
         // initialize variables
         fastAdapter = new FastItemAdapter<>();
