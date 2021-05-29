@@ -36,12 +36,9 @@ public class iUobApplication extends Application {
         if (BuildConfig.DEBUG) {
             Logger.addLogAdapter(new AndroidLogAdapter());
             // disable Firebase crashes
-            Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-                @Override
-                public void uncaughtException(Thread paramThread, Throwable paramThrowable) {
-                    Log.wtf("Crash", paramThrowable.getMessage(), paramThrowable);
-                    //System.exit(2); //Prevents the service/app from freezing
-                }
+            Thread.setDefaultUncaughtExceptionHandler((paramThread, paramThrowable) -> {
+                Log.wtf("Crash", paramThrowable.getMessage(), paramThrowable);
+                //System.exit(2); //Prevents the service/app from freezing
             });
         }
     }

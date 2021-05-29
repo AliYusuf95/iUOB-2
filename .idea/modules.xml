@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="iUOB/app" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/iUOB.iml" filepath="$PROJECT_DIR$/.idea/iUOB.iml" group="iUOB" />
-      <module fileurl="file://$PROJECT_DIR$/photoeditorsdk/photoeditorsdk.iml" filepath="$PROJECT_DIR$/photoeditorsdk/photoeditorsdk.iml" group="iUOB/photoeditorsdk" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/iUOB.iml" filepath="$PROJECT_DIR$/.idea/iUOB.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/iUOB.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/iUOB.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/photoeditorsdk/iUOB.photoeditorsdk.iml" filepath="$PROJECT_DIR$/.idea/modules/photoeditorsdk/iUOB.photoeditorsdk.iml" />
     </modules>
   </component>
 </project>

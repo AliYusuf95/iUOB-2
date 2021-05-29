@@ -182,20 +182,17 @@ public class ScheduleBuilderFragment extends BaseFragment {
             semester = 1;
         }
 
-        semesterRadio.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
-                switch (i){
-                    case R.id.first:
-                        semester = 1;
-                        break;
-                    case R.id.second:
-                        semester = 2;
-                        break;
-                    case R.id.summer:
-                        semester = 3;
-                        break;
-                }
+        semesterRadio.setOnCheckedChangeListener((radioGroup, i) -> {
+            switch (i){
+                case R.id.first:
+                    semester = 1;
+                    break;
+                case R.id.second:
+                    semester = 2;
+                    break;
+                case R.id.summer:
+                    semester = 3;
+                    break;
             }
         });
 
@@ -213,7 +210,7 @@ public class ScheduleBuilderFragment extends BaseFragment {
                 if (!m.find()) {return false;}
                 String courseName = m.group(1);
                 Logger.d(courseName);
-                return Arrays.binarySearch(Constants.coursesNameList, courseName) > 0;
+                return Arrays.asList(Constants.coursesNameList).contains(courseName);
             }
 
             @Override

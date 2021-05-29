@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 import androidx.lifecycle.ProcessLifecycleOwner;
@@ -16,6 +17,7 @@ import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.appopen.AppOpenAd;
 import com.muqdd.iuob2.R;
+import com.orhanobut.logger.Logger;
 
 import java.util.Date;
 
@@ -58,7 +60,8 @@ public class AppOpenManager implements LifecycleObserver, Application.ActivityLi
              * @param ad the loaded app open ad.
              */
             @Override
-            public void onAppOpenAdLoaded(AppOpenAd ad) {
+            public void onAdLoaded(@NonNull AppOpenAd ad) {
+                Logger.d("onAdLoaded");
                 appOpenAd = ad;
                 loadTime = (new Date()).getTime();
             }
@@ -69,7 +72,7 @@ public class AppOpenManager implements LifecycleObserver, Application.ActivityLi
              * @param loadAdError the error.
              */
             @Override
-            public void onAppOpenAdFailedToLoad(LoadAdError loadAdError) {
+            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                 // Handle the error.
             }
 
@@ -106,7 +109,8 @@ public class AppOpenManager implements LifecycleObserver, Application.ActivityLi
                         }
                     };
 
-            appOpenAd.show(currentActivity, fullScreenContentCallback);
+            appOpenAd.setFullScreenContentCallback(fullScreenContentCallback);
+            appOpenAd.show(currentActivity);
 
         } else {
             fetchAd();

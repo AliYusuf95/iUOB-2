@@ -8,11 +8,10 @@
 .externalNativeBuild
 /app/google-services.json
 app/libs/
-/app/keystore.jks
 /screanshots/
 /.idea
 /keystore.properties
-/pepk.jar
-/private_key.pky
-/upload_certificate.pemcryp
+*.pepk
+*.jks
+*.pem
 src/main/java/com/muqdd/iuob2/network/IUOBApi.java

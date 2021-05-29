@@ -16,17 +16,16 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.muqdd.iuob2.R;
 import com.muqdd.iuob2.app.BaseActivity;
-import com.muqdd.iuob2.features.account.LoginFragment;
-import com.muqdd.iuob2.models.User;
 import com.muqdd.iuob2.features.about.AboutFragment;
 import com.muqdd.iuob2.features.account.AccountFragment;
+import com.muqdd.iuob2.features.account.LoginFragment;
 import com.muqdd.iuob2.features.calendar.CalendarSemestersFragment;
 import com.muqdd.iuob2.features.links.LinksFragment;
 import com.muqdd.iuob2.features.map.MapFragment;
 import com.muqdd.iuob2.features.my_schedule.MyScheduleFragment;
 import com.muqdd.iuob2.features.schedule_builder.ScheduleBuilderFragment;
 import com.muqdd.iuob2.features.semester_schedule.SemestersHolderFragment;
-import com.muqdd.iuob2.features.stories.StoriesFragment;
+import com.muqdd.iuob2.models.User;
 import com.orhanobut.logger.Logger;
 
 import androidx.appcompat.widget.Toolbar;
@@ -69,11 +68,11 @@ public class MainActivity extends BaseActivity {
         sendAnalyticTracker(R.string.app_name);
 
 
-        MobileAds.initialize(this, initializationStatus -> { });
-        AdView mAdView = findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
-
+        MobileAds.initialize(this, initializationStatus -> {
+            AdView mAdView = findViewById(R.id.adView);
+            AdRequest adRequest = new AdRequest.Builder().build();
+            mAdView.loadAd(adRequest);
+        });
     }
 
     @Override
@@ -121,13 +120,13 @@ public class MainActivity extends BaseActivity {
 
     private void initDrawerMenu(Bundle savedInstanceState) {
 
-        stories = new PrimaryDrawerItem()
-                .withTag(Menu.STORIES)
-                .withName(Menu.STORIES.toString())
-                .withIcon(R.drawable.ic_send_24dp)
-                .withIconColorRes(R.color.colorPrimaryDark)
-                .withIconTintingEnabled(true)
-                .withSelectedTextColorRes(R.color.colorPrimaryDark);
+//        stories = new PrimaryDrawerItem()
+//                .withTag(Menu.STORIES)
+//                .withName(Menu.STORIES.toString())
+//                .withIcon(R.drawable.ic_send_24dp)
+//                .withIconColorRes(R.color.colorPrimaryDark)
+//                .withIconTintingEnabled(true)
+//                .withSelectedTextColorRes(R.color.colorPrimaryDark);
 
         semesterSchedule = new PrimaryDrawerItem()
                 .withTag(Menu.SEMESTER_SCHEDULE)
@@ -135,11 +134,11 @@ public class MainActivity extends BaseActivity {
                 .withIcon(R.drawable.semester)
                 .withSelectedTextColorRes(R.color.colorPrimaryDark);
 
-        calendarSchedule = new PrimaryDrawerItem()
-                .withTag(Menu.CALENDAR)
-                .withName(Menu.CALENDAR.toString())
-                .withIcon(R.drawable.calendar)
-                .withSelectedTextColorRes(R.color.colorPrimaryDark);
+//        calendarSchedule = new PrimaryDrawerItem()
+//                .withTag(Menu.CALENDAR)
+//                .withName(Menu.CALENDAR.toString())
+//                .withIcon(R.drawable.calendar)
+//                .withSelectedTextColorRes(R.color.colorPrimaryDark);
 
         mySchedule = new PrimaryDrawerItem()
                 .withTag(Menu.MY_SCHEDULE)
@@ -188,7 +187,7 @@ public class MainActivity extends BaseActivity {
                 .withActionBarDrawerToggleAnimated(true) // to animate hamburger icon
                 .withTranslucentStatusBar(false) // for embedded drawer
                 .addDrawerItems(
-                        stories,
+                        // stories,
                         semesterSchedule,
                         // calendarSchedule,
                         //new DividerDrawerItem(), // just test divider
@@ -211,9 +210,9 @@ public class MainActivity extends BaseActivity {
                     } else {
                         lastSelectedItem = drawerItem;
                         switch ((Menu) drawerItem.getTag()) {
-                            case STORIES:
-                                replaceFragment(StoriesFragment.newInstance());
-                                break;
+//                            case STORIES:
+//                                replaceFragment(StoriesFragment.newInstance());
+//                                break;
                             case SEMESTER_SCHEDULE:
                                 replaceFragment(SemestersHolderFragment.newInstance());
                                 break;
@@ -300,10 +299,10 @@ public class MainActivity extends BaseActivity {
      */
     private void setDrawerMenuSelection(Fragment mFragment, boolean fireOnClick){
         if(mFragment != null && drawerMenu != null){
-            if (mFragment instanceof StoriesFragment){
-                drawerMenu.setSelection(stories, fireOnClick);
-            }
-            else if (mFragment instanceof SemestersHolderFragment){
+//            if (mFragment instanceof StoriesFragment){
+//                drawerMenu.setSelection(stories, fireOnClick);
+//            }
+            if (mFragment instanceof SemestersHolderFragment){
                 drawerMenu.setSelection(semesterSchedule, fireOnClick);
             }
 //            if (mFragment instanceof CalendarSemestersFragment){

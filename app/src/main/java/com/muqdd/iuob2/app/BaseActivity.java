@@ -6,23 +6,13 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.StringRes;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -35,7 +25,7 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.mikepenz.materialdrawer.Drawer;
 import com.muqdd.iuob2.BuildConfig;
 import com.muqdd.iuob2.R;
@@ -44,6 +34,14 @@ import com.orhanobut.logger.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
 /**
  * Created by Ali Yusuf on 3/10/2017.
@@ -77,7 +75,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     };
     protected FirebaseAnalytics mFirebaseAnalytics;
-    private InterstitialAd interstitialAd;
+    private InterstitialAd mInterstitialAd;
 
     @SuppressLint("UseSparseArrays")
     @Override
@@ -85,45 +83,44 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         ServiceGenerator.init(this);
         // register FCM token
-        FirebaseInstanceId.getInstance().getInstanceId()
-                .addOnCompleteListener(task -> {
-                    if (!task.isSuccessful() || task.getResult() == null) {
-                        Logger.e("getInstanceId failed", task.getException());
-                        return;
-                    }
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
+            if (!task.isSuccessful() || task.getResult() == null) {
+                Logger.e("getInstanceId failed", task.getException());
+                return;
+            }
 
-                    // Get new Instance ID token
-                    String token = task.getResult().getToken();
-                    Logger.d("FCM Registration Token: " + token);
-                });
+            // Get new FCM registration token
+            String token = task.getResult();
+            Logger.d("FCM Registration Token: " + token);
+        });
         permissionsRequests = new HashMap<>();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         // Obtain the FirebaseAnalytics instance.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         // Initialize the Mobile Ads SDK.
-        MobileAds.initialize(this, new OnInitializationCompleteListener() {
-            @Override
-            public void onInitializationComplete(InitializationStatus initializationStatus) {
-            }
-        });
+        MobileAds.initialize(this, initializationStatus -> {
+            // Create the InterstitialAd and set the adUnitId.
+            AdRequest adRequest = new AdRequest.Builder().build();
+            InterstitialAd.load(this, getString(R.string.google_admob_add_course_unit_id), adRequest, new InterstitialAdLoadCallback() {
+                @Override
+                public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                    // The mInterstitialAd reference will be null until
+                    // an ad is loaded.
+                    mInterstitialAd = interstitialAd;
+                }
 
-        // Create the InterstitialAd and set the adUnitId.
-        interstitialAd = new InterstitialAd(this);
-        interstitialAd.setAdUnitId(getString(R.string.google_admob_add_course_unit_id));
-        AdRequest adRequest = new AdRequest.Builder().build();
-        interstitialAd.loadAd(adRequest);
-        interstitialAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdClosed() {
-                interstitialAd.loadAd(new AdRequest.Builder().build());
-            }
+                @Override
+                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                    mInterstitialAd = null;
+                }
+            });
         });
     }
 
     final public void showInterstitial() {
         // Show the ad if it's ready.
-        if (interstitialAd != null && interstitialAd.isLoaded()) {
-            interstitialAd.show();
+        if (mInterstitialAd != null) {
+            mInterstitialAd.show(BaseActivity.this);
         }
     }
 
@@ -226,12 +223,14 @@ public abstract class BaseActivity extends AppCompatActivity {
      *
      * @param fragment Fragment instance
      */
-    public void replaceFragment(Fragment fragment){}
+    public void replaceFragment(Fragment fragment) {
+    }
 
     /**
      * Display fragment and add the old one to the back stack
      *
      * @param fragment Fragment instance
      */
-    public void displayFragment(Fragment fragment){}
+    public void displayFragment(Fragment fragment) {
+    }
 }
